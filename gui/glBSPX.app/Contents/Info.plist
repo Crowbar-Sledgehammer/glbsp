@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>glBSPX</string>
 	<key>CFBundleIconFile</key>
-	<string>Icon</string>
+	<string>glbspx.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>gnu.glbspx</string>
 	<key>CFBundleName</key>
