@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted.  28th April 2001.
+by Andrew Apted.  8th June 2001.
 
 
 Introduction
@@ -15,23 +15,23 @@ file that makes it very easy (and fast !) for an OpenGL DOOM engine to
 compute the polygons needed for drawing the levels.
 
 There are many DOOM ports that understand the GL Nodes which glBSP
-creates, including: EDGE, the Doomsday engine (JDOOM), and Doom3D.
-See the links below.
+creates, including: EDGE, the Doomsday engine (JDOOM), Doom3D, PrBoom,
+and Vavoom.  See the links below.
 
 
 Status
 ------
 
-The current version of glBSP is 1.93.  It has been tested and known to
+The current version of glBSP is 1.94.  It has been tested and known to
 work on numerous large wads, including DOOM I shareware, DOOM II,
-TeamTNT's Eternal III, and beta versions of Fanatic's QDOOM.
+TeamTNT's Eternal III, Fanatic's QDOOM, and many others.
 
 NOTE: Version 1.91 introduced support for "V2 GL Nodes".  This allows
       the BSP information to be stored with greater precision,
       preventing problems like "slime trails".  It may take a while
       before all DOOM ports that understand GL Nodes are updated to
       read the new format.  Until they do, use the -v1 option to
-      generate the old format.
+      generate the old format (e.g. EDGE 1.24 needs this).
 
 
 Copyright
@@ -66,15 +66,10 @@ General Public License for more details.
 Contact
 -------
 
-Questions, bug reports, suggestsions, etc... about glBSP should be
-directed to the glBSP public forum which can be found here:
+Questions, bug reports, suggestions, etc... about glBSP should be
+sent to the following email address:
 
-   http://sourceforge.net/forum/?group_id=10592
-
-Alternatively you could join the glbsp-public mailing list.  Details
-about doing this can be found here:
-
-   http://sourceforge.net/mail/?group_id=10592
+   glbsp-public@lists.sourceforge.net   
 
 
 Links
@@ -95,11 +90,17 @@ The JDOOM homepage is here:
 The Doom3D site can be found here:
    http://www.redrival.com/fudgefactor/doom3d.html
 
+Look here for PrBOOM:
+   http://prboom.sourceforge.net/
+
+The Vavoom site is here:
+   http://www.raven-games.com/vavoom
+
 
 Acknowledgements
 ----------------
 
-Andy Baker, for making binaries and stuff.
+Andy Baker, for making binaries, writing code and other help.
 
 Marc A. Pullen, for testing and helping with the documentation.
 
@@ -125,4 +126,8 @@ id Software, for not only creating such an irresistable game, but
 releasing the source code for so much of their stuff.
 
 ... and everyone else who deserves it ! 
+
+
+
+---------------------------------------------------------------------------
 

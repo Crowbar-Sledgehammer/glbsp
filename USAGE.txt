@@ -1,9 +1,16 @@
 
-Using glBSP
+USING glBSP
 ===========
 
-by Andrew Apted.  28th April 2001.
+by Andrew Apted.  8th June 2001.
 
+
+Running glBSP
+-------------
+
+glBSP is a command line tool.  Under Windows this means it must be run
+from the DOS box.  (Later on I hope to have a fully-featured GUI
+version, but it's gonna take a lot more work).
 
 There are two main ways of using glBSP:
 
@@ -134,11 +141,11 @@ The following options are recognised:
                trees.  See the section below for more info.  The
                default value (5) is known to be a good compromise.
 
-  -noreject    Normally glBSP will create an empty REJECT map for
+  -noreject    Normally glBSP will create an simple REJECT map for
                each level.  This options prevents any existing
                REJECT map from being clobbered.
 
-  -noprog      Does not show the twirling progress indicator.
+  -noprog      Does not show the progress indicator.
 
   -warn        Shows extra warning messages, which detail various
                non-serious problems that glBSP has while analysing the

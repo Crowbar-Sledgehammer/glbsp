@@ -2,6 +2,10 @@
 TODO
 ====
 
+*  update GLNODE info with GWA-timestamp issue.
+
++  proper INSTALL for UNIX.
+
 +  improve file errors in wad.c, return GLBSP_E_{Read,Write}Error.
 
 -  implement a Unix/GTK+ version.
