@@ -2,7 +2,7 @@
 // LOCAL : Unix/FLTK local definitions
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -101,6 +101,9 @@ typedef struct guix_preferences_s
 
   // warn about input file == output file
   boolean_g same_file_warn;
+
+  // filename for saving the log
+  const char *save_log_file;
 }
 guix_preferences_t;
 
@@ -269,6 +272,9 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
     const char *message, const char *right = "OK", 
     const char *middle = NULL, const char *left = NULL);
 
+int DialogQueryFilename(const char *title, const char *message,
+    const char ** name_ptr, const char *guess_name);
+
 void GUI_FatalError(const char *str, ...);
 
 
@@ -351,6 +357,9 @@ public:
   // locking routine (see Guix_MainWin)
   void LockOut(boolean_g lock_it);
 };
+
+#define ALERT_TXT  "glBSP Alert"
+#define MISSING_COMMS  "(Not Specified)"
 
 
 //
@@ -582,8 +591,8 @@ public:
   // routine to clear the text box
   void ClearLog();
 
-  // routine to save the log to a file.  Returns TRUE if successful or
-  // FALSE if an error occurred.
+  // routine to save the log to a file.  Will overwrite the file if
+  // already exists.  Returns TRUE if successful or FALSE on error.
   //
   boolean_g SaveLog(const char *filename);
 

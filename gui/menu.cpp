@@ -2,7 +2,7 @@
 // MENU : Unix/FLTK Menu handling
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -58,7 +58,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-  "By Andrew Apted (C) 2000-2001\n"
+  "By Andrew Apted (C) 2000-2002\n"
   "\n"
   "Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
   "\n"
@@ -100,7 +100,7 @@ static void menu_do_about(Fl_Widget *w, void * data)
 
 
   // nice big logo text
-  box = new Fl_Box(240, 5, 350, 50, "glbspX  " GLBSP_VER);
+  box = new Fl_Box(240, 5, 350, 50, "glBSPX  " GLBSP_VER);
   box->labelsize(24);
   ab_win->add(box);
 
@@ -178,6 +178,107 @@ static void menu_do_license(Fl_Widget *w, void * data)
 
 //------------------------------------------------------------------------
 
+static void menu_do_save_log(Fl_Widget *w, void * data)
+{
+  char guess_name[512];
+    
+  // compute the "guess" filename
+  
+  if (! guix_info.output_file ||
+      ! HelperFilenameValid(guix_info.output_file) ||
+      strlen(guix_info.output_file) > 500)
+  {
+    strcpy(guess_name, "glbsp.log");
+  }
+  else
+  {
+    strcpy(guess_name, HelperReplaceExt(guix_info.output_file, "log"));
+  }
+
+  int choice;
+  char buffer[1024];
+
+  for (;;)
+  {
+    choice = DialogQueryFilename("glBSP Query (Save Log)",
+        "Please select the file to save the log into:",
+        & guix_prefs.save_log_file, guess_name);
+
+    if (choice != 0)
+      return;
+
+    if (! HelperFilenameValid(guix_prefs.save_log_file))
+    {
+      sprintf(buffer,
+          "Invalid Log filename:\n"
+          "\n"
+          "      %s\n"
+          "\n"
+          "Please check the filename and try again.",
+          guix_prefs.save_log_file);
+
+      DialogShowAndGetChoice(ALERT_TXT, skull_image, buffer);
+      continue;
+    }
+
+    // check for missing extension
+
+    if (! HelperHasExt(guix_prefs.save_log_file))
+    {
+      sprintf(buffer,
+          "The Log file you selected has no extension.\n"
+          "\n"
+          "Do you want to add \".LOG\" and continue ?");
+
+      choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
+          buffer, "OK", "Re-Select", "Cancel");
+
+      if (choice < 0 || choice == 2)
+        return;
+
+      if (choice == 1)
+        continue;
+
+      // choice == 0
+      {
+        char *new_log = HelperReplaceExt(guix_prefs.save_log_file, "log");
+
+        GlbspFree(guix_prefs.save_log_file);
+        guix_prefs.save_log_file = GlbspStrDup(new_log);
+      }
+    }
+
+    // check if file already exists...
+    
+    if (guix_prefs.overwrite_warn && 
+        HelperFileExists(guix_prefs.save_log_file))
+    {
+      sprintf(buffer,
+          "Warning: the chosen Log file already exists:\n"
+          "\n"
+          "      %s\n"
+          "\n"
+          "Do you want to overwrite it ?",
+          guix_prefs.save_log_file);
+
+      choice = DialogShowAndGetChoice("glBSP Alert", skull_image,
+          buffer, "OK", "Re-Select", "Cancel");
+
+      if (choice < 0 || choice == 2)
+        return;
+
+      if (choice == 1)
+        continue;
+    }
+
+    guix_win->text_box->SaveLog(guix_prefs.save_log_file);
+    return;
+  }
+}
+
+
+//------------------------------------------------------------------------
+
 #undef FCAL
 #define FCAL  (Fl_Callback *)
 
@@ -185,8 +286,8 @@ static Fl_Menu_Item menu_items[] =
 {
   { "&File", 0, 0, 0, FL_SUBMENU },
     { "&Preferences...",    0, FCAL menu_do_prefs },
+    { "&Save Log...",       0, FCAL menu_do_save_log },
     { "&Clear Log",         0, FCAL menu_do_clear_log, 0, FL_MENU_DIVIDER },
-/// { "&Save Log...",       0, FCAL menu_do_save_log, 0, FL_MENU_DIVIDER },
     { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },
     { 0 },
 

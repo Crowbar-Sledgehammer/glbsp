@@ -2,7 +2,7 @@
 // DIALOG : Unix/FLTK Pop-up dialogs
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -32,6 +32,7 @@ static unsigned char *about_image_rgb;
 static Fl_Window *cur_diag;
 static int cur_diag_result;
 static boolean_g cur_diag_done;
+static const char *cur_diag_guess_name;
 
 
 static void UncompressAboutImage(unsigned char *& rgb)
@@ -83,7 +84,7 @@ void DialogLoadImages(void)
 
   UncompressAboutImage(about_image_rgb);
   
-  about_image = new Fl_Image(about_image_rgb, 
+  about_image = new Fl_RGB_Image(about_image_rgb, 
       ABOUT_IMG_W, ABOUT_IMG_H, 3, (ABOUT_IMG_W * 3));
 }
 
@@ -125,6 +126,59 @@ static void dialog_left_button_CB(Fl_Widget *w, void *data)
 {
   cur_diag_result = 2;
   cur_diag_done = TRUE;
+}
+
+static void dialog_file_browse_CB(Fl_Widget *w, void *data)
+{
+  Fl_Input *inp_box = (Fl_Input *) data;
+  const char *new_name; 
+  
+  new_name = fl_file_chooser("Select the log file", "*.log",
+      inp_box->value());
+
+  // cancelled ?
+  if (! new_name)
+    return;
+
+  inp_box->value(new_name);
+}
+
+static void dialog_file_guess_CB(Fl_Widget *w, void *data)
+{
+  Fl_Input *inp_box = (Fl_Input *) data;
+
+  if (cur_diag_guess_name)
+  {
+    inp_box->value(cur_diag_guess_name);
+  }
+  
+}
+
+
+//------------------------------------------------------------------------
+
+static void DialogRun()
+{
+  cur_diag->set_modal();
+  cur_diag->show();
+
+  // read initial pos (same logic as in Guix_MainWin)
+  WindowSmallDelay();
+  int init_x = cur_diag->x(); 
+  int init_y = cur_diag->y();
+
+  // run the GUI and let user make their choice
+  while (! cur_diag_done)
+  {
+    Fl::wait();
+  }
+
+  // check if the user moved/resized the window
+  if (cur_diag->x() != init_x || cur_diag->y() != init_y)
+  {
+    guix_prefs.dialog_x = cur_diag->x();
+    guix_prefs.dialog_y = cur_diag->y();
+  }
 }
 
 
@@ -219,23 +273,118 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
   }
 
   // show time !
-  cur_diag->set_modal();
-  cur_diag->show();
+  DialogRun();
+ 
+  // delete window (automatically deletes child widgets)
+  delete cur_diag;
+  cur_diag = NULL;
 
-  // read initial pos (same logic as in Guix_MainWin)
-  WindowSmallDelay();
-  int init_x = cur_diag->x(); 
-  int init_y = cur_diag->y();
+  return cur_diag_result;
+}
 
-  // run the GUI and let user make their choice
-  while (! cur_diag_done)
-    Fl::wait();
 
-  // check if the user moved/resized the window
-  if (cur_diag->x() != init_x || cur_diag->y() != init_y)
+//
+// DialogQueryFilename
+// 
+// Shows the current filename (name_ptr) in an input box, and provides
+// a browse button to choose a new filename, and an optional button to
+// guess the new filename (if `guess_name' is NULL, then the button is
+// disabled).
+//
+// This routine does NOT ensure that the filename is valid (or any
+// other requirement, e.g. has a certain extension).
+// 
+// Returns 0 if "OK" was pressed, 1 if "Cancel" was pressed, or -1 if
+// escape was pressed or the window was manually closed.
+// 
+int DialogQueryFilename(const char *title, const char *message,
+        const char ** name_ptr, const char *guess_name)
+{
+  cur_diag_result = -1;
+  cur_diag_done = FALSE;
+  cur_diag_guess_name = guess_name;
+
+  // determine required size
+  int width = 400;
+  int height;
+
+  // set current font for fl_measure()
+  fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
+
+  fl_measure(message, width, height);
+
+  if (width < 400)
+    width = 400;
+
+  if (height < 16)
+    height = 16;
+ 
+  width  += 60 + 20 + 16;  // 16 extra, just in case
+  height += 60 + 40 + 16;  // 
+
+  // create window
+  cur_diag = new Fl_Window(0, 0, width, height, title);
+  cur_diag->end();
+  cur_diag->size_range(width, height, width, height);
+  cur_diag->callback((Fl_Callback *) dialog_closed_CB);
+  
+  cur_diag->position(guix_prefs.dialog_x, guix_prefs.dialog_y);
+
+  // set the resizable
+  Fl_Box *box = new Fl_Box(0, height-1, width, 1);
+  cur_diag->add(box);
+  cur_diag->resizable(box); 
+
+  // create the message area
+  box = new Fl_Box(14, 10, width-20 - 20, height-10 - 100, message);
+  box->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+  cur_diag->add(box);
+  
+  // create buttons
+  
+  Fl_Button *b_ok;
+  Fl_Button *b_cancel;
+  
+  b_ok = new Fl_Return_Button(width - 120*1, height-40, 104, 30, "OK");
+  b_ok->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
+  b_ok->callback((Fl_Callback *) dialog_right_button_CB);
+  cur_diag->add(b_ok);
+
+  b_cancel = new Fl_Button(width - 120*2, height-40, 104, 30, "Cancel");
+  b_cancel->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
+  b_cancel->callback((Fl_Callback *) dialog_middle_button_CB);
+  cur_diag->add(b_cancel);
+
+  // create input box
+  Fl_Input *inp_box;
+  
+  inp_box = new Fl_Input(20, height-90, width - 230, 26);
+  inp_box->value(*name_ptr);
+  cur_diag->add(inp_box);
+ 
+  // create the browse and guess button
+  Fl_Button *b_browse;
+  Fl_Button *b_guess;
+
+  b_guess = new Fl_Button(width - 120, inp_box->y(), 70, 26, "Guess");
+  b_guess->align(FL_ALIGN_INSIDE);
+  b_guess->callback((Fl_Callback *) dialog_file_guess_CB, inp_box);
+  cur_diag->add(b_guess);
+
+  b_browse = new Fl_Button(width - 205, inp_box->y(), 80, 
+      b_guess->h(), "Browse");
+  b_browse->align(FL_ALIGN_INSIDE);
+  b_browse->callback((Fl_Callback *) dialog_file_browse_CB, inp_box);
+  cur_diag->add(b_browse);
+
+  // show time !
+  DialogRun();
+
+  if (cur_diag_result == 0)
   {
-    guix_prefs.dialog_x = cur_diag->x();
-    guix_prefs.dialog_y = cur_diag->y();
+    GlbspFree(*name_ptr);
+
+    *name_ptr = GlbspStrDup(inp_box->value());
   }
  
   // delete window (automatically deletes child widgets)
@@ -265,7 +414,7 @@ void GUI_FatalError(const char *str, ...)
   if (buffer[0] == 0 || buffer[strlen(buffer)-1] != '\n')
     strcat(buffer, "\n");
 
-  strcat(buffer, "\nglbspX will now shut down.");
+  strcat(buffer, "\nglBSPX will now shut down.");
     
   DialogShowAndGetChoice("glBSP Fatal Error", pldie_image, buffer);
 

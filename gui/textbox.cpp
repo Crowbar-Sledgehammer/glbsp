@@ -2,7 +2,7 @@
 // TEXTBOX : Unix/FLTK Text messages
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -121,9 +121,56 @@ void Guix_TextBox::ClearLog()
 
 boolean_g Guix_TextBox::SaveLog(const char *filename)
 {
-  // FIXME: implement SaveLog
+  FILE *fp = fopen(filename, "w");
 
-  return FALSE;
+  if (! fp)
+    return FALSE;
+
+  for (int y=1; y <= size(); y++)
+  {
+    const char *L_txt = text(y);
+
+    if (! L_txt)
+    {
+      fprintf(fp, "\n");
+      continue;
+    }
+    
+    if (L_txt[0] == '@' && L_txt[1] == '-')
+    {
+      fprintf(fp, "--------------------------------");
+      fprintf(fp, "--------------------------------\n");
+      continue;
+    }
+
+    // remove any `@' formatting info
+
+    while (*L_txt == '@')
+    {
+      L_txt++;
+      
+      if (*L_txt == 0)
+        break;
+
+      char fmt_ch = *L_txt++;
+
+      if (fmt_ch == '.')
+        break;
+
+      // uppercase formatting chars (e.g. @C) have an int argument
+      if (isupper(fmt_ch))
+      {
+        while (isdigit(*L_txt))
+          L_txt++;
+      }
+    }
+
+    fprintf(fp, "%s\n", L_txt);
+  }
+  
+  fclose(fp);
+
+  return TRUE;
 }
 
 
