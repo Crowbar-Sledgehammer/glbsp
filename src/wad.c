@@ -1262,6 +1262,9 @@ glbsp_ret_e WriteWadFile(const char *filename)
   PrintMsg("\n");
   PrintMsg("Saving WAD as %s\n", filename);
 
+  if (cur_info->gwa_mode)
+    wad.kind = PWAD;
+
   RecomputeDirectory();
 
   // create output wad file & write the header
