@@ -145,11 +145,10 @@ int main(int argc, char **argv)
   // handle drag and drop: a single non-option argument
   //
   // NOTE: there is no support for giving options to glbspX via the
-  // command line.  I think that users can just use plain `glbsp' if
-  // they want to give options this way.  The difficult here lies in
-  // possible conflicts between given options and those already set
-  // from within the GUI.  Plus we may want to handle a drag-n-drop of
-  // multiple files one day.
+  // command line.  Plain `glbsp' should be used if this is desired.
+  // The difficult here lies in possible conflicts between given
+  // options and those already set from within the GUI.  Plus we may
+  // want to handle a drag-n-drop of multiple files later on.
   //
   boolean_g unused_args = FALSE;
 
@@ -184,20 +183,20 @@ int main(int argc, char **argv)
       break;
 
     case COOKIE_E_NO_FILE:
-      guix_win->text_box->AddMsg("** Missing INI file -- Using defaults **",
-          FL_RED, TRUE);
+      guix_win->text_box->AddMsg(
+          "** Missing INI file -- Using defaults **\n", FL_RED, TRUE);
       break;
 
     case COOKIE_E_PARSE_ERRORS:
     case COOKIE_E_CHECK_ERRORS:
-      guix_win->text_box->AddMsg("** Warning: Errors found in INI file **",
-          FL_RED, TRUE);
+      guix_win->text_box->AddMsg(
+          "** Warning: Errors found in INI file **\n", FL_RED, TRUE);
       break;
   }
 
   if (unused_args)
-    guix_win->text_box->AddMsg("** Warning: Ignoring extra arguments to glbspX **", FL_RED, TRUE);
- 
+    guix_win->text_box->AddMsg(
+        "** Warning: Ignoring extra arguments to glbspX **\n", FL_RED, TRUE);
 
   // run the GUI until the user quits
   while (! guix_win->want_quit)
