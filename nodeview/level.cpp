@@ -871,7 +871,7 @@ void LoadLevel(const char *level_name)
 		gl_wad = the_gwa;
 
 		if (! gl_wad || ! gl_wad->FindLevel(gl_name))
-			FatalError("Unable to find GL level: %s\n", gl_name);
+			FatalError("Unable to find GL info (%s lump)\n", gl_name);
 	}
 
 	GetGLVerts(gl_wad);
