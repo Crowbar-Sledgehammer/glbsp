@@ -27,14 +27,13 @@
 //
 int HelperCaseCmp(const char *A, const char *B)
 {
-  for (; *A || *B; A++, B++)
+  for (; *A && *B; A++, B++)
   {
     if (toupper(*A) != toupper(*B))
       return (toupper(*A) - toupper(*B));
   }
 
-  // strings are equal
-  return 0;
+  return (*A) ? 1 : (*B) ? -1 : 0;
 }
 
 
@@ -46,13 +45,16 @@ int HelperCaseCmp(const char *A, const char *B)
 //
 int HelperCaseCmpLen(const char *A, const char *B, int len)
 {
-  for (; (*A || *B) && (len > 0); A++, B++, len--)
+  for (; *A && *B && (len > 0); A++, B++, len--)
   {
     if (toupper(*A) != toupper(*B))
       return (toupper(*A) - toupper(*B));
   }
 
-  return 0;
+  if (len == 0)
+    return 0;
+
+  return (*A) ? 1 : (*B) ? -1 : 0;
 }
 
 
@@ -158,12 +160,20 @@ char *HelperReplaceExt(const char *filename, const char *ext)
 
   strcpy(buffer, filename);
   
-  dot_pos = strrchr(buffer, '.');
+  int len = strlen(buffer);
 
-  if (dot_pos)
-    dot_pos[1] = 0;
+  if (HelperHasExt(filename))
+  {
+    dot_pos = strrchr(buffer, '.');
+
+    if (dot_pos)
+      dot_pos[1] = 0;
+  }
   else
-    strcat(buffer, ".");
+  {
+    if (len > 0 && buffer[len-1] != '.')
+      strcat(buffer, ".");
+  }
   
   strcat(buffer, ext);
   return buffer;
