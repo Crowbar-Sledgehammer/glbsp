@@ -45,6 +45,9 @@ static int block_x, block_y;
 static int block_w, block_h;
 static int block_count;
 
+static int block_mid_x = 0;
+static int block_mid_y = 0;
+
 static uint16_g ** block_lines;
 
 static uint16_g *block_ptrs;
@@ -382,9 +385,6 @@ static void CompressBlockmap(void)
 
   if (cur_offset > 65535)
   {
-    PrintWarn("Blockmap has OVERFLOWED!  May cause problems "
-        "or even crash\n");
-    
     MarkHardFailure(LIMIT_BLOCKMAP);
   }
 
@@ -514,12 +514,12 @@ static void FindBlockmapLimits(bbox_t *bbox)
 
   if (num_linedefs > 0)
   {
-    mid_x = (mid_x / num_linedefs) * 16;
-    mid_y = (mid_y / num_linedefs) * 16;
+    block_mid_x = (mid_x / num_linedefs) * 16;
+    block_mid_y = (mid_y / num_linedefs) * 16;
   }
 
 # if DEBUG_BLOCKMAP
-  PrintDebug("Blockmap lines centered at (%d,%d)\n", mid_x, mid_y);
+  PrintDebug("Blockmap lines centered at (%d,%d)\n", block_mid_x, block_mid_y);
 # endif
 }
 
@@ -528,9 +528,6 @@ static void FindBlockmapLimits(bbox_t *bbox)
 //
 static void TruncateBlockmap(void)
 {
-  int orig_w = block_w;
-  int orig_h = block_h;
-
   while (block_w * block_h > cur_info->block_limit)
   {
     block_w -= block_w / 8;
@@ -539,15 +536,18 @@ static void TruncateBlockmap(void)
 
   block_count = block_w * block_h;
 
-  PrintWarn("Blockmap TOO LARGE!  Truncated to %dx%d blocks\n",
+  PrintMiniWarn("Blockmap TOO LARGE!  Truncated to %dx%d blocks\n",
       block_w, block_h);
 
   MarkSoftFailure(LIMIT_BMAP_TRUNC);
 
   /* center the truncated blockmap */
-  // FIXME: use cluster center
-  block_x += (block_w - orig_w) * 128 / 2;
-  block_y += (block_h - orig_h) * 128 / 2;
+  block_x = block_mid_x - block_w * 64;
+  block_y = block_mid_y - block_h * 64;
+
+# if DEBUG_BLOCKMAP
+  PrintDebug("New blockmap origin: (%d,%d)\n", block_x, block_y);
+# endif
 }
 
 //
