@@ -282,7 +282,7 @@ Guix_FactorBox::Guix_FactorBox(int x, int y, int w, int h) :
   factor = new Fl_Counter(x+60, y+8, 100, 24, "Factor ");
   factor->align(FL_ALIGN_LEFT);
   factor->type(FL_SIMPLE_COUNTER);
-  factor->range(1, 99);
+  factor->range(1, 32);
   factor->step(1, 1);
   add(factor);
 

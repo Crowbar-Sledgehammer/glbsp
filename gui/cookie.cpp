@@ -360,6 +360,12 @@ void CookieCheckEm(int& problems)
     guix_prefs.manual_h = MANUAL_WINDOW_MIN_H;
     problems++;
   }
+
+  if (guix_info.factor > 32)
+  {
+    guix.factor = 32;
+    problems++;
+  }
 }
 
 //
