@@ -2,17 +2,13 @@
 TODO
 ====
 
-*  check ROUNDING issues, e.g. (int)X --> (int)rint(X).
-   - analyze.c, level.c, node.c.
-
-+  allow -v2 and -v3 options (generalise it).
-
 +  remove ability to do plain nodes (glBSPX too).
 
 -  manpage: add authors/credits section
 
-TEST: implement V3 of GL-Nodes specs (new GL_SEGS and GL_SSECT format).
-
+DONE: allow -v2 and -v3 options (generalise it).
+DONE: check ROUNDING issues, e.g. (int)X --> (int)rint(X).
+DONE: implement V3 of GL-Nodes specs (new GL_SEGS and GL_SSECT format).
 DONE: improve overflow (soft/hard limit) messages, esp. at the end.
 
 
@@ -23,7 +19,7 @@ LATER / IDEAS
 
 -  MacOSX: Project builder setup for glBSPX.
 
-?  square mode: split directly in half using fake horiz/vert seg.
+?  "binary" mode: split directly in half using fake horiz/vert seg.
 
 -  make the command line and GUI versions use the plugin library.
 

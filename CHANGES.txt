@@ -25,6 +25,11 @@ Changes in V2.10  (Unreleased)
    and ignores them (produces no segs from the second and subsequent ones).
    It's now up to the Engine to detect this old trick and emulate it.
 
+ - v1 vertex coords are now rounded to integers (not truncated).
+
+ - generalised the -v1 option, allowing -v2 and -v3 as well.  Using -v3
+   will force the GL_SEGS and GL_SSECT lumps to be V3 format.
+
  - modified the "based on BSP" messages in the program output and in the
    documentation, so that people don't get the impression that glBSP is
    100% backwards compatible with the original BSP (it isn't).
