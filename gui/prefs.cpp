@@ -47,7 +47,7 @@ static void prefs_reset_all_CB(Fl_Widget *w, void *data)
 //
 // PrefWin Constructor
 //
-Guix_PrefWin::Guix_PrefWin() : Fl_Window(480, 280, "glBSP Preferences")
+Guix_PrefWin::Guix_PrefWin() : Fl_Window(480, 290, "glBSP Preferences")
 {
   // cancel the automatic `begin' in Fl_Group constructor
   end();
@@ -104,19 +104,19 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(480, 280, "glBSP Preferences")
 
   // create reset button
   
-  groups[1] = new Fl_Group(0, 110, w(), 110);
+  groups[1] = new Fl_Group(0, 110, w(), 120);
   groups[1]->box(FL_THIN_UP_BOX);
   groups[1]->resizable(0);
   add(groups[1]);
 
-  reset_all = new Fl_Button((w() - 240) / 2, 110+17, 240, 26,
+  reset_all = new Fl_Button((w() - 240) / 2, 180, 240, 26,
       "Reset All To Defaults");
   reset_all->labelfont(FL_HELVETICA | FL_BOLD);
   reset_all->callback((Fl_Callback *) prefs_reset_all_CB);
   groups[1]->add(reset_all);
 
-  Fl_Box *reset_txt = new Fl_Box(FL_FLAT_BOX, 20, 166, w() - 40, 50,
-      "This resets all user-changeable options to default "
+  Fl_Box *reset_txt = new Fl_Box(FL_FLAT_BOX, 20, 130, w() - 40, 46,
+      "This button resets all user-changeable options to default "
       "values, including everything in the main window.");
 
   reset_txt->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | 
@@ -125,7 +125,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(480, 280, "glBSP Preferences")
   
   // create quit button
   
-  groups[2] = new Fl_Group(0, 220, w(), 60);
+  groups[2] = new Fl_Group(0, 230, w(), 60);
   groups[2]->box(FL_THIN_UP_BOX);
   groups[2]->resizable(0);
   add(groups[2]);

@@ -363,7 +363,7 @@ void CookieCheckEm(int& problems)
 
   if (guix_info.factor > 32)
   {
-    guix.factor = 32;
+    guix_info.factor = 32;
     problems++;
   }
 }

@@ -263,7 +263,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
 
   CY += 21;
 
-  choose_fresh = new Fl_Check_Button(CX, CY, 22, 22, "Fresh Partitions Lines");
+  choose_fresh = new Fl_Check_Button(CX, CY, 22, 22, "Fresh Partition Lines");
   choose_fresh->down_box(FL_DOWN_BOX);
   choose_fresh->align(FL_ALIGN_RIGHT);
   choose_fresh->callback((Fl_Callback *) misc_opts_check_CB);
