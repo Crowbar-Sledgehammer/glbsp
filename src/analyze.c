@@ -42,7 +42,6 @@
 
 #define DEBUG_WALLTIPS  0
 #define DEBUG_POLYOBJ   0
-#define DEBUG_DUMMY     0
 
 #define POLY_BOX_SZ  10
 
@@ -649,6 +648,7 @@ void PruneSectors(void)
     FatalError("Couldn't find any Sectors");
 }
 
+#if 0  // REMOVE ME
 void DetectDummySectors(void)
 {
   // Dummy sectors are detected with the following criteria:
@@ -788,6 +788,7 @@ void DetectDummySectors(void)
   UtilFree(bboxes);
   UtilFree(notdummy);
 }
+#endif
 
 static INLINE_G int LineVertexLowest(const linedef_t *L)
 {

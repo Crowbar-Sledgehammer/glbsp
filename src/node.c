@@ -407,10 +407,6 @@ superblock_t *CreateSegs(void)
     if (line->zero_len)
       continue;
 
-    // ignore lines from dummy sectors
-    if (line->right && line->right->sector && line->right->sector->is_dummy)
-      continue;
-
     // ignore overlapping lines
     if (line->overlap)
       continue;

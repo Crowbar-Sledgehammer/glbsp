@@ -2,7 +2,7 @@
 USING glBSP
 ===========
 
-by Andrew Apted.  17th April 2004.
+by Andrew Apted.  4th July 2004.
 
 
 Running glBSP
@@ -108,7 +108,7 @@ The following options are recognised:
                each level.  This options prevents any existing
                REJECT map from being clobbered.
 
-  -noprog      Does not show the progress indicator.
+  -noprog      Turn off the progress indicator.
 
   -normal      glBSP usually detects if the normal node info (i.e.
                the non-GL variety) is present, and leave it untouched
@@ -120,8 +120,8 @@ The following options are recognised:
                smaller PWAD.
                
                NOTE: this may make your level a lot harder to edit !
-               Therefore this option is most useful when producing a
-               final WAD for public release.
+               Therefore this option is most useful when producing
+               the final WAD for public release.
  
   -v1          Backwards compatibility.  The current version of the
                "GL Nodes" spec (V2.0) introduces a new format for the
@@ -154,12 +154,6 @@ provided to allow complete control or for special circumstances:
                the output filename has the ".gwa" extension.  This
                option forces glBSP into GWA mode.
  
-  -keepdummy   Keeps the small dummy sectors (used for extrafloors)
-               in the generated BSP tree.  Normally these sectors are
-               never entered, viewed or collision checked, and so can
-               be omitted from the BSP tree / blockmap without problem
-               (making everything work more efficiently).
-
   -keepsect    Prevents unused sectors that are found in the level
                from being removed.  This is important for anything
                that refers to sector numbers directly (e.g. certain
@@ -300,9 +294,9 @@ closer together are also better (the BSP is more balanced).
 Differences to BSP 2.3
 ----------------------
 
-As mentioned in the readme file, glBSP is based on BSP 2.3.  Most of
-the code has been rewritten, however, and some features of BSP were
-changed or abandoned.  Features that are different:
+As mentioned in the readme file, glBSP was originally based on BSP 2.3.
+Most of the code has been rewritten, however, and some features of BSP
+were changed or abandoned.  Features that are different:
 
   +  When the output file is not specified (i.e. no -o option), then
      the default output file will be a GWA file with the same name.

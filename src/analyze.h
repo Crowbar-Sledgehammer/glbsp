@@ -28,7 +28,6 @@
 void DetectDuplicateVertices(void);
 void DetectDuplicateSidedefs(void);
 void DetectPolyobjSectors(void);
-void DetectDummySectors(void);
 void DetectOverlappingLines(void);
 
 // pruning routines

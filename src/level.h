@@ -89,9 +89,6 @@ typedef struct sector_s
   // -JL- non-zero if this sector contains a polyobj.
   int has_polyobj;
 
-  // this is a dummy sector (for extrafloors).
-  char is_dummy;
-
   // reference count.  When building normal nodes, unused sectors will
   // be pruned.
   int ref_count;
