@@ -24,7 +24,7 @@
 #define MAIN_WINDOW_MIN_W  540
 #define MAIN_WINDOW_MIN_H  450
 
-class Guix_MainWin : public Fl_Window
+class Guix_MainWin : public Fl_Double_Window
 {
 public:
 	Guix_MainWin(const char *title);

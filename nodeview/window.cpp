@@ -57,7 +57,7 @@ void WindowSmallDelay(void)
 // MainWin Constructor
 //
 	Guix_MainWin::Guix_MainWin(const char *title) :
-Fl_Window(620, 520, title)
+Fl_Double_Window(620, 520, title)
 {
 	// turn off auto-add-widget mode
 	end();
