@@ -915,11 +915,22 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
 
   *N = node = NewNode();
 
-  // FIXME: This could be source of round-off error
-  node->x  = (int)best->psx;
-  node->y  = (int)best->psy;
-  node->dx = (int)best->pdx;
-  node->dy = (int)best->pdy;
+  assert(best->linedef);
+
+  if (best->side == 0)
+  {
+    node->x  = best->linedef->start->x;
+    node->y  = best->linedef->start->y;
+    node->dx = best->linedef->end->x - node->x;
+    node->dy = best->linedef->end->y - node->y;
+  }
+  else  /* left side */
+  {
+    node->x  = best->linedef->end->x;
+    node->y  = best->linedef->end->y;
+    node->dx = best->linedef->start->x - node->x;
+    node->dy = best->linedef->start->y - node->y;
+  }
 
   /* check for really long partition (overflows dx,dy in NODES) */
   if (best->p_length >= 30000)
