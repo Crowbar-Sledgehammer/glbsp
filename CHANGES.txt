@@ -5,9 +5,15 @@ CHANGELOG
 Changes in V2.10  (Unreleased)
 ------------------------------
 
- - choose first seg in a subsector better, avoid self-referenced lines.
+ - support V3 GL-Nodes (handle more than 65534 segs in GL_SEGS lump, and
+   more than 32767 vertices in GL_VERT lump).
+
+ - produce a much more comprehensive problem report when levels fail (or
+   have possibly failed) to build properly (by overflowing limits, etc).
 
  - allow levels to contain more than 32767 sidedefs.
+
+ - choose first seg in a subsector better, avoid self-referenced lines.
 
  - removed -fresh option (now the default), and added a -fast option.
 
