@@ -38,13 +38,12 @@
 #include "wad.h"
 
 
-
 #define DEBUG_BLOCKMAP  0
 
 
-int block_x, block_y;
-int block_w, block_h;
-int block_count;
+static int block_x, block_y;
+static int block_w, block_h;
+static int block_count;
 
 static uint16_g ** block_lines;
 
@@ -56,6 +55,18 @@ static int block_compression;
 #define DUMMY_DUP  0xFFFF
 
 
+//
+// GetBlockmapBounds
+//
+void GetBlockmapBounds(int *x, int *y, int *w, int *h)
+{
+  *x = block_x; *y = block_y;
+  *w = block_w; *h = block_h;
+}
+
+//
+// CheckLinedefInsideBox
+//
 int CheckLinedefInsideBox(int xmin, int ymin, int xmax, int ymax,
     int x1, int y1, int x2, int y2)
 {

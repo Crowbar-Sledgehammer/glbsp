@@ -26,10 +26,7 @@
 
 #define DEFAULT_BLOCK_LIMIT  44000
 
-extern int block_x, block_y;
-extern int block_w, block_h;
-
-// compute blockmap origin & size (the block_x/y/w/h variables above)
+// compute blockmap origin & size (the block_x/y/w/h variables)
 // based on the set of loaded linedefs.
 //
 void InitBlockmap(void);
@@ -37,8 +34,11 @@ void InitBlockmap(void);
 // build the blockmap and write the data into the BLOCKMAP lump
 void PutBlockmap(void);
 
-// utility routine.
+// utility routines...
+void GetBlockmapBounds(int *x, int *y, int *w, int *h);
+
 int CheckLinedefInsideBox(int xmin, int ymin, int xmax, int ymax,
     int x1, int y1, int x2, int y2);
+
 
 #endif /* __GLBSP_BLOCKMAP_H__ */

@@ -42,9 +42,6 @@ const nodebuildinfo_t *cur_info = NULL;
 const nodebuildfuncs_t *cur_funcs = NULL;
 volatile nodebuildcomms_t *cur_comms = NULL;
 
-int cur_build_pos;
-int cur_file_pos;
-
 static char glbsp_message_buf[1024];
 
 
@@ -82,8 +79,11 @@ const nodebuildinfo_t default_buildinfo =
 
 const nodebuildcomms_t default_buildcomms =
 {
-  NULL,   // message
-  FALSE   // cancelled
+  NULL,    // message
+  FALSE,   // cancelled
+
+  0, 0,    // total warnings
+  0, 0     // build and file positions
 };
 
 
@@ -123,7 +123,7 @@ static void AddExtraFile(nodebuildinfo_t *info, const char *str)
 }
 
 #define HANDLE_BOOLEAN(name, field)  \
-    if (StrCaseCmp(opt_str, name) == 0)  \
+    if (UtilStrCaseCmp(opt_str, name) == 0)  \
     {  \
       info->field = TRUE;  \
       argv++; argc--;  \
@@ -185,7 +185,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     if (opt_str[0] == '-')
       opt_str++;
 
-    if (StrCaseCmp(opt_str, "o") == 0)
+    if (UtilStrCaseCmp(opt_str, "o") == 0)
     {
       if (got_output)
       {
@@ -217,7 +217,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
-    if (StrCaseCmp(opt_str, "factor") == 0)
+    if (UtilStrCaseCmp(opt_str, "factor") == 0)
     {
       if (argc < 2)
       {
@@ -232,7 +232,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
-    if (StrCaseCmp(opt_str, "maxblock") == 0)
+    if (UtilStrCaseCmp(opt_str, "maxblock") == 0)
     {
       if (argc < 2)
       {
@@ -324,7 +324,7 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
       info->gwa_mode = TRUE;
   }
 
-  if (StrCaseCmp(info->input_file, info->output_file) == 0)
+  if (UtilStrCaseCmp(info->input_file, info->output_file) == 0)
   {
     info->load_all = TRUE;
     info->same_filenames = TRUE;
@@ -412,7 +412,7 @@ static glbsp_ret_e HandleLevel(void)
   DisplaySetBarLimit(1, 1000);
   DisplaySetBar(1, 0);
 
-  cur_build_pos = 0;
+  cur_comms->build_pos = 0;
 
   LoadLevel();
 
@@ -437,7 +437,8 @@ static glbsp_ret_e HandleLevel(void)
 
     if (root_node)
       PrintVerbose("Heights of left and right subtrees = (%d,%d)\n",
-          ComputeHeight(root_node->r.node), ComputeHeight(root_node->l.node));
+          ComputeBspHeight(root_node->r.node),
+          ComputeBspHeight(root_node->l.node));
 
     SaveLevel(root_node);
   }
@@ -463,7 +464,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   cur_funcs = funcs;
   cur_comms = comms;
 
-  total_big_warn = total_small_warn = 0;
+  cur_comms->total_big_warn = 0;
+  cur_comms->total_small_warn = 0;
 
   // clear cancelled flag
   comms->cancelled = FALSE;
@@ -520,7 +522,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   DisplaySetBarLimit(2, CountLevels() * 10);
   DisplaySetBar(2, 0);
 
-  cur_file_pos = 0;
+  cur_comms->file_pos = 0;
   
   // loop over each level in the wad
   while (FindNextLevel())
@@ -530,8 +532,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     if (ret != GLBSP_E_OK)
       break;
 
-    cur_file_pos += 10;
-    DisplaySetBar(2, cur_file_pos);
+    cur_comms->file_pos += 10;
+    DisplaySetBar(2, cur_comms->file_pos);
   }
 
   DisplayClose();
@@ -546,8 +548,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
       DeleteGwaFile(cur_info->output_file);
 
     PrintMsg("\n");
-    PrintMsg("Total serious warnings: %d\n", total_big_warn);
-    PrintMsg("Total minor warnings: %d\n", total_small_warn);
+    PrintMsg("Total serious warnings: %d\n", cur_comms->total_big_warn);
+    PrintMsg("Total minor warnings: %d\n", cur_comms->total_small_warn);
 
     ReportFailedLevels();
   }

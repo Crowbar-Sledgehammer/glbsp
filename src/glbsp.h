@@ -121,6 +121,10 @@ typedef struct nodebuildcomms_s
 
   // the GUI can set this to tell the node builder to stop
   boolean_g cancelled;
+
+  // from here on, various bits of internal state
+  int total_small_warn, total_big_warn;
+  int build_pos, file_pos;
 }
 nodebuildcomms_t;
 

@@ -38,8 +38,8 @@
 #include "wad.h"
 
 
-FILE *in_file = NULL;
-FILE *out_file = NULL;
+static FILE *in_file = NULL;
+static FILE *out_file = NULL;
 
 
 #define DEBUG_DIR   0
@@ -520,8 +520,8 @@ static void ReadLumpData(lump_t *lump)
 {
   size_t len;
 
-  cur_file_pos++;
-  DisplaySetBar(1, cur_file_pos);
+  cur_comms->file_pos++;
+  DisplaySetBar(1, cur_comms->file_pos);
   DisplayTicker();
 
 # if DEBUG_LUMP
@@ -791,8 +791,8 @@ static void WriteLumpData(lump_t *lump)
   size_t len;
   int align_size;
 
-  cur_file_pos++;
-  DisplaySetBar(1, cur_file_pos);
+  cur_comms->file_pos++;
+  DisplaySetBar(1, cur_comms->file_pos);
   DisplayTicker();
 
 # if DEBUG_LUMP
@@ -1273,7 +1273,7 @@ glbsp_ret_e ReadWadFile(const char *filename)
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_READ_ME, LUMP_READ_ME));
   DisplaySetBar(1, 0);
 
-  cur_file_pos = 0;
+  cur_comms->file_pos = 0;
 
   // now read lumps
   check = ReadAllLumps();
@@ -1326,7 +1326,7 @@ glbsp_ret_e WriteWadFile(const char *filename)
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_IGNORE_ME, 0));
   DisplaySetBar(1, 0);
 
-  cur_file_pos = 0;
+  cur_comms->file_pos = 0;
 
   // now write all the lumps to the output wad
   check1 = WriteAllLumps();

@@ -34,11 +34,6 @@
 
 #define DEBUGGING_FILE  "gb_debug.txt"
 
-
-int total_big_warn;
-int total_small_warn;
-
-
 #define DEBUG_ENDIAN  0
 
 static int cpu_big_endian = 0;
@@ -131,7 +126,7 @@ void PrintWarn(const char *str, ...)
 
   (* cur_funcs->print_msg)("Warning: %s", message_buf);
 
-  total_big_warn++;
+  cur_comms->total_big_warn++;
 
 #if DEBUG_ENABLED
   PrintDebug("Warning: %s", message_buf);
@@ -154,7 +149,7 @@ void PrintMiniWarn(const char *str, ...)
     (* cur_funcs->print_msg)("Warning: %s", message_buf);
   }
 
-  total_small_warn++;
+  cur_comms->total_small_warn++;
 
 #if DEBUG_ENABLED
   va_start(args, str);
