@@ -69,6 +69,7 @@ Guix_Book::Guix_Book() : Fl_Window(guix_prefs.manual_w,
  
   size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);
   position(guix_prefs.manual_x, guix_prefs.manual_y);
+  color(MAIN_BG_COLOR, MAIN_BG_COLOR);
  
   // allow manual closing of window
   callback((Fl_Callback *) book_quit_CB);
@@ -80,44 +81,46 @@ Guix_Book::Guix_Book() : Fl_Window(guix_prefs.manual_w,
 
   // create buttons in top row
 
-  group = new Fl_Group(0, 0, w(), 34);
-  group->resizable(0);
+  group = new Fl_Group(0, h() - 34, w(), 34);
   add(group);
   
-  int CX = 4;
-  int CY = 4;
+  int CX = 10;
+  int CY = h() - 30;
 
   contents = new Fl_Button(CX, CY, 96, 26, "&Contents");
   contents->box(FL_THIN_UP_BOX);
   contents->callback((Fl_Callback *) book_contents_CB);
   group->add(contents);
 
-  CX += 100;
+  CX += 126;
 
   prev = new Fl_Button(CX, CY, 96, 26, "<<  &Prev");
   prev->box(FL_THIN_UP_BOX);
   prev->callback((Fl_Callback *) book_prev_CB);
   group->add(prev);
 
-  CX += 100;
+  CX += 106;
 
   next = new Fl_Button(CX, CY, 96, 26, "&Next  >>");
   next->box(FL_THIN_UP_BOX);
   next->callback((Fl_Callback *) book_next_CB);
   group->add(next);
 
-  CX += 100;
+  CX += 106;
 
-  quit = new Fl_Button(CX, 4, 96, 26, "Close");
+  quit = new Fl_Button(w() - 96 - 10, CY, 96, 26, "Close");
   quit->box(FL_THIN_UP_BOX);
   quit->callback((Fl_Callback *) book_quit_CB);
   group->add(quit);
 
-  CX += 100;
+  Fl_Box *invis_2 = new Fl_Box(CX, 0, w() - 96 - 10 - CX, 20);
+  add(invis_2);
+
+  group->resizable(invis_2);
 
   // create the browser
 
-  browser = new Fl_Hold_Browser(0, 34, w(), h() - 34);
+  browser = new Fl_Hold_Browser(0, 0, w(), h() - 34);
   browser->callback((Fl_Callback *) book_selector_CB);
  
   add(browser);
@@ -404,19 +407,23 @@ Guix_License::Guix_License() : Fl_Window(guix_prefs.manual_w,
  
   size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);
   position(guix_prefs.manual_x, guix_prefs.manual_y);
+  color(MAIN_BG_COLOR, MAIN_BG_COLOR);
  
   // allow manual closing of window
   callback((Fl_Callback *) license_quit_CB);
-  
+
   want_quit = FALSE;
 
-  // create quit button in top row
+  // create close button in bottom row
 
-  group = new Fl_Group(0, 0, w(), 34);
-  group->resizable(0);
+  Fl_Box *invis_1 = new Fl_Box(0, 0, 30, 30);
+  add(invis_1);
+  
+  group = new Fl_Group(0, h() - 34, w(), 34);
+  group->resizable(invis_1);
   add(group);
   
-  quit = new Fl_Button(4, 4, 96, 26, "Close");
+  quit = new Fl_Button(w() - 96 - 14, h() - 30, 96, 26, "Close");
   quit->box(FL_THIN_UP_BOX);
   quit->callback((Fl_Callback *) license_quit_CB);
   group->add(quit);
@@ -425,7 +432,7 @@ Guix_License::Guix_License() : Fl_Window(guix_prefs.manual_w,
 
   int i;
 
-  browser = new Fl_Browser(0, 34, w(), h() - 34);
+  browser = new Fl_Browser(0, 0, w(), h() - 34);
  
   for (i=0; license_text[i]; i++)
     browser->add(license_text[i]);
