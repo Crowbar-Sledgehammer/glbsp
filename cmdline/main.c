@@ -84,6 +84,7 @@ static void ShowOptions(void)
     "\n"
     "General Options:\n"
     "  -factor <nnn>    Changes the cost assigned to SEG splits\n"
+    "  -fresh           Choose fresh partition lines\n"
     "  -noreject        Does not clobber the reject map\n"
     "  -noprog          Does not show progress indicator\n"
     "  -warn            Show extra warning messages\n"
@@ -97,7 +98,7 @@ static void ShowOptions(void)
     "  -forcenormal     Forces the normal nodes to be recomputed\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
     "  -keepsect        Don't prune unused sectors\n"
-    "  -noprune         Don't prune anything that is unused\n"
+    "  -noprune         Don't prune anything which is unused\n"
     "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"
   );
 }
