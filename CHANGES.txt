@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-Changes in V2.10  (21st September 2004)
+Changes in V2.10  (27th September 2004)
 ---------------------------------------
 
  - support V3 GL-Nodes (handle more than 65534 segs in GL_SEGS lump, and
@@ -44,6 +44,9 @@ Changes in V2.10  (21st September 2004)
 
  - the Unix and MacOS X makefiles now have "make install" targets.  Also
    converted the docs into a manual page for the Unix installation.
+
+ - moved makefiles and project files into top-level directory.  Removed
+   the support for building with Borland C++Builder.
 
 
 Changes in V2.05  (31st December 2003)
