@@ -69,68 +69,55 @@ void MainSetDefaults(void)
 /* ----- main program ----------------------------- */
 
 
-
 int main(int argc, char **argv)
 {
 	InitDebug();
 	InitEndian();
 
-	if (argc > 1 &&
-		(strcmp(argv[1], "/?") == 0 || strcmp(argv[1], "-h") == 0 ||
-		 strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "--help") == 0 ||
-		 strcmp(argv[1], "-HELP") == 0 || strcmp(argv[1], "--HELP") == 0))
-	{
+    // skip program name
+    argv++, argc--;
+                                                                                            
+    ArgvInit(argc, (const char **)argv);
+ 
+    if (ArgvFind('?', NULL) >= 0 || ArgvFind('h', "help") >= 0)
+    {
 		ShowTitle();
-		ShowInfo();
-		exit(1);
-	}
+        ShowInfo();
+        exit(1);
+    }
 
-	int first_arg = 1;
-
-#ifdef MACOSX
-	if (first_arg < argc && (strncmp(argv[first_arg], "-psn", 4) == 0))
-		first_arg++;
-#endif
-
-	// set defaults, also initializes the nodebuildxxxx stuff
-	MainSetDefaults();
-
-	ReadWadFile("ddd.wad");
-
-	FindNextLevel();
-	FindNextLevel();
-	FindNextLevel();
-	FindNextLevel();
-	FindNextLevel();
-	LoadLevel();
-
-	// handle drag and drop: a single non-option argument
-	//
-	// NOTE: there is no support for giving options to glBSPX via the
-	// command line.  Plain `glbsp' should be used if this is desired.
-	// The difficult here lies in possible conflicts between given
-	// options and those already set from within the GUI.  Plus we may
-	// want to handle a drag-n-drop of multiple files later on.
-	//
-	bool unused_args = false;
-
-	if (first_arg < argc && argv[first_arg][0] != '-')
-	{
-		///    guix_info.input_file = GlbspStrDup(argv[first_arg]);
-	}
-
-	if (first_arg < argc)
-		unused_args = true;
-
+	Fl::scheme(NULL);
+	fl_message_font(FL_HELVETICA /* _BOLD */, 18);
 
 	// load icons for file chooser
 	Fl_File_Icon::load_system_icons();
 
-	guix_win = new Guix_MainWin(MY_TITLE);
+	try
+	{
+		// set defaults, also initializes the nodebuildxxxx stuff
+		MainSetDefaults();
 
-	// run the GUI until the user quits
-	while (! guix_win->want_quit)
-		Fl::wait();
+		ReadWadFile("hhh.wad");
+
+		FindNextLevel();
+		FindNextLevel();
+
+		LoadLevel();
+
+		guix_win = new Guix_MainWin(MY_TITLE);
+
+		// run the GUI until the user quits
+		while (! guix_win->want_quit)
+			Fl::wait();
+	}
+	catch (assert_fail_c err)
+	{
+		fl_alert("Sorry, an internal error occurred:\n%s", err.GetMessage());
+	}
+	catch (...)
+	{
+		fl_alert("An unknown problem occurred (UI code)");
+	}
 
 	delete guix_win;
 	guix_win = NULL;
