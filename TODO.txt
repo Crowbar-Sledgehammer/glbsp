@@ -6,16 +6,15 @@ TODO
 
 +  MacOSX: de-FINK-itise glBSPX.
 
-TEST: cookie under linux (use .glbspX_rc if exists, otherwise .glBSPX_rc).
+   -  Project builder setup for MacOS X.
 
 TOO COMPLEX: -modify option: directly modifies the input wad.
 
-LATER
------
+
+LATER / IDEAS
+=============
 
 +  Put Changelog on GLBSP page.
-
--  Project builder setup for MacOS X.
 
 ?  -shrink option: finds duplicated LUMPS and merges them (for GFX).
 
@@ -35,5 +34,6 @@ LATER
      Warn  = FALSE
      Quiet = TRUE
      Version = 1
+     DummyMaxGroup = 1
      DummyLineTypes = 280-281, 289, 400-417, 430-433
 

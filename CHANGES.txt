@@ -26,6 +26,8 @@ Changes in V2.05  (Unreleased)
 
  - fixed massive slow-down in GUI version under MacOSX (maybe others).
 
+ - automatically ignores extrafloor dummy sectors.
+
  - renamed GUI version to glBSPX (was: glbspX).
 
 

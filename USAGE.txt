@@ -2,7 +2,7 @@
 USING glBSP
 ===========
 
-by Andrew Apted.  29th September 2003.
+by Andrew Apted.  3rd December 2003.
 
 
 Running glBSP
@@ -155,11 +155,18 @@ provided to allow complete control or for special circumstances:
                the output filename has the ".gwa" extension.  This
                option forces glBSP into GWA mode.
  
+  -keepdummy   Keeps the small dummy sectors (used for extrafloors)
+               in the generated BSP tree.  Normally these sectors are
+               never entered, viewed or collision checked, and so can
+               be omitted from the BSP tree / blockmap without problem
+               (making everything work more efficiently).
+
   -keepsect    Prevents unused sectors that are found in the level
                from being removed.  This is important for anything
                that refers to sector numbers directly (e.g. certain
-               EDGE RTS commands), since pruning unused sectors can
-               make their numbers (as seen in an editor) different.
+               obsolete RTS commands in EDGE), since pruning unused
+               sectors can make their numbers (as seen in an editor)
+               different.
  
   -noprune     Disables all pruning of unused vertices, sidedefs,
                linedefs and sectors from levels.  Pruning only occurs
