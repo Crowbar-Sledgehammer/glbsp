@@ -2,23 +2,19 @@
 TODO
 ====
 
-*  BUG: crash with jHexen 1.7.14/15, MAP10. 
-
-   --> Remove the dummy detection and ignore code.
-
--  Remove/modify the 'Based on BSP' messages.
-
-*  Unix/Linux: have 'make install' targets.
-
-+  Put Changelog on GLBSP page.
++  improve overflow (soft/hard limit) messages, esp. at the end.
 
 -  MacOSX: Project builder setup for glBSPX.
+
+-  manpage: add authors/credits section
+
+-  put Changelog on GLBSP page.
 
 
 LATER / IDEAS
 =============
 
--  Convert docs to a man page.
+-  make the command line and GUI versions use the plugin library.
 
 -  Autoconf / Automake.
 
