@@ -105,7 +105,7 @@ static const char *intro_text[] =
   "@m Status:",
   "",
   "#P00",
-  "The current version is 1.96. It has been tested and",
+  "The current version is 1.97. It has been tested and",
   "known to work on numerous large wads, including DOOM I, DOOM II,",
   "TeamTNT's Eternal III, Fanatic's QDOOM, and many others.",
   "",
