@@ -48,6 +48,15 @@ void PrintMiniWarn(const char *str, ...);
 // set message for certain errors
 void SetErrorMsg(const char *str);
 
+// argument handling
+extern const char **arg_list;
+extern int arg_count;
+
+void ArgvInit(int argc, const char **argv);
+void ArgvTerm(void);
+int ArgvFind(char short_name, const char *long_name, int *num_params = NULL);
+bool ArgvIsOption(int index);
+
 // endian handling
 void InitEndian(void);
 uint16_g Endian_U16(uint16_g);
