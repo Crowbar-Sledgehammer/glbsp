@@ -243,7 +243,7 @@ typedef struct seg_s
   // longer in any superblock (e.g. now in a subsector).
   struct superblock_s *block;
 
-  // precomputed data for fast calculations
+  // precomputed data for faster calculations
   float_g psx, psy;
   float_g pex, pey;
   float_g pdx, pdy;

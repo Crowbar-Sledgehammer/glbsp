@@ -1085,7 +1085,7 @@ lump_t *CreateGLLump(const char *name)
 //
 // AppendLevelLump
 //
-void AppendLevelLump(lump_t *lump, void *data, int length)
+void AppendLevelLump(lump_t *lump, const void *data, int length)
 {
   if (length == 0)
     return;

@@ -698,8 +698,8 @@ static int SegCompare(const void *p1, const void *p2)
 
 /* ----- writing routines ------------------------------ */
 
-static uint8_g lev_v2_magic[4] = "gNd2";
-static uint8_g lev_v3_magic[4] = "gNd3";
+static const uint8_g *lev_v2_magic = (uint8_g *) "gNd2";
+static const uint8_g *lev_v3_magic = (uint8_g *) "gNd3";
 
 void PutVertices(char *name, int do_gl)
 {

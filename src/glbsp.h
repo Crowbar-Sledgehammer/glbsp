@@ -75,11 +75,11 @@ typedef struct nodebuildinfo_s
   const char *input_file;
   const char *output_file;
 
-  const char **extra_files;
   // pointer to a NULL terminated array of strings containing extra
   // input filenames.  Normally this field is NULL.  When there are
   // extra filenames, 'output_file' will be NULL -- also the build
   // mode will be GWA.
+  const char **extra_files;
 
   int factor;
 

@@ -213,7 +213,7 @@ lump_t *CreateGLLump(const char *name);
 // append some raw data to the end of the given level lump (created
 // with the above function).
 //
-void AppendLevelLump(lump_t *lump, void *data, int length);
+void AppendLevelLump(lump_t *lump, const void *data, int length);
 
 // mark the fact that this level failed to build.
 void MarkSoftFailure(int soft);

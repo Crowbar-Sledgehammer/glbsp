@@ -45,9 +45,6 @@
 
 #define POLY_BOX_SZ  10
 
-// forward declarations
-static int VertexCheckMultiSectors(vertex_t *v);
-
 // stuff needed from level.c (this file closely related)
 extern vertex_t  ** lev_vertices;
 extern linedef_t ** lev_linedefs;
@@ -299,6 +296,7 @@ void DetectPolyobjSectors(void)
   }
 }
 
+#if 0
 //
 // BoxContainsThing
 //
@@ -321,6 +319,7 @@ static int BoxContainsThing(const bbox_t *bbox)
 
   return FALSE;
 }
+#endif
 
 
 /* ----- analysis routines ----------------------------- */
@@ -646,148 +645,6 @@ void PruneSectors(void)
   if (new_num == 0)
     FatalError("Couldn't find any Sectors");
 }
-
-#if 0  // REMOVE ME
-void DetectDummySectors(void)
-{
-  // Dummy sectors are detected with the following criteria:
-  //   (a) not larger than 128x128.
-  //   (b) all linedefs are one-sided (isolated from main area).
-  //   (c) contains NO things.
-
-  int i;
-  int count;
-
-  char *notdummy;
-  bbox_t *bboxes;
-
-  if (num_sectors == 0)
-    return;
-
-  DisplayTicker();
-
-  notdummy = (char *) UtilCalloc(num_sectors);
-  bboxes = (bbox_t *) UtilCalloc(num_sectors * sizeof(bbox_t));
-
-  // reset bounding boxes
-  for (i = 0; i < num_sectors; i++) 
-  {
-    notdummy[i] = FALSE;
-
-    bboxes[i].minx = bboxes[i].miny = SHRT_MAX;
-    bboxes[i].maxx = bboxes[i].maxy = SHRT_MIN;
-  }
-
-  // pass over all linedefs, checking if two-sided and computing bboxes
-  for (i = 0; i < num_linedefs; i++)
-  {
-    linedef_t *L = lev_linedefs[i];
-
-    int s1 = (L->right && L->right->sector) ? L->right->sector->index : -1;
-    int s2 = (L->left  && L->left->sector)  ? L->left->sector->index  : -1;
-
-    if (L->zero_len)
-      continue;
-
-    if ((L->left && L->right) || 
-        VertexCheckMultiSectors(L->start) ||
-        VertexCheckMultiSectors(L->end))
-    {
-      if (s1 >= 0) notdummy[s1] = TRUE;
-      if (s2 >= 0) notdummy[s2] = TRUE;
-    }
-    else  // update BBOX
-    {
-      float_g x1 = L->start->x;
-      float_g y1 = L->start->y;
-      float_g x2 = L->end->x;
-      float_g y2 = L->end->y;
-
-      int minx = MIN((int)floor(x1), (int)floor(x2));
-      int miny = MIN((int)floor(y1), (int)floor(y2));
-      int maxx = MAX((int)ceil(x1), (int)ceil(x2));
-      int maxy = MAX((int)ceil(y1), (int)ceil(y2));
-
-      if (s1 >= 0)
-      {
-        bboxes[s1].minx = MIN(bboxes[s1].minx, minx);
-        bboxes[s1].miny = MIN(bboxes[s1].miny, miny);
-        bboxes[s1].maxx = MAX(bboxes[s1].maxx, maxx);
-        bboxes[s1].maxy = MAX(bboxes[s1].maxy, maxy);
-      }
-      if (s2 >= 0)
-      {
-        bboxes[s2].minx = MIN(bboxes[s2].minx, minx);
-        bboxes[s2].miny = MIN(bboxes[s2].miny, miny);
-        bboxes[s2].maxx = MAX(bboxes[s2].maxx, maxx);
-        bboxes[s2].maxy = MAX(bboxes[s2].maxy, maxy);
-      }
-    }
-  }
-
-  // check the bboxes, and count the dummies
-  count = 0;
-
-  for (i = 0; i < num_sectors; i++)
-  {
-    if (notdummy[i])
-      continue;
-
-    if (lev_sectors[i]->coalesce || lev_sectors[i]->has_polyobj)
-    {
-      notdummy[i] = TRUE;
-      continue;
-    }
-
-    // ignore sectors which have no linedefs
-    if (bboxes[i].minx == SHRT_MAX)
-    {
-      notdummy[i] = TRUE;
-      continue;
-    }
-
-#   if DEBUG_DUMMY
-    PrintDebug("  Bounding box for isolated sector %d: (%d,%d) .. (%d,%d)\n",
-        i, bboxes[i].minx, bboxes[i].miny, bboxes[i].maxx, bboxes[i].maxy);
-#   endif
-
-    if (bboxes[i].maxx - bboxes[i].minx > 128 ||
-        bboxes[i].maxy - bboxes[i].miny > 128)
-    {
-      notdummy[i] = TRUE;
-      continue;
-    }
-
-    // check if the sector contains a thing
-    if (BoxContainsThing(bboxes + i))
-    {
-#     if DEBUG_DUMMY
-      PrintDebug("  Isolated sector %d contains a thing\n", i);
-#     endif
-
-      notdummy[i] = TRUE;
-      continue;
-    }
-
-    // must be a dummy sector
-    count++;
-
-    lev_sectors[i]->is_dummy = TRUE;
-
-#   if DEBUG_DUMMY
-    PrintDebug("  Sector %d is DUMMY\n", i);
-#   endif
-  }
-
-  if (count > 0)
-  {
-      PrintVerbose("Detected %d dummy sectors\n", count);
-  }
-
-  UtilFree(bboxes);
-  UtilFree(notdummy);
-}
-#endif
 
 static INLINE_G int LineVertexLowest(const linedef_t *L)
 {
@@ -1118,36 +975,5 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
   
   InternalError("Vertex %d has no tips !", vert->index);
   return FALSE;
-}
-
-//
-// VertexCheckMultiSectors
-//
-static int VertexCheckMultiSectors(vertex_t *vert)
-{
-  sector_t *sec = NULL;
-
-  wall_tip_t *tip;
-
-  for (tip = vert->tip_set; tip; tip=tip->next)
-  {
-    if (tip->left)
-    {
-      if (! sec)
-        sec = tip->left;
-      else if (sec != tip->left)
-        return TRUE;
-    }
-
-    if (tip->right)
-    {
-      if (! sec)
-        sec = tip->right;
-      else if (sec != tip->right)
-        return TRUE;
-    }
-  }
-
-  return FALSE;  // zero or one sector
 }
 
