@@ -153,9 +153,21 @@ int main(int argc, char **argv)
 				level_name = arg_list[idx + 1];
 		}
 
+		path_c *path = NULL;
+		{
+			int params;
+			int idx = ArgvFind(0, "path", &params);
+
+			if (idx >= 0 && params >= 1)
+				path = path_c::ReadFile(arg_list[idx + 1]);
+		}
+
 		LoadLevel(level_name);
 
 		guix_win = new Guix_MainWin(MY_TITLE);
+
+		if (path)
+			guix_win->grid->SetPath(path);
 
 		double lx, ly, hx, hy;
 		LevelGetBounds(&lx, &ly, &hx, &hy);
