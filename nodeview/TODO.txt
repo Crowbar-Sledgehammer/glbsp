@@ -4,9 +4,17 @@ NodeView TODO list
 
 + support GWA files.
 
-- partition line: draw arrow heads along it.
++ when no -warp is specified, choose first map in wad.
+
++ allow decent into a subsector (solid purple polygon ?).
+
+- info line at bottom of main window:
+	- map name.
+	- mouse coords.
+	- zoom factor.
+    - current node/subsector.
 
 - class-ify the wad structures.  [partially done]
 
-- when no -warp is specified, choose first map in wad.
+- partition line: draw arrow heads along it.
 
