@@ -2,9 +2,13 @@
 TODO
 ====
 
--  Rework INSTALL.txt
+-  icon.xpm IS OLD !
 
 +  Retest installation on MacOS X and Win32.
+
+CHECK OVER: Rework INSTALL.txt
+
+DONE: glBSPX: manual and license windows: put buttons at bottom.
 
 
 LATER / IDEAS

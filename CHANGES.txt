@@ -35,6 +35,8 @@ Changes in V2.05  (Unreleased)
  - reduced the amount of global symbols, and renamed some things for
    more consistency (e.g. UtilStrCaseCmp).
 
+ - glBSPX: the manual/license windows have a nicer interface.
+
 
 Changes in V2.00  (25th September 2002)
 ---------------------------------------
