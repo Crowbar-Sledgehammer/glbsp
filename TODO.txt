@@ -2,13 +2,7 @@
 TODO
 ====
 
--  manpage: add authors/credits section
-
-DONE: remove ability to do plain nodes (glBSPX too).
-DONE: allow -v2 and -v3 options (generalise it).
-DONE: check ROUNDING issues, e.g. (int)X --> (int)rint(X).
-DONE: implement V3 of GL-Nodes specs (new GL_SEGS and GL_SSECT format).
-DONE: improve overflow (soft/hard limit) messages, esp. at the end.
+Test, test, test, ..., Release !
 
 
 LATER / IDEAS
@@ -16,9 +10,9 @@ LATER / IDEAS
 
 -  put Changelog on GLBSP page.
 
--  MacOSX: Project builder setup for glBSPX.
+-  MacOS X: Project builder setup for glBSPX.
 
-?  "binary" mode: split directly in half using fake horiz/vert seg.
+-  "binary" mode: split directly in half using fake horiz/vert seg.
 
 -  make the command line and GUI versions use the plugin library.
 
