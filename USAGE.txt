@@ -120,10 +120,6 @@ heap" size using the companion CWSPARAM program, bumping it up from
 128 to 1024 (see the CWSPARAM.DOC file for the details).  If you have
 a different one (e.g. QDPMI), then check its documentation.
 
-I'll be implementing a work-around for this problem in the next
-release of glBSP (rather reluctantly I have to say, since it is not a
-bug in *my* code).
-
 
 Option Descriptions
 -------------------
@@ -271,4 +267,6 @@ changed or abandoned.  Features that are different:
      999 would cause an angle adjustment was removed.
  
   +  glBSP has Hexen support.
+ 
+  +  glBSP packs the blockmap, and can merge identical sidedefs.
  
