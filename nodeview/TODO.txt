@@ -4,13 +4,9 @@ NodeView TODO list
 
 + support GWA files.
 
-- fix partition line drawing.
+- partition line: draw arrow heads along it.
 
 - class-ify the wad structures.  [partially done]
 
-DONE: fix drawing bugs at high zoom levels.
-DONE: start: center screen on map (or player#1), select zoom to fit map.
-DONE: debugging: make it run-time selectable.
-
-TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
+- when no -warp is specified, choose first map in wad.
 
