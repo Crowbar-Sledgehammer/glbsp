@@ -2,14 +2,11 @@
 TODO
 ====
 
--  rework memory allocation, to cope with buggy DJGPP malloc().
+*  Implement a Unix/GTK+ version.
 
--  make loading/saving progress into percentage.
++  write debugging code in system.c.
 
--  un-recursivify AddSegToSuper() and co.
+-  improve file errors in wad.c, return GLBSP_E_{Read,Write}Error.
 
--  rotate subsectors if the first seg has a different sector from the
-   second and third.
-
-+  implement REJECT building code.
+-  detect overflow of wad lumps (esp. GL_SEGS) and show a message.
 
