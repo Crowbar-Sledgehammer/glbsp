@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-// MENU : Unix/FLTK Menu handling
+//  MENU : Menu handling
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2000-2004 Andrew Apted
+//  GL-Node Viewer (C) 2004-2005 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,22 +47,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-	"By Andrew Apted (C) 2000-2004\n"
-	"\n"
-	"Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
-	"\n"
-	"Additional credits to...\n"
-	"    Andy Baker & Marc Pullen, for invaluable help\n"
-	"    Janis Legzdinsh, for fixing up Hexen support\n"
-	"    Matt Fell, for the Doom Specs\n"
-	"    Raphael Quinet, for DEU and the original idea\n"
-	"    ... and everyone else who deserves it !\n"
-	"\n"
-	"This program is free software, under the terms of\n"
-	"the GNU General Public License, and comes with\n"
-	"ABSOLUTELY NO WARRANTY.\n"
-	"\n"
-	"Website:  http://glbsp.sourceforge.net";
+	"By Andrew Apted (C) 2004-2005";
 
 
 static void menu_do_about(Fl_Widget *w, void * data)
@@ -70,7 +55,7 @@ static void menu_do_about(Fl_Widget *w, void * data)
 #if 0
   menu_want_to_quit = false;
 
-  Fl_Window *ab_win = new Fl_Window(600, 340, "About glBSP");
+  Fl_Window *ab_win = new Fl_Window(600, 340, "About GL-Node Viewer");
   ab_win->end();
 
   // non-resizable

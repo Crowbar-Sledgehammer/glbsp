@@ -1,5 +1,7 @@
 #
-# NodeView Makefile for Unix/FLTK
+#  GL-Node Viewer
+#
+#  Makefile for Unix/FLTK
 #
 
 PROGNAME=nodeview

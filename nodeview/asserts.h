@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------------
-//  Assertions
+//  ASSERTIONS
 //----------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2000-2004 Andrew Apted
+//  GL-Node Viewer (C) 2004-2005 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,8 +16,8 @@
 //
 //----------------------------------------------------------------------------
 
-#ifndef __NODEVIEW_ASSERT__
-#define __NODEVIEW_ASSERT__
+#ifndef __NODEVIEW_ASSERT_H__
+#define __NODEVIEW_ASSERT_H__
 
 class assert_fail_c
 {
@@ -67,4 +67,4 @@ public:
 void AssertFail(const char *msg, ...);
 // throw an assertion exception with the given message.
 
-#endif  /* __NODEVIEW_ASSERT__ */
+#endif  /* __NODEVIEW_ASSERT_H__ */

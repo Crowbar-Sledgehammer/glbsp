@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-// MAIN : Unix/FLTK Main program
+//  MAIN Program
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2000-2004 Andrew Apted
+//  GL-Node Viewer (C) 2004-2005 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ static void ShowTitle(void)
 {
 	GUI_PrintMsg(
 		"\n"
-		"**** GL-Node Viewer " " (C) 2004 Andrew Apted ****\n\n"
+		"**** GL-Node Viewer " " (C) 2005 Andrew Apted ****\n\n"
 	);
 }
 
