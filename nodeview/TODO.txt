@@ -2,19 +2,19 @@
 NodeView TODO list
 ==================
 
-- integrate lib_ and sys_ code from mp_server.  [partially done]
-
-DONE: catch exceptions (assertions) in main.
-
-- command-line options to select WAD and MAP.
-
-- start: center screen on map (or player#1), select zoom to fit map.
-
-- class-ify the wad structures.
+- GUI option to select MAP.
 
 - support GWA files.
 
+- start: center screen on map (or player#1), select zoom to fit map.
+
+- debugging: make it run-time enablable.
+
+- class-ify the wad structures.
+
 - fix drawing bugs at high zoom levels.
+
+DONE: command-line options to select WAD.
 
 TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
 
