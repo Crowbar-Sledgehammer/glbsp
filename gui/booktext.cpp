@@ -2,7 +2,7 @@
 // BOOKTEXT : Unix/FLTK Manual Text
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -24,7 +24,6 @@
 static const char * contents_text[];
 static const char * intro_text[];
 static const char * using_text[];
-static const char * dialog_text[];
 static const char * note_tc_text[];
 static const char * howwork_text[];
 static const char * diff_text[];
@@ -39,12 +38,11 @@ const book_page_t book_pages[] =
   { contents_text },   // #00
   { intro_text },      // #01
   { using_text },      // #02
-  { dialog_text },     // #03
-  { note_tc_text },    // #04
-  { howwork_text },    // #05
-  { diff_text },       // #06
-  { contact_text },    // #07
-  { acknow_text },     // #08
+  { note_tc_text },    // #03
+  { howwork_text },    // #04
+  { diff_text },       // #05
+  { contact_text },    // #06
+  { acknow_text },     // #07
   { NULL }
 };
 
@@ -54,23 +52,22 @@ const book_page_t book_pages[] =
 static const char *contents_text[] =
 {
   "",
-  "@c@l@b glbspX Manual",
+  "@c@l@b glBSPX Manual",
   "",
   "@-",
   "",
   "@r by Andrew Apted   ",
-  "@r Updated: 24th September 2001   ",
+  "@r Updated: 17th December 2001   ",
   "",
   "@c@m Table of Contents",
   "",
   "#L01@c" GRN " 1. Introduction",
-  "#L02@c" GRN " 2. Using glbspX",
-  "#L03@c" GRN " 3. Dialogs and Menus",
-  "#L04@c" GRN " 4. Notes for TC authors",
-  "#L05@c" GRN " 5. How glBSP Works",
-  "#L06@c" GRN " 6. Differences to BSP 2.3",
-  "#L07@c" GRN " 7. Contact and Links",
-  "#L08@c" GRN " 8. Acknowledgements",
+  "#L02@c" GRN " 2. Using glBSPX",
+  "#L04@c" GRN " 3. Notes for TC authors",
+  "#L05@c" GRN " 4. How glBSP Works",
+  "#L06@c" GRN " 5. Differences to BSP 2.3",
+  "#L07@c" GRN " 6. Contact and Links",
+  "#L08@c" GRN " 7. Acknowledgements",
   NULL
 };
 
@@ -97,18 +94,18 @@ static const char *intro_text[] =
   "and Vavoom.#- See the Contact and Links page.",
   "",
   "#P00",
-  "glbspX is the GUI (graphical user interface) version, which runs",
+  "glBSPX is the GUI (graphical user interface) version, which runs",
   "in a window. There is also a command-line version called simply",
   "`glbsp', which is designed to be run from a DOS box (Windows)",
   "or a text console / CLI (Linux etc). ",
-  "glbspX lets you perform all the usual node-building jobs,",
+  "glBSPX lets you perform all the usual node-building jobs,",
   "though the command-line version supports some more (rarely-useful)",
   "options.",
   "",
   "@m Status:",
   "",
   "#P00",
-  "The current version is 1.95. It has been tested and",
+  "The current version is 1.96. It has been tested and",
   "known to work on numerous large wads, including DOOM I, DOOM II,",
   "TeamTNT's Eternal III, Fanatic's QDOOM, and many others.",
   "",
@@ -124,14 +121,18 @@ static const char *intro_text[] =
   "",
   "@m Legal stuff:",
   "",
-  " glBSP (and glbspX) is Copyright (C) 2000-2001 Andrew Apted.",
+  " glBSP (and glBSPX) is Copyright (C) 2000-2002 Andrew Apted.",
   "#P00",
   "It is based on `BSP 2.3' (C) Colin Reed and Lee Killough,",
   "which was created from the basic theory stated in DEU5 (OBJECTS.C)",
   "by Raphael Quinet.",
   "",
   "#P00",
-  "glBSP (and glbspX) is under the GNU General Public License",
+  "The GUI version (glBSPX) is based in part on the work of the FLTK ",
+  "project, see http://www.fltk.org.",
+  "",
+  "#P00",
+  "glBSP (and glBSPX) is under the GNU General Public License",
   "(GPL). Click on the the Help > License menu to see the full text.",
   "",
   " All trademarks are the propriety of their owners.",
@@ -145,7 +146,7 @@ static const char *intro_text[] =
 static const char *using_text[] =
 {
   "",
-  "@c@l 2. Using glbspX ",
+  "@c@l 2. Using glBSPX ",
   "",
   "@-",
   "",
@@ -153,7 +154,7 @@ static const char *using_text[] =
   "The way glBSP operates is pretty simple: it will load the input",
   "wad file, build the nodes for the levels that it finds, and then",
   "save to the output file.  All this is triggered when you press",
-  "on the big `Build Nodes' button in the main window. ",
+  "on the big `BUILD' button in the main window. ",
   "The `Files' box let you specify the Input and Output filenames,",
   "and the other boxes let you control various aspects about the way",
   "nodes are built.",
@@ -169,7 +170,7 @@ static const char *using_text[] =
   "@m  Build Modes",
   "",
   "#P00",
-  "There are five different build modes in glbspX, which can be",
+  "There are five different build modes in glBSPX, which can be",
   "selected in the upper left box in the main window.",
   "Here is a description of them:",
   "",
@@ -211,17 +212,6 @@ static const char *using_text[] =
   "does a pretty decent job building the normal nodes as well.",
   "",
 
-  "@m Factor",
-  "",
-  "#P00",
-  "The factor value has a box of its own, just above the text output",
-  "box. It specifies the cost assigned to seg splits. ",
-  "Larger values make seg splits more costly (and thus glBSP tries",
-  "harder to avoid them), but smaller values produce better BSP",
-  "trees.  See the section `How glBSP Works' for more info. ",
-  "The default factor is known to be a good compromise.",
-  "",
-
   "@m Misc Options",
   "",
   "#P00",
@@ -260,20 +250,18 @@ static const char *using_text[] =
   "harder to edit !  Therefore this option is most useful",
   "when producing a final WAD for public release.",
   "",
-  NULL
-};
 
+  "@m Factor",
+  "",
+  "#P00",
+  "The factor value is located just below the Misc options. ",
+  "It specifies the cost assigned to seg splits. ",
+  "Larger values make seg splits more costly (and thus glBSP tries",
+  "harder to avoid them), but smaller values produce better BSP",
+  "trees.  See the section `How glBSP Works' for more info. ",
+  "The default factor is known to be a good compromise.",
+  "",
 
-//------------------------------------------------------------------------
-
-static const char *dialog_text[] =
-{
-  "",
-  "@c@l 3. Dialogs and Menus ",
-  "",
-  "@-",
-  "",
-  "(Sorry, this section has not been written yet)",
   NULL
 };
 
@@ -283,7 +271,7 @@ static const char *dialog_text[] =
 static const char *note_tc_text[] =
 {
   "",
-  "@c@l 4. Notes for TC authors",
+  "@c@l 3. Notes for TC authors",
   "",
   "@-",
   "",
@@ -348,7 +336,7 @@ static const char *note_tc_text[] =
 static const char *howwork_text[] =
 {
   "",
-  "@c@l 5. How glBSP Works",
+  "@c@l 4. How glBSP Works",
   "",
   "@-",
   "",
@@ -398,7 +386,7 @@ static const char *howwork_text[] =
 static const char *diff_text[] =
 {
   "",
-  "@c@l 6. Differences to BSP 2.3",
+  "@c@l 5. Differences to BSP 2.3",
   "",
   "@-",
   "",
@@ -408,7 +396,7 @@ static const char *diff_text[] =
   "changed or abandoned.  Features that are different:",
   "",
   "#P13",
-  "+ This GUI version, glbspX, is completely new !",
+  "+ This GUI version, glBSPX, is completely new !",
   "",
   "#P13",
   "+ When the output file is not specified (i.e. no -o option), then",
@@ -449,7 +437,7 @@ static const char *diff_text[] =
 static const char *contact_text[] =
 {
   "",
-  "@c@l 7. Contact and Links",
+  "@c@l 6. Contact and Links",
   "",
   "@-",
   "",
@@ -480,7 +468,7 @@ static const char *contact_text[] =
 static const char *acknow_text[] =
 {
   "",
-  "@c@l 8. Acknowledgements",
+  "@c@l 7. Acknowledgements",
   "",
   "@-",
   "",
