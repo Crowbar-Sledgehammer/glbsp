@@ -542,7 +542,17 @@ int W_Grid::handle(int event)
 			return 1;
 
 		case FL_PUSH:
-			descend_by_mouse(Fl::event_x(), Fl::event_y());
+			if (Fl::event_state() & FL_CTRL)
+			{
+				// select new subsector
+				route_len = 0;
+				do { /* nothing */ }
+				while (descend_by_mouse(Fl::event_x(), Fl::event_y()));
+			}
+			else
+			{
+				descend_by_mouse(Fl::event_x(), Fl::event_y());
+			}
 			redraw();
 			return 1;
 
@@ -612,6 +622,11 @@ int W_Grid::handle_key(int key)
 		case 'u': case 'U':
 			if (route_len > 0)
 				route_len--;
+			redraw();
+			return 1;
+
+		case 't': case 'T':
+			route_len = 0;
 			redraw();
 			return 1;
 
