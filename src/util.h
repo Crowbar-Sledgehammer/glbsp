@@ -39,6 +39,10 @@
 #define ABS(x)  ((x) >= 0 ? (x) : -(x))
 #endif
 
+#ifndef I_ROUND
+#define I_ROUND(x)  ((int) (((x) < 0.0f) ? ((x) - 0.5f) : ((x) + 0.5f)))
+#endif
+
 /* ----- function prototypes ---------------------------- */
 
 // allocate and clear some memory.  guaranteed not to fail.
