@@ -22,7 +22,7 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "1.95pre1"
+#define GLBSP_VER  "1.95rc2"
 
 
 // certain GCC attributes can be useful
