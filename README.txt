@@ -8,7 +8,7 @@ by Andrew Apted.  17th December 2001.
 Introduction
 ------------
 
-glBSP is a nodes builder specially designed to be used with OpenGL
+glBSP is a node builder specially designed to be used with OpenGL
 ports of the DOOM game engine. It adheres to the "GL-Friendly Nodes"
 specification, which means it adds some new special nodes to a WAD
 file that makes it very easy (and fast !) for an OpenGL DOOM engine to

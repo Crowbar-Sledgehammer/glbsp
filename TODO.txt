@@ -2,10 +2,19 @@
 TODO
 ====
 
-+  glBSPX: Create common dialog code for (a) invalid filename, 
-           (b) no ext, (c) file already exists, ETC ETC.
+*  website: reorganise !!
 
-+  glBSPX: Fix modal windows not having close buttons in Win32.
+*  compile packages:
 
-+  Put CHANGES.txt on website.
+   Y  Linux Cmdline
+   Y  Linux GUI
+   -  Win32 Cmdline
+   -  Win32 GUI
+   Y  DOS Cmdline
+
+-  glBSPX: check IDI_XXX icon stuff.
+
+-  glBSPX: Fix modal windows not having close buttons in Win32.
+
+-  Put CHANGES.txt on website.
 
