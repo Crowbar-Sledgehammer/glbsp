@@ -72,7 +72,7 @@ Option Descriptions
 
 The following options are recognised:
 
-  -quiet       Quieter output.  Information about each level (like
+  -q / -quiet  Quieter output.  Information about each level (like
                the number of linedefs, blockmap size, etc) is not
                displayed when this option is given, and a few other
                messages are skipped.  Important messages, like

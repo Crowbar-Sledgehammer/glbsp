@@ -30,7 +30,13 @@ Changes in V2.10  (Unreleased)
  - v1 vertex coords are now rounded to integers (not truncated).
 
  - generalised the -v1 option, allowing -v2 and -v3 as well.  Using -v3
-   will force the GL_SEGS and GL_SSECT lumps to be V3 format.
+   will force the GL_SEGS and GL_SSECT lumps to be the new V3 format
+   (mainly useful for testing an engine's support).
+
+ - when truncating the blockmap, it is now centered on the average of all
+   linedef vertices.
+
+ - fixed potential inaccuracy in the NODES and GL_NODES lumps.
 
  - modified the "based on BSP" messages in the program output and in the
    documentation, so that people don't get the impression that glBSP is
