@@ -2,7 +2,7 @@
 // MAIN : Unix/FLTK Main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2004 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -81,7 +81,7 @@ static void ShowTitle(void)
 {
   GUI_PrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2003 Andrew Apted.  ***\n"
+    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2004 Andrew Apted.  ***\n"
     "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
   );
 }
