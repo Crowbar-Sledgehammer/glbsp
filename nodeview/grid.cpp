@@ -45,6 +45,15 @@ W_Grid::~W_Grid()
 
 void W_Grid::SetZoom(int new_zoom)
 {
+	if (new_zoom < MIN_GRID_ZOOM)
+		new_zoom = MIN_GRID_ZOOM;
+
+	if (new_zoom > MAX_GRID_ZOOM)
+		new_zoom = MAX_GRID_ZOOM;
+
+	if (zoom == new_zoom)
+		return;
+
 	zoom = new_zoom;
 
 	zoom_mul = pow(2.0, (zoom / 2.0 - 9.0));
@@ -98,13 +107,13 @@ void W_Grid::draw()
 
 	if (zoom >= 22)
 	{
-		fl_color(fl_color_cube(0, 0, 1));
+		fl_color(FL_GRAY_RAMP + 2);
 		draw_grid(1);
 	}
 
 	if (zoom >= 16)
 	{
-		fl_color(fl_color_cube(0, 1, 1));
+		fl_color(fl_color_cube(0, 0, 1));
 		draw_grid(8);
 	}
 
@@ -116,9 +125,14 @@ void W_Grid::draw()
 
 	if (true)
 	{
-		fl_color(fl_color_cube(0, 0, 4));
+		fl_color(fl_color_cube(0, 0, 3));
 		draw_grid(512);
 	}
+
+	node_c *nd = lev_nodes.Get(lev_nodes.num - 1);
+
+	draw_partition(nd);
+	draw_node(nd);
 
 	fl_pop_clip();
 }
@@ -164,6 +178,117 @@ void W_Grid::draw_grid(int spacing)
 		if (wy > y2) break;
 		fl_xyline(x1, wy, x2);
 	}
+
+	int rx1, ry1;
+	int rx2, ry2;
+
+	MapToWin(-500, +300, &rx1, &ry1);
+	MapToWin(+200, -400, &rx2, &ry2);
+}
+
+void W_Grid::draw_partition(const node_c *nd)
+{
+	int x1 = x();
+	int y1 = y();
+
+	int x2 = x() + w();
+	int y2 = y() + h();
+
+	int mx1 = nd->x;
+	int my1 = nd->y;
+	int mx2 = mx1 + nd->dx;
+	int my2 = my1 + nd->dy;
+
+	int nx1, ny1;
+	int nx2, ny2;
+
+	for (;;)
+	{
+		MapToWin(mx1, my1, &nx1, &ny1);
+		MapToWin(mx2, my2, &nx2, &ny2);
+	
+		if (MAX(nx1, nx2) < x1 || MIN(nx1, nx2) > x2)
+			return;
+
+		if (MAX(ny1, ny2) < y1 || MIN(ny1, ny2) > y2)
+			return;
+
+		bool in_1 = (x1 < nx1 && nx1 < x2) && (y1 < ny1 && ny1 < y2);
+		bool in_2 = (x1 < nx2 && nx2 < x2) && (y1 < ny2 && ny2 < y2);
+
+		if (in_1 || in_2)
+		{
+			int mdx = mx2 - mx1;
+			int mdy = my2 - my1;
+
+			mx1 -= mdx; my1 -= mdy;
+			mx2 += mdx; my2 += mdy;
+
+			continue;
+		}
+
+		break;
+	}
+
+	fl_color(FL_MAGENTA);
+	fl_line(nx1, ny1, nx2, ny2);
+}
+
+void W_Grid::draw_node(const node_c *nd)
+{
+	for (int side = 0; side < 2; side++)
+	{
+		const child_t *ch = (side == 0) ? &nd->r  : &nd->l;
+		
+		draw_child(ch);
+	}
+}
+
+void W_Grid::draw_child(const child_t *ch)
+{
+	//!!! FIXME: bbox check
+
+	if (ch->node)
+	{
+		draw_node(ch->node);
+		return;
+	}
+
+	subsec_c *sub = ch->subsec;
+
+	for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
+	{
+		int sx1, sy1;
+		int sx2, sy2;
+
+		// skip left sides (for efficiency)
+
+		if (seg->side)
+			continue;
+
+		MapToWin(seg->start->x, seg->start->y, &sx1, &sy1);
+		MapToWin(seg->end  ->x, seg->end  ->y, &sx2, &sy2);
+		
+		fl_color(seg->linedef ? seg->linedef->left ? 
+			(ABS(seg->linedef->left->sector->floor_h - seg->linedef->right->sector->floor_h) > 24) ? FL_GREEN : FL_GRAY_RAMP+15 : FL_WHITE : fl_color_cube(0,4,3));
+		fl_line(sx1, sy1, sx2, sy2);
+	}
+}
+
+void W_Grid::scroll(int dx, int dy)
+{
+	dx = dx * w() / 10;
+	dy = dy * h() / 10;
+
+	double mdx = dx / zoom_mul;
+	double mdy = dy / zoom_mul;
+
+	mid_x += mdx;
+	mid_y += mdy;
+
+// fprintf(stderr, "Scroll pix (%d,%d) map (%1.1f, %1.1f) mid (%1.1f, %1.1f)\n", dx, dy, mdx, mdy, mid_x, mid_y);
+
+	redraw();
 }
 
 //------------------------------------------------------------------------
@@ -209,20 +334,38 @@ int W_Grid::handle_key(int key)
 	if (key == 0)
 		return 0;
 
-	if (key == '+' || key == '=')
+	switch (key)
 	{
-		if (zoom < MAX_GRID_ZOOM)
+		case '+': case '=':
 			SetZoom(zoom + 1);
+			return 1;
 
-		return 1;
-	}
-
-	if (key == '-' || key == '_')
-	{
-		if (zoom > MIN_GRID_ZOOM)
+		case '-': case '_':
 			SetZoom(zoom - 1);
+			return 1;
 
-		return 1;
+		case FL_Left:
+			scroll(-1, 0);
+			return 1;
+
+		case FL_Right:
+			scroll(+1, 0);
+			return 1;
+
+		case FL_Up:
+			scroll(0, +1);
+			return 1;
+
+		case FL_Down:
+			scroll(0, -1);
+			return 1;
+
+		case 'x':
+			DialogShowAndGetChoice(ALERT_TXT, 0, "Please foo the joo.");
+			return 1;
+
+		default:
+			break;
 	}
 
 	return 0;  // unused

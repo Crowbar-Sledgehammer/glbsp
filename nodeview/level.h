@@ -20,13 +20,13 @@
 #define __NODEVIEW_LEVEL_H__
 
 
-struct node_s;
-struct sector_s;
-struct superblock_s;
+class node_c;
+class sector_c;
 
 
-typedef struct vertex_s
+class vertex_c
 {
+public:
 	// coordinates
 	double x, y;
 
@@ -34,33 +34,19 @@ typedef struct vertex_s
 	// vertices has occurred.  For GL vertices, bit 30 will be set.
 	int index;
 
-	// reference count.  When building normal node info, unused vertices
-	// will be pruned.
-	int ref_count;
-
-	// usually NULL, unless this vertex occupies the same location as a
-	// previous vertex.  Only used during the pruning phase.
-	struct vertex_s *equiv;
-}
-vertex_t;
+	vertex_c(int _idx, const raw_vertex_t *raw);
+	vertex_c(int _idx, const raw_v2_vertex_t *raw);
+	~vertex_c();
+};
 
 #define IS_GL_VERTEX  (1 << 30)
 
 
-typedef struct sector_s
+class sector_c
 {
+public:
 	// sector index.  Always valid after loading & pruning.
 	int index;
-
-	// allow segs from other sectors to coexist in a subsector.
-	char coalesce;
-
-	// -JL- non-zero if this sector contains a polyobj.
-	int has_polyobj;
-
-	// reference count.  When building normal nodes, unused sectors will
-	// be pruned.
-	int ref_count;
 
 	// heights
 	int floor_h, ceil_h;
@@ -73,14 +59,17 @@ typedef struct sector_s
 	int light;
 	int special;
 	int tag;
-}
-sector_t;
+
+	sector_c(int _idx, const raw_sector_t *raw);
+	~sector_c();
+};
 
 
-typedef struct sidedef_s
+class sidedef_c
 {
+public:
 	// adjacent sector.  Can be NULL (invalid sidedef)
-	sector_t *sector;
+	sector_c *sector;
 
 	// offset values
 	int x_offset, y_offset;
@@ -93,38 +82,22 @@ typedef struct sidedef_s
 	// sidedef index.  Always valid after loading & pruning.
 	int index;
 
-	// reference count.  When building normal nodes, unused sidedefs will
-	// be pruned.
-	int ref_count;
-
-	// usually NULL, unless this sidedef is exactly the same as a
-	// previous one.  Only used during the pruning phase.
-	struct sidedef_s *equiv;
-
-	// this is true if the sidedef is on a special line.  We don't merge
-	// these sidedefs together, as they might scroll, or change texture
-	// when a switch is pressed.
-	int on_special;
-}
-sidedef_t;
+	sidedef_c(int _idx, const raw_sidedef_t *raw);
+	~sidedef_c();
+};
 
 
-typedef struct linedef_s
+class linedef_c
 {
-	// link for list
-	struct linedef_s *next;
+public:
+	vertex_c *start;    // from this vertex...
+	vertex_c *end;      // ... to this vertex
 
-	vertex_t *start;    // from this vertex...
-	vertex_t *end;      // ... to this vertex
-
-	sidedef_t *right;   // right sidedef
-	sidedef_t *left;    // left sidede, or NULL if none
+	sidedef_c *right;   // right sidedef
+	sidedef_c *left;    // left sidede, or NULL if none
 
 	// line is marked two-sided
 	char two_sided;
-
-	// prefer not to split
-	char is_precious;
 
 	// zero length (line should be totally ignored)
 	char zero_len;
@@ -136,20 +109,19 @@ typedef struct linedef_s
 	// Hexen support
 	int specials[5];
 
-	// normally NULL, except when this linedef directly overlaps an earlier
-	// one (a rarely-used trick to create higher mid-masked textures).
-	// No segs should be created for these overlapping linedefs.
-	struct linedef_s *overlap;
-
 	// linedef index.  Always valid after loading & pruning of zero
 	// length lines has occurred.
 	int index;
-}
-linedef_t;
+
+	linedef_c(int _idx, const raw_linedef_t *raw);
+	linedef_c(int _idx, const raw_hexen_linedef_t *raw);
+	~linedef_c();
+};
 
 
-typedef struct thing_s
+class thing_c
 {
+public:
 	int x, y;
 	int type;
 	int options;
@@ -159,69 +131,62 @@ typedef struct thing_s
 
 	// Always valid (thing indices never change).
 	int index;
-}
-thing_t;
+
+	thing_c(int _idx, const raw_thing_t *raw);
+	thing_c(int _idx, const raw_hexen_thing_t *raw);
+	~thing_c();
+};
 
 
-typedef struct seg_s
+class seg_c
 {
+public:
 	// link for list
-	struct seg_s *next;
+	struct seg_c *next;
 
-	vertex_t *start;   // from this vertex...
-	vertex_t *end;     // ... to this vertex
+	vertex_c *start;   // from this vertex...
+	vertex_c *end;     // ... to this vertex
 
 	// linedef that this seg goes along, or NULL if miniseg
-	linedef_t *linedef;
+	linedef_c *linedef;
 
 	// adjacent sector, or NULL if invalid sidedef or miniseg
-	sector_t *sector;
+	sector_c *sector;
 
 	// 0 for right, 1 for left
 	int side;
 
-	// seg on other side, or NULL if one-sided.  This relationship is
-	// always one-to-one -- if one of the segs is split, the partner seg
-	// must also be split.
-	struct seg_s *partner;
+///	// seg on other side, or NULL if one-sided.  This relationship is
+///	// always one-to-one -- if one of the segs is split, the partner seg
+///	// must also be split.
+///	struct seg_c *partner;
 
 	// seg index.  Only valid once the seg has been added to a
 	// subsector.  A negative value means it is invalid -- there
 	// shouldn't be any of these once the BSP tree has been built.
 	int index;
 
-	// when 1, this seg has become zero length (integer rounding of the
-	// start and end vertices produces the same location).  It should be
-	// ignored when writing the SEGS or V1 GL_SEGS lumps.  [Note: there
-	// won't be any of these when writing the V2 GL_SEGS lump].
-	int degenerate;
-
-	// the superblock that contains this seg, or NULL if the seg is no
-	// longer in any superblock (e.g. now in a subsector).
-	struct superblock_s *block;
-
-	// precomputed data for fast calculations
+	// precomputed data for faster calculations
 	double psx, psy;
 	double pex, pey;
 	double pdx, pdy;
 
-	double p_length;
-	double p_angle;
-	double p_para;
-	double p_perp;
+	double p_length, p_angle;
+	double p_para,   p_perp;
 
-	// linedef that this seg initially comes from.  For "real" segs,
-	// this is just the same as the `linedef' field above.  For
-	// "minisegs", this is the linedef of the partition line.
-	linedef_t *source_line;
-}
-seg_t;
+	seg_c(int _idx, const raw_gl_seg_t *raw);
+	seg_c(int _idx, const raw_v3_seg_t *raw);
+	~seg_c();
+
+	void precompute_data();
+};
 
 
-typedef struct subsec_s
+class subsec_c
 {
+public:
 	// list of segs
-	seg_t *seg_list;
+	seg_c *seg_list;
 
 	// count of segs
 	int seg_count;
@@ -233,14 +198,23 @@ typedef struct subsec_s
 	// approximate middle point
 	double mid_x;
 	double mid_y;
-}
-subsec_t;
+
+	subsec_c(int _idx, const raw_subsec_t *raw);
+	subsec_c(int _idx, const raw_v3_subsec_t *raw);
+	~subsec_c();
+
+	void append_seg(seg_c *cur);
+	void build_seg_list(int first, int count);
+	// builds the list of segs, and also determines mid point.
+};
 
 
 typedef struct bbox_s
 {
 	int minx, miny;
 	int maxx, maxy;
+
+	void from_raw(const raw_bbox_t *raw);
 }
 bbox_t;
 
@@ -248,8 +222,8 @@ bbox_t;
 typedef struct child_s
 {
 	// child node or subsector (one must be NULL)
-	struct node_s *node;
-	subsec_t *subsec;
+	node_c *node;
+	subsec_c *subsec;
 
 	// child bounding box
 	bbox_t bounds;
@@ -257,8 +231,9 @@ typedef struct child_s
 child_t;
 
 
-typedef struct node_s
+class node_c
 {
+public:
 	int x, y;     // starting point
 	int dx, dy;   // offset to ending point
 
@@ -270,86 +245,106 @@ typedef struct node_s
 	// created.
 	int index;
 
-	// the node is too long, and the (dx,dy) values should be halved
-	// when writing into the NODES lump.
-	int too_long;
-}
-node_t;
-
-
-typedef struct superblock_s
-{
-	// parent of this block, or NULL for a top-level block
-	struct superblock_s *parent;
-
-	// coordinates on map for this block, from lower-left corner to
-	// upper-right corner.  Pseudo-inclusive, i.e (x,y) is inside block
-	// if and only if x1 <= x < x2 and y1 <= y < y2.
-	int x1, y1;
-	int x2, y2;
-
-	// sub-blocks.  NULL when empty.  [0] has the lower coordinates, and
-	// [1] has the higher coordinates.  Division of a square always
-	// occurs horizontally (e.g. 512x512 -> 256x512 -> 256x256).
-	struct superblock_s *subs[2];
-
-	// number of real segs and minisegs contained by this block
-	// (including all sub-blocks below it).
-	int real_num;
-	int mini_num;
-
-	// list of segs completely contained by this block.
-	seg_t *segs;
-}
-superblock_t;
-
-#define SUPER_IS_LEAF(s)  \
-    ((s)->x2-(s)->x1 <= 256 && (s)->y2-(s)->y1 <= 256)
+	node_c (int _idx, const raw_node_t *raw);
+	~node_c();
+};
 
 
 /* ----- Level data arrays ----------------------- */
 
-extern int num_vertices;
-extern int num_linedefs;
-extern int num_sidedefs;
-extern int num_sectors;
-extern int num_things;
-extern int num_segs;
-extern int num_subsecs;
-extern int num_nodes;
-extern int num_stale_nodes;
+template <typename TYPE> class container_tp
+{
+public:
+	int num;
 
-extern int num_normal_vert;
-extern int num_gl_vert;
-extern int num_complete_seg;
+private:
+	TYPE ** arr;
 
+	const char *const name;
+
+public:
+	container_tp(const char *type_name) : num(0), arr(NULL), name(type_name)
+	{
+	}
+	
+	~container_tp()
+	{
+		if (arr)
+			FreeAll();
+	}
+
+	void Allocate(int _num)
+	{
+		if (arr)
+			FreeAll();
+
+		num = _num;
+		arr = new TYPE* [num];
+
+		for (int i = 0; i < num; i++)
+		{
+			arr[i] = NULL;	
+		}
+	}
+
+	void FreeAll()
+	{
+		for (int i = 0; i < num; i++)
+		{
+			if (arr[i] != NULL)
+				delete arr[i];	
+		}
+
+		delete[] arr;
+
+		num = 0;
+		arr = NULL;
+	}
+
+	void Set(int index, TYPE *cur)
+	{
+		if (arr[index] != NULL)
+			delete arr[index];
+
+		arr[index] = cur;
+	}
+
+	TYPE *Get(int index)
+	{
+		if (index < 0 || index >= num)
+		{
+			FatalError("No such %s number #%d", name, index);
+		}
+
+		return arr[index];
+	}
+};
+
+#define EXTERN_LEVELARRAY(TYPE, BASEVAR)  \
+    extern container_tp<TYPE> BASEVAR;
+
+EXTERN_LEVELARRAY(vertex_c,  lev_vertices)
+EXTERN_LEVELARRAY(vertex_c,  lev_gl_verts)
+EXTERN_LEVELARRAY(linedef_c, lev_linedefs)
+EXTERN_LEVELARRAY(sidedef_c, lev_sidedefs)
+EXTERN_LEVELARRAY(sector_c,  lev_sectors)
+EXTERN_LEVELARRAY(thing_c,   lev_things)
+EXTERN_LEVELARRAY(seg_c,     lev_segs)
+EXTERN_LEVELARRAY(subsec_c,  lev_subsecs)
+EXTERN_LEVELARRAY(node_c,    lev_nodes)
 
 /* ----- function prototypes ----------------------- */
 
-// allocation routines
-vertex_t *NewVertex(void);
-linedef_t *NewLinedef(void);
-sidedef_t *NewSidedef(void);
-sector_t *NewSector(void);
-thing_t *NewThing(void);
-seg_t *NewSeg(void);
-subsec_t *NewSubsec(void);
-node_t *NewNode(void);
-node_t *NewStaleNode(void);
-
-// lookup routines
-vertex_t *LookupVertex(int index);
-linedef_t *LookupLinedef(int index);
-sidedef_t *LookupSidedef(int index);
-sector_t *LookupSector(int index);
-thing_t *LookupThing(int index);
-seg_t *LookupSeg(int index);
-subsec_t *LookupSubsec(int index);
-node_t *LookupNode(int index);
-node_t *LookupStaleNode(int index);
-
-// check whether the current level already has normal nodes
-bool CheckForNormalNodes(void);
+///--- // lookup routines
+///--- vertex_c *LookupVertex(int index);
+///--- linedef_c *LookupLinedef(int index);
+///--- sidedef_c *LookupSidedef(int index);
+///--- sector_c *LookupSector(int index);
+///--- thing_c *LookupThing(int index);
+///--- seg_c *LookupSeg(int index);
+///--- subsec_c *LookupSubsec(int index);
+///--- node_c *LookupNode(int index);
+///--- node_c *LookupStaleNode(int index);
 
 // load all level data for the current level
 void LoadLevel(void);

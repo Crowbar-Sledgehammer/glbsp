@@ -140,6 +140,12 @@ private:
 	// FLTK virtual method for drawing.
 
 	void draw_grid(int spacing);
+	void draw_partition(const node_c *nd);
+	void draw_node(const node_c *nd);
+	void draw_child(const child_t *ch);
+
+	void scroll(int dx, int dy);
+	// scroll the map
 
 public:
 	int handle_key(int key);
@@ -160,7 +166,7 @@ private:
 	double mid_y;
 };
 
-#define GRID_FIND(x,y)  int(((x) < 0) ? fmod((x),(y)) + (y) : fmod((x),(y)))
+#define GRID_FIND(x,y)  int( (x) - fmod((x),(y)) + ((x) < 0) ? (y) : 0 )
 
 
 //

@@ -22,187 +22,53 @@
 #define DEBUG_LOAD      0
 #define DEBUG_BSP       0
 
-#define ALLOC_BLKNUM  1024
-
 
 // per-level variables
 
-bool lev_doing_normal;
 bool lev_doing_hexen;
 
-static bool lev_v3_segs;
-static bool lev_v3_subsecs;
 
+#define LEVELARRAY(TYPE, BASEVAR, NAMESTR)  \
+    container_tp<TYPE> BASEVAR(NAMESTR);
 
-#define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
-    TYPE ** BASEVAR = NULL;  \
-    int NUMVAR = 0;
-
-
-LEVELARRAY(vertex_t,  lev_vertices,   num_vertices)
-LEVELARRAY(linedef_t, lev_linedefs,   num_linedefs)
-LEVELARRAY(sidedef_t, lev_sidedefs,   num_sidedefs)
-LEVELARRAY(sector_t,  lev_sectors,    num_sectors)
-LEVELARRAY(thing_t,   lev_things,     num_things)
-
-static LEVELARRAY(seg_t,     segs,       num_segs)
-static LEVELARRAY(subsec_t,  subsecs,    num_subsecs)
-static LEVELARRAY(node_t,    nodes,      num_nodes)
-static LEVELARRAY(node_t,    stale_nodes,num_stale_nodes)
-
-
-int num_normal_vert = 0;
-int num_gl_vert = 0;
-int num_complete_seg = 0;
-
-
-/* ----- allocation routines ---------------------------- */
-
-#define ALLIGATOR(TYPE, BASEVAR, NUMVAR)  \
-{  \
-	if ((NUMVAR % ALLOC_BLKNUM) == 0)  \
-	{  \
-	BASEVAR = (TYPE **) UtilRealloc(BASEVAR, (NUMVAR + ALLOC_BLKNUM) *   \
-		sizeof(TYPE *));  \
-	}  \
-	BASEVAR[NUMVAR] = (TYPE *) UtilCalloc(sizeof(TYPE));  \
-	NUMVAR += 1;  \
-	return BASEVAR[NUMVAR - 1];  \
-}
-
-
-vertex_t *NewVertex(void)
-    ALLIGATOR(vertex_t, lev_vertices, num_vertices)
-
-linedef_t *NewLinedef(void)
-    ALLIGATOR(linedef_t, lev_linedefs, num_linedefs)
-
-sidedef_t *NewSidedef(void)
-    ALLIGATOR(sidedef_t, lev_sidedefs, num_sidedefs)
-
-sector_t *NewSector(void)
-    ALLIGATOR(sector_t, lev_sectors, num_sectors)
-
-thing_t *NewThing(void)
-    ALLIGATOR(thing_t, lev_things, num_things)
-
-seg_t *NewSeg(void)
-    ALLIGATOR(seg_t, segs, num_segs)
-
-subsec_t *NewSubsec(void)
-    ALLIGATOR(subsec_t, subsecs, num_subsecs)
-
-node_t *NewNode(void)
-    ALLIGATOR(node_t, nodes, num_nodes)
-
-node_t *NewStaleNode(void)
-    ALLIGATOR(node_t, stale_nodes, num_stale_nodes)
-
-
-/* ----- free routines ---------------------------- */
-
-#define FREEMASON(TYPE, BASEVAR, NUMVAR)  \
-{  \
-	int i;  \
-	for (i=0; i < NUMVAR; i++)  \
-		UtilFree(BASEVAR[i]);  \
-	if (BASEVAR)  \
-		UtilFree(BASEVAR);  \
-	BASEVAR = NULL; NUMVAR = 0;  \
-}
-
-
-void FreeVertices(void)
-    FREEMASON(vertex_t, lev_vertices, num_vertices)
-
-void FreeLinedefs(void)
-    FREEMASON(linedef_t, lev_linedefs, num_linedefs)
-
-void FreeSidedefs(void)
-    FREEMASON(sidedef_t, lev_sidedefs, num_sidedefs)
-
-void FreeSectors(void)
-    FREEMASON(sector_t, lev_sectors, num_sectors)
-
-void FreeThings(void)
-    FREEMASON(thing_t, lev_things, num_things)
-
-void FreeSegs(void)
-    FREEMASON(seg_t, segs, num_segs)
-
-void FreeSubsecs(void)
-    FREEMASON(subsec_t, subsecs, num_subsecs)
-
-void FreeNodes(void)
-    FREEMASON(node_t, nodes, num_nodes)
-
-void FreeStaleNodes(void)
-    FREEMASON(node_t, stale_nodes, num_stale_nodes)
-
-
-/* ----- lookup routines ------------------------------ */
-
-#define LOOKERUPPER(BASEVAR, NUMVAR, NAMESTR)  \
-{  \
-	if (index < 0 || index >= NUMVAR)  \
-		FatalError("No such %s number #%d", NAMESTR, index);  \
-	\
-	return BASEVAR[index];  \
-}
-
-vertex_t *LookupVertex(int index)
-      LOOKERUPPER(lev_vertices, num_vertices, "vertex")
-
-linedef_t *LookupLinedef(int index)
-      LOOKERUPPER(lev_linedefs, num_linedefs, "linedef")
-  
-sidedef_t *LookupSidedef(int index)
-      LOOKERUPPER(lev_sidedefs, num_sidedefs, "sidedef")
-  
-sector_t *LookupSector(int index)
-      LOOKERUPPER(lev_sectors, num_sectors, "sector")
-  
-thing_t *LookupThing(int index)
-      LOOKERUPPER(lev_things, num_things, "thing")
-  
-seg_t *LookupSeg(int index)
-      LOOKERUPPER(segs, num_segs, "seg")
-  
-subsec_t *LookupSubsec(int index)
-      LOOKERUPPER(subsecs, num_subsecs, "subsector")
-  
-node_t *LookupNode(int index)
-      LOOKERUPPER(nodes, num_nodes, "node")
-
-node_t *LookupStaleNode(int index)
-      LOOKERUPPER(stale_nodes, num_stale_nodes, "stale_node")
+LEVELARRAY(vertex_c,  lev_vertices, "vertex")
+LEVELARRAY(vertex_c,  lev_gl_verts, "gl_vert")
+LEVELARRAY(linedef_c, lev_linedefs, "linedef")
+LEVELARRAY(sidedef_c, lev_sidedefs, "sidedef")
+LEVELARRAY(sector_c,  lev_sectors,  "sector")
+LEVELARRAY(thing_c,   lev_things,   "thing")
+LEVELARRAY(seg_c,     lev_segs,     "seg")
+LEVELARRAY(subsec_c,  lev_subsecs,  "subsector")
+LEVELARRAY(node_c,    lev_nodes,    "node")
 
 
 /* ----- reading routines ------------------------------ */
 
+static const uint8_g *lev_v2_magic = (uint8_g *)"gNd2";
+static const uint8_g *lev_v3_magic = (uint8_g *)"gNd3";
 
-//
-// CheckForNormalNodes
-//
-bool CheckForNormalNodes(void)
+// forward decls
+void GetLinedefsHexen(void);
+void GetThingsHexen(void);
+
+vertex_c::vertex_c(int _idx, const raw_vertex_t *raw)
 {
-	lump_t *lump;
+	index = _idx;
 
-	/* Note: an empty NODES lump can be valid */
-	if (FindLevelLump("NODES") == NULL)
-		return false;
+	x = (double) SINT16(raw->x);
+	y = (double) SINT16(raw->y);
+}
 
-	lump = FindLevelLump("SEGS");
+vertex_c::vertex_c(int _idx, const raw_v2_vertex_t *raw)
+{
+	index = _idx;
 
-	if (! lump || lump->length == 0 || CheckLevelLumpZero(lump))
-		return false;
+	x = (double) SINT32(raw->x) / 65536.0;
+	y = (double) SINT32(raw->y) / 65536.0;
+}
 
-	lump = FindLevelLump("SSECTORS");
-
-	if (! lump || lump->length == 0 || CheckLevelLumpZero(lump))
-		return false;
-
-	return true;
+vertex_c::~vertex_c()
+{
 }
 
 //
@@ -210,9 +76,8 @@ bool CheckForNormalNodes(void)
 //
 void GetVertices(void)
 {
-	int i, count=-1;
-	raw_vertex_t *raw;
 	lump_t *lump = FindLevelLump("VERTEXES");
+	int count = -1;
 
 	if (lump)
 		count = lump->length / sizeof(raw_vertex_t);
@@ -224,21 +89,82 @@ void GetVertices(void)
 	if (!lump || count == 0)
 		FatalError("Couldn't find any Vertices");
 
-	raw = (raw_vertex_t *) lump->data;
+	lev_vertices.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_vertex_t *raw = (raw_vertex_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		vertex_t *vert = NewVertex();
+		lev_vertices.Set(i, new vertex_c(i, raw));
+	}
+}
 
-		vert->x = (double) SINT16(raw->x);
-		vert->y = (double) SINT16(raw->y);
+//
+// GetV2Verts
+//
+void GetV2Verts(const uint8_g *data, int length)
+{
+	int count = length / sizeof(raw_v2_vertex_t);
 
-		vert->index = i;
+	lev_gl_verts.Allocate(count);
+
+	raw_v2_vertex_t *raw = (raw_v2_vertex_t *) data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_gl_verts.Set(i, new vertex_c(i, raw));
+	}
+}
+
+//
+// GetGLVerts
+//
+void GetGLVerts(void)
+{
+	lump_t *lump = FindLevelLump("GL_VERT");
+
+# if DEBUG_LOAD
+	PrintDebug("GetVertices: num = %d\n", count);
+# endif
+
+	if (!lump)
+		FatalError("Couldn't find any GL Vertices");
+
+	if (lump->length >= 4 && memcmp(lump->data, lev_v2_magic, 4) == 0)
+	{
+		GetV2Verts((uint8_g *)lump->data + 4, lump->length - 4);
+		return;
 	}
 
-	num_normal_vert = num_vertices;
-	num_gl_vert = 0;
-	num_complete_seg = 0;
+	int count = lump->length / sizeof(raw_vertex_t);
+
+	lev_gl_verts.Allocate(count);
+
+	raw_vertex_t *raw = (raw_vertex_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_gl_verts.Set(i, new vertex_c(i, raw));
+	}
+}
+
+sector_c::sector_c(int _idx, const raw_sector_t *raw)
+{
+	index = _idx;
+
+	floor_h = SINT16(raw->floor_h);
+	ceil_h  = SINT16(raw->ceil_h);
+
+	memcpy(floor_tex, raw->floor_tex, sizeof(floor_tex));
+	memcpy(ceil_tex,  raw->ceil_tex,  sizeof(ceil_tex));
+
+	light   = UINT16(raw->light);
+	special = UINT16(raw->special);
+	tag     = SINT16(raw->tag);
+}
+
+sector_c::~sector_c()
+{
 }
 
 //
@@ -246,8 +172,7 @@ void GetVertices(void)
 //
 void GetSectors(void)
 {
-	int i, count=-1;
-	raw_sector_t *raw;
+	int count = -1;
 	lump_t *lump = FindLevelLump("SECTORS");
 
 	if (lump)
@@ -260,30 +185,40 @@ void GetSectors(void)
 	PrintDebug("GetSectors: num = %d\n", count);
 # endif
 
-	raw = (raw_sector_t *) lump->data;
+	lev_sectors.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_sector_t *raw = (raw_sector_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		sector_t *sector = NewSector();
-
-		sector->floor_h = SINT16(raw->floor_h);
-		sector->ceil_h  = SINT16(raw->ceil_h);
-
-		memcpy(sector->floor_tex, raw->floor_tex, sizeof(sector->floor_tex));
-		memcpy(sector->ceil_tex,  raw->ceil_tex,  sizeof(sector->ceil_tex));
-
-		sector->light = UINT16(raw->light);
-		sector->special = UINT16(raw->special);
-		sector->tag = SINT16(raw->tag);
-
-		sector->coalesce = (sector->tag >= 900 && sector->tag < 1000) ?
-			true : false;
-
-		/* sector indices never change */
-		sector->index = i;
-
-		/* Note: rej_* fields are handled completely in reject.c */
+		lev_sectors.Set(i, new sector_c(i, raw));
 	}
+}
+
+thing_c::thing_c(int _idx, const raw_thing_t *raw)
+{
+	index = _idx;
+
+	x = SINT16(raw->x);
+	y = SINT16(raw->y);
+
+	type    = UINT16(raw->type);
+	options = UINT16(raw->options);
+}
+
+thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
+{
+	index = _idx;
+
+	x = SINT16(raw->x);
+	y = SINT16(raw->y);
+
+	type    = UINT16(raw->type);
+	options = UINT16(raw->options);
+}
+
+thing_c::~thing_c()
+{
 }
 
 //
@@ -291,8 +226,13 @@ void GetSectors(void)
 //
 void GetThings(void)
 {
-	int i, count=-1;
-	raw_thing_t *raw;
+	if (lev_doing_hexen)
+	{
+		GetThingsHexen();
+		return;
+	}
+	
+	int count = -1;
 	lump_t *lump = FindLevelLump("THINGS");
 
 	if (lump)
@@ -310,19 +250,13 @@ void GetThings(void)
 	PrintDebug("GetThings: num = %d\n", count);
 # endif
 
-	raw = (raw_thing_t *) lump->data;
+	lev_things.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_thing_t *raw = (raw_thing_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		thing_t *thing = NewThing();
-
-		thing->x = SINT16(raw->x);
-		thing->y = SINT16(raw->y);
-
-		thing->type = UINT16(raw->type);
-		thing->options = UINT16(raw->options);
-
-		thing->index = i;
+		lev_things.Set(i, new thing_c(i, raw));
 	}
 }
 
@@ -331,8 +265,7 @@ void GetThings(void)
 //
 void GetThingsHexen(void)
 {
-	int i, count=-1;
-	raw_hexen_thing_t *raw;
+	int count = -1;
 	lump_t *lump = FindLevelLump("THINGS");
 
 	if (lump)
@@ -350,20 +283,33 @@ void GetThingsHexen(void)
 	PrintDebug("GetThingsHexen: num = %d\n", count);
 # endif
 
-	raw = (raw_hexen_thing_t *) lump->data;
+	lev_things.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_hexen_thing_t *raw = (raw_hexen_thing_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		thing_t *thing = NewThing();
-
-		thing->x = SINT16(raw->x);
-		thing->y = SINT16(raw->y);
-
-		thing->type = UINT16(raw->type);
-		thing->options = UINT16(raw->options);
-
-		thing->index = i;
+		lev_things.Set(i, new thing_c(i, raw));
 	}
+}
+
+sidedef_c::sidedef_c(int _idx, const raw_sidedef_t *raw)
+{
+	index = _idx;
+
+	sector = (SINT16(raw->sector) == -1) ? NULL :
+		lev_sectors.Get(UINT16(raw->sector));
+
+	x_offset = SINT16(raw->x_offset);
+	y_offset = SINT16(raw->y_offset);
+
+	memcpy(upper_tex, raw->upper_tex, sizeof(upper_tex));
+	memcpy(lower_tex, raw->lower_tex, sizeof(lower_tex));
+	memcpy(mid_tex,   raw->mid_tex,   sizeof(mid_tex));
+}
+
+sidedef_c::~sidedef_c()
+{
 }
 
 //
@@ -371,8 +317,7 @@ void GetThingsHexen(void)
 //
 void GetSidedefs(void)
 {
-	int i, count=-1;
-	raw_sidedef_t *raw;
+	int count = -1;
 	lump_t *lump = FindLevelLump("SIDEDEFS");
 
 	if (lump)
@@ -385,39 +330,76 @@ void GetSidedefs(void)
 	PrintDebug("GetSidedefs: num = %d\n", count);
 # endif
 
-	raw = (raw_sidedef_t *) lump->data;
+	lev_sidedefs.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_sidedef_t *raw = (raw_sidedef_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		sidedef_t *side = NewSidedef();
-
-		side->sector = (SINT16(raw->sector) == -1) ? NULL :
-			LookupSector(UINT16(raw->sector));
-
-		if (side->sector)
-			side->sector->ref_count++;
-
-		side->x_offset = SINT16(raw->x_offset);
-		side->y_offset = SINT16(raw->y_offset);
-
-		memcpy(side->upper_tex, raw->upper_tex, sizeof(side->upper_tex));
-		memcpy(side->lower_tex, raw->lower_tex, sizeof(side->lower_tex));
-		memcpy(side->mid_tex,   raw->mid_tex,   sizeof(side->mid_tex));
-
-		/* sidedef indices never change */
-		side->index = i;
+		lev_sidedefs.Set(i, new sidedef_c(i, raw));
 	}
 }
 
-static sidedef_t *SafeLookupSidedef(uint16_g num)
+static sidedef_c *SafeLookupSidedef(uint16_g num)
 {
 	if (num == 0xFFFF)
 		return NULL;
 
-	if ((int)num >= num_sidedefs && (sint16_g)(num) < 0)
+	if ((int)num >= lev_sidedefs.num && (sint16_g)(num) < 0)
 		return NULL;
 
-	return LookupSidedef(num);
+	return lev_sidedefs.Get(num);
+}
+
+linedef_c::linedef_c(int _idx, const raw_linedef_t *raw)
+{
+	index = _idx;
+
+	start = lev_vertices.Get(UINT16(raw->start));
+	end   = lev_vertices.Get(UINT16(raw->end));
+
+	/* check for zero-length line */
+	zero_len = (fabs(start->x - end->x) < DIST_EPSILON) && 
+			   (fabs(start->y - end->y) < DIST_EPSILON);
+
+	flags = UINT16(raw->flags);
+	type  = UINT16(raw->type);
+	tag   = SINT16(raw->tag);
+
+	two_sided = (flags & LINEFLAG_TWO_SIDED) ? true : false;
+
+	right = SafeLookupSidedef(UINT16(raw->sidedef1));
+	left  = SafeLookupSidedef(UINT16(raw->sidedef2));
+}
+
+linedef_c::linedef_c(int _idx, const raw_hexen_linedef_t *raw)
+{
+	index = _idx;
+
+	start = lev_vertices.Get(UINT16(raw->start));
+	end   = lev_vertices.Get(UINT16(raw->end));
+
+	// check for zero-length line
+	zero_len = (fabs(start->x - end->x) < DIST_EPSILON) && 
+	           (fabs(start->y - end->y) < DIST_EPSILON);
+
+	flags = UINT16(raw->flags);
+	type  = UINT8(raw->type);
+	tag   = 0;
+
+	/* read specials */
+	for (int j = 0; j < 5; j++)
+		specials[j] = UINT8(raw->specials[j]);
+
+	// -JL- Added missing twosided flag handling that caused a broken reject
+	two_sided = (flags & LINEFLAG_TWO_SIDED) ? true : false;
+
+	right = SafeLookupSidedef(UINT16(raw->sidedef1));
+	left  = SafeLookupSidedef(UINT16(raw->sidedef2));
+}
+
+linedef_c::~linedef_c()
+{
 }
 
 //
@@ -425,8 +407,13 @@ static sidedef_t *SafeLookupSidedef(uint16_g num)
 //
 void GetLinedefs(void)
 {
-	int i, count=-1;
-	raw_linedef_t *raw;
+	if (lev_doing_hexen)
+	{
+		GetLinedefsHexen();
+		return;
+	}
+	
+	int count = -1;
 	lump_t *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
@@ -439,51 +426,13 @@ void GetLinedefs(void)
 	PrintDebug("GetLinedefs: num = %d\n", count);
 # endif
 
-	raw = (raw_linedef_t *) lump->data;
+	lev_linedefs.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_linedef_t *raw = (raw_linedef_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		linedef_t *line;
-
-		vertex_t *start = LookupVertex(UINT16(raw->start));
-		vertex_t *end   = LookupVertex(UINT16(raw->end));
-
-		start->ref_count++;
-		end->ref_count++;
-
-		line = NewLinedef();
-
-		line->start = start;
-		line->end   = end;
-
-		/* check for zero-length line */
-		line->zero_len = (fabs(start->x - end->x) < DIST_EPSILON) && 
-			(fabs(start->y - end->y) < DIST_EPSILON);
-
-		line->flags = UINT16(raw->flags);
-		line->type = UINT16(raw->type);
-		line->tag  = SINT16(raw->tag);
-
-		line->two_sided = (line->flags & LINEFLAG_TWO_SIDED) ? true : false;
-		line->is_precious = (line->tag >= 900 && line->tag < 1000) ? 
-			true : false;
-
-		line->right = SafeLookupSidedef(UINT16(raw->sidedef1));
-		line->left  = SafeLookupSidedef(UINT16(raw->sidedef2));
-
-		if (line->right)
-		{
-			line->right->ref_count++;
-			line->right->on_special |= (line->type > 0) ? 1 : 0;
-		}
-
-		if (line->left)
-		{
-			line->left->ref_count++;
-			line->left->on_special |= (line->type > 0) ? 1 : 0;
-		}
-
-		line->index = i;
+		lev_linedefs.Set(i, new linedef_c(i, raw));
 	}
 }
 
@@ -492,8 +441,7 @@ void GetLinedefs(void)
 //
 void GetLinedefsHexen(void)
 {
-	int i, j, count=-1;
-	raw_hexen_linedef_t *raw;
+	int count = -1;
 	lump_t *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
@@ -506,67 +454,328 @@ void GetLinedefsHexen(void)
 	PrintDebug("GetLinedefsHexen: num = %d\n", count);
 # endif
 
-	raw = (raw_hexen_linedef_t *) lump->data;
+	lev_linedefs.Allocate(count);
 
-	for (i=0; i < count; i++, raw++)
+	raw_hexen_linedef_t *raw = (raw_hexen_linedef_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		linedef_t *line;
+		lev_linedefs.Set(i, new linedef_c(i, raw));
+	}
+}
 
-		vertex_t *start = LookupVertex(UINT16(raw->start));
-		vertex_t *end   = LookupVertex(UINT16(raw->end));
+static vertex_c *FindVertex16(uint16_g index)
+{
+	if (index & 0x8000)
+		return lev_gl_verts.Get(index & 0x7FFF);
 
-		start->ref_count++;
-		end->ref_count++;
+	return lev_vertices.Get(index);
+}
 
-		line = NewLinedef();
+static vertex_c *FindVertex32(int index)
+{
+	if (index & IS_GL_VERTEX)
+		return lev_gl_verts.Get(index & ~IS_GL_VERTEX);
 
-		line->start = start;
-		line->end   = end;
+	return lev_vertices.Get(index);
+}
 
-		// check for zero-length line
-		line->zero_len = (fabs(start->x - end->x) < DIST_EPSILON) && 
-			(fabs(start->y - end->y) < DIST_EPSILON);
+seg_c::seg_c(int _idx, const raw_gl_seg_t *raw)
+{
+	index = _idx;
 
-		line->flags = UINT16(raw->flags);
-		line->type = UINT8(raw->type);
-		line->tag  = 0;
+	next = NULL;
 
-		/* read specials */
-		for (j=0; j < 5; j++)
-			line->specials[j] = UINT8(raw->specials[j]);
+/// fprintf(stderr, "SEG %d  V %d..%d line %d side %d\n",
+/// index, UINT16(raw->start), UINT16(raw->end), SINT16(raw->linedef), SINT16(raw->side));
 
-		// -JL- Added missing twosided flag handling that caused a broken reject
-		line->two_sided = (line->flags & LINEFLAG_TWO_SIDED) ? true : false;
+	start = FindVertex16(UINT16(raw->start));
+	end   = FindVertex16(UINT16(raw->end));
 
-		line->right = SafeLookupSidedef(UINT16(raw->sidedef1));
-		line->left  = SafeLookupSidedef(UINT16(raw->sidedef2));
+	linedef = (SINT16(raw->linedef) == -1) ? NULL :
+		lev_linedefs.Get(UINT16(raw->linedef));
 
-		// -JL- Added missing sidedef handling that caused all sidedefs to be
-		//      pruned.
-		if (line->right)
-		{
-			line->right->ref_count++;
-			line->right->on_special |= (line->type > 0) ? 1 : 0;
-		}
+	side = UINT16(raw->side);
 
-		if (line->left)
-		{
-			line->left->ref_count++;
-			line->left->on_special |= (line->type > 0) ? 1 : 0;
-		}
+	sidedef_c *sss = NULL;
 
-		line->index = i;
+	if (linedef)
+		sss = side ? linedef->left : linedef->right;
+	
+	sector = sss ? sss->sector : NULL;
+
+	// partner is currently ignored
+
+	precompute_data();
+}
+
+seg_c::seg_c(int _idx, const raw_v3_seg_t *raw)
+{
+	index = _idx;
+
+	next = NULL;
+
+	start = FindVertex32(UINT32(raw->start));
+	end   = FindVertex32(UINT32(raw->end));
+
+	linedef = (SINT16(raw->linedef) == -1) ? NULL :
+		lev_linedefs.Get(UINT16(raw->linedef));
+
+	side = UINT16(raw->flags) & V3SEG_F_LEFT;
+
+	sidedef_c *sss = NULL;
+
+	if (linedef)
+		sss = side ? linedef->left : linedef->right;
+
+	sector = sss ? sss->sector : NULL;
+
+	// partner is currently ignored
+
+	precompute_data();
+}
+
+seg_c::~seg_c()
+{
+}
+
+void seg_c::precompute_data()
+{
+	psx = start->x;
+	psy = start->y;
+
+	pex = end->x;
+	pey = end->y;
+
+	pdx = pex - psx;
+	pdy = pey - psy;
+
+	p_length = UtilComputeDist(pdx, pdy);
+	p_angle  = UtilComputeAngle(pdx, pdy);
+
+/// fprintf(stderr, "|  (%1.0f,%1.0f)->(%1.0f,%1.0f)  Delta (%1.6f, %1.6f)\n",
+/// psx, psy, pex, pey, pdx, pdy);
+
+	if (p_length <= 0)
+		PrintWarn("Seg %d has zero p_length.\n", index);
+
+	p_perp =  psy * pdx - psx * pdy;
+	p_para = -psx * pdx - psy * pdy;
+}
+
+//
+// GetV3Segs
+//
+void GetV3Segs(const uint8_g *data, int length)
+{
+	int count = length / sizeof(raw_v3_seg_t);
+
+	lev_segs.Allocate(count);
+
+	raw_v3_seg_t *raw = (raw_v3_seg_t *) data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_segs.Set(i, new seg_c(i, raw));
 	}
 }
 
 //
-// GetStaleNodes
+// GetGLSegs
 //
-void GetStaleNodes(void)
+void GetGLSegs(void)
 {
-	int i, count=-1;
-	raw_node_t *raw;
-	lump_t *lump = FindLevelLump("NODES");
+	lump_t *lump = FindLevelLump("GL_SEGS");
+
+# if DEBUG_LOAD
+	PrintDebug("GetVertices: num = %d\n", count);
+# endif
+
+	if (!lump)
+		FatalError("Couldn't find any GL Segs");
+
+	if (lump->length >= 4 && memcmp(lump->data, lev_v3_magic, 4) == 0)
+	{
+		GetV3Segs((uint8_g *)lump->data + 4, lump->length - 4);
+		return;
+	}
+
+	int count = lump->length / sizeof(raw_gl_seg_t);
+
+	lev_segs.Allocate(count);
+
+	raw_gl_seg_t *raw = (raw_gl_seg_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_segs.Set(i, new seg_c(i, raw));
+	}
+}
+
+
+subsec_c::subsec_c(int _idx, const raw_subsec_t *raw)
+{
+	index = _idx;
+
+	seg_count = UINT16(raw->num);
+	int first = UINT16(raw->first);
+
+	build_seg_list(first, seg_count);
+}
+
+subsec_c::subsec_c(int _idx, const raw_v3_subsec_t *raw)
+{
+	index = _idx;
+
+	seg_count = UINT32(raw->num);
+	int first = UINT32(raw->first);
+
+	build_seg_list(first, seg_count);
+}
+
+subsec_c::~subsec_c()
+{
+}
+
+void subsec_c::append_seg(seg_c *cur)
+{
+	if (! cur)
+		InternalError("Missing seg for subsector !\n");
+
+	mid_x += (cur->start->x + cur->end->x) / 2.0;
+	mid_y += (cur->start->y + cur->end->y) / 2.0;
+
+	// add it to the tail
+
+	if (! seg_list)
+	{
+		seg_list = cur;
+		return;
+	}
+
+	seg_c *tail = seg_list;
+
+	while (tail->next)
+		tail = tail->next;
+	
+	tail->next = cur;
+}
+
+void subsec_c::build_seg_list(int first, int count)
+{
+	seg_list = NULL;
+
+	mid_x = 0;
+	mid_y = 0;
+
+	for (; count > 0; first++, count--)
+	{
+		seg_c *seg = lev_segs.Get(first);
+
+		append_seg(seg);
+	}
+
+	mid_x /= count;
+	mid_y /= count;
+}
+
+//
+// GetV3Subsecs
+//
+void GetV3Subsecs(const uint8_g *data, int length)
+{
+	int count = length / sizeof(raw_v3_subsec_t);
+
+	lev_subsecs.Allocate(count);
+
+	raw_v3_subsec_t *raw = (raw_v3_subsec_t *) data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_subsecs.Set(i, new subsec_c(i, raw));
+	}
+}
+
+//
+// GetGLSubsecs
+//
+void GetGLSubsecs(void)
+{
+	lump_t *lump = FindLevelLump("GL_SSECT");
+
+# if DEBUG_LOAD
+	PrintDebug("GetVertices: num = %d\n", count);
+# endif
+
+	if (!lump)
+		FatalError("Couldn't find any GL Subsectors");
+
+	if (lump->length >= 4 && memcmp(lump->data, lev_v3_magic, 4) == 0)
+	{
+		GetV3Subsecs((uint8_g *)lump->data + 4, lump->length - 4);
+		return;
+	}
+
+	int count = lump->length / sizeof(raw_subsec_t);
+
+	lev_subsecs.Allocate(count);
+
+	raw_subsec_t *raw = (raw_subsec_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
+	{
+		lev_subsecs.Set(i, new subsec_c(i, raw));
+	}
+}
+
+void bbox_t::from_raw(const raw_bbox_t *raw)
+{
+	minx = SINT16(raw->minx);
+	miny = SINT16(raw->miny);
+	maxx = SINT16(raw->maxx);
+	maxy = SINT16(raw->maxy);
+}
+
+node_c::node_c(int _idx, const raw_node_t *raw)
+{
+	index = _idx;
+
+	x  = SINT16(raw->x);
+	y  = SINT16(raw->y);
+	dx = SINT16(raw->dx);
+	dy = SINT16(raw->dy);
+
+	r.bounds.from_raw(&raw->b1);
+	l.bounds.from_raw(&raw->b2);
+
+	r.node = l.node = NULL;
+	r.subsec = l.subsec = NULL;
+
+	int r_idx = UINT16(raw->right);
+	int l_idx = UINT16(raw->left);
+
+	if (r_idx & 0x8000)
+		r.subsec = lev_subsecs.Get(r_idx & 0x7FFF);
+	else
+		r.node = lev_nodes.Get(r_idx);
+
+	if (l_idx & 0x8000)
+		l.subsec = lev_subsecs.Get(l_idx & 0x7FFF);
+	else
+		l.node = lev_nodes.Get(l_idx);
+}
+
+node_c::~node_c()
+{
+}
+
+//
+// GetGLNodes
+//
+void GetGLNodes(void)
+{
+	int count = -1;
+	lump_t *lump = FindLevelLump("GL_NODES");
 
 	if (lump)
 		count = lump->length / sizeof(raw_node_t);
@@ -578,48 +787,16 @@ void GetStaleNodes(void)
 	PrintDebug("GetStaleNodes: num = %d\n", count);
 # endif
 
-	raw = (raw_node_t *) lump->data;
+	lev_nodes.Allocate(count);
 
-	/* must allocate all the nodes beforehand, since they contain
-	 * internal references to each other.
-	 */
-	for (i=0; i < count; i++)
+	raw_node_t *raw = (raw_node_t *) lump->data;
+
+	for (int i = 0; i < count; i++, raw++)
 	{
-		NewStaleNode();
-	}
-
-	for (i=0; i < count; i++, raw++)
-	{
-		node_t *nd = LookupStaleNode(i);
-
-		nd->x  = SINT16(raw->x);
-		nd->y  = SINT16(raw->y);
-		nd->dx = SINT16(raw->dx);
-		nd->dy = SINT16(raw->dy);
-
-		nd->index = i;
-
-		/* Note: we ignore the subsector references */
-
-		if ((UINT16(raw->right) & 0x8000) == 0)
-		{
-			nd->r.node = LookupStaleNode(UINT16(raw->right));
-		}
-
-		if ((UINT16(raw->left) & 0x8000) == 0)
-		{
-			nd->l.node = LookupStaleNode(UINT16(raw->left));
-		}
-
-		/* we also ignore the bounding boxes -- not needed */
+		lev_nodes.Set(i, new node_c(i, raw));
 	}
 }
 
-
-/* ----- writing routines ------------------------------ */
-
-static const uint8_g *lev_v2_magic = (uint8_g *)"gNd2";
-static const uint8_g *lev_v3_magic = (uint8_g *)"gNd3";
 
 
 /* ----- whole-level routines --------------------------- */
@@ -629,51 +806,25 @@ static const uint8_g *lev_v3_magic = (uint8_g *)"gNd3";
 //
 void LoadLevel(void)
 {
-	char message[256];
-
 	const char *level_name = GetLevelName();
-
-	bool normal_exists = CheckForNormalNodes();
-
-	lev_doing_normal = false;
 
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
-	lev_v3_segs = false;
-	lev_v3_subsecs = lev_v3_segs;
-
-	if (lev_doing_normal)
-		sprintf(message, "Building normal and GL nodes on %s", level_name);
-	else
-		sprintf(message, "Building GL nodes on %s", level_name);
-
-	if (lev_doing_hexen)
-		strcat(message, " (Hexen)");
-
-	PrintVerbose("\n\n");
-	PrintMsg("%s\n", message);
-	PrintVerbose("\n");
-
 	GetVertices();
 	GetSectors();
 	GetSidedefs();
+	GetLinedefs();
+	GetThings();
 
-	if (lev_doing_hexen)
-	{
-		GetLinedefsHexen();
-		GetThingsHexen();
-	}
-	else
-	{
-		GetLinedefs();
-		GetThings();
-	}
+	GetGLVerts();
+	GetGLSegs();
+	GetGLSubsecs();
+	GetGLNodes();
 
-	PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
-			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
+///	PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
+///			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
-	GetStaleNodes();
 }
 
 //
@@ -681,14 +832,14 @@ void LoadLevel(void)
 //
 void FreeLevel(void)
 {
-	FreeVertices();
-	FreeSidedefs();
-	FreeLinedefs();
-	FreeSectors();
-	FreeThings();
-	FreeSegs();
-	FreeSubsecs();
-	FreeNodes();
-	FreeStaleNodes();
+    lev_vertices.FreeAll();
+    lev_gl_verts.FreeAll();
+    lev_linedefs.FreeAll();
+    lev_sidedefs.FreeAll();
+    lev_sectors.FreeAll();
+    lev_things.FreeAll();
+    lev_segs.FreeAll();
+    lev_subsecs.FreeAll();
+    lev_nodes.FreeAll();
 }
 

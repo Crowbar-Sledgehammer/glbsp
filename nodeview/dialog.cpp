@@ -25,6 +25,9 @@ static int cur_diag_result;
 static bool cur_diag_done;
 static const char *cur_diag_guess_name;
 
+static int pref_dialog_x = -1;
+static int pref_dialog_y = -1;
+
 
 static void dialog_closed_CB(Fl_Widget *w, void *data)
 {
@@ -97,8 +100,8 @@ static void DialogRun()
 	// check if the user moved/resized the window
 	if (cur_diag->x() != init_x || cur_diag->y() != init_y)
 	{
-		///    guix_prefs.dialog_x = cur_diag->x();
-		///    guix_prefs.dialog_y = cur_diag->y();
+		pref_dialog_x = cur_diag->x();
+		pref_dialog_y = cur_diag->y();
 	}
 }
 
@@ -147,7 +150,8 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
 	cur_diag->size_range(width, height, width, height);
 	cur_diag->callback((Fl_Callback *) dialog_closed_CB);
 
-	///  cur_diag->position(guix_prefs.dialog_x, guix_prefs.dialog_y);
+	if (pref_dialog_x >= 0)
+		cur_diag->position(pref_dialog_x, pref_dialog_y);
 
 	// set the resizable
 	Fl_Box *box = new Fl_Box(60, 0, width - 3*120, height);
@@ -259,7 +263,8 @@ int DialogQueryFilename(const char *message,
 	cur_diag->size_range(width, height, width, height);
 	cur_diag->callback((Fl_Callback *) dialog_closed_CB);
 
-	/// cur_diag->position(guix_prefs.dialog_x, guix_prefs.dialog_y);
+	if (pref_dialog_x >= 0)
+		cur_diag->position(pref_dialog_x, pref_dialog_y);
 
 	// set the resizable
 	Fl_Box *box = new Fl_Box(0, height-1, width, 1);

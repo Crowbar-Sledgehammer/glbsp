@@ -72,6 +72,9 @@ void MainSetDefaults(void)
 
 int main(int argc, char **argv)
 {
+	InitDebug();
+	InitEndian();
+
 	if (argc > 1 &&
 		(strcmp(argv[1], "/?") == 0 || strcmp(argv[1], "-h") == 0 ||
 		 strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "--help") == 0 ||
@@ -91,6 +94,15 @@ int main(int argc, char **argv)
 
 	// set defaults, also initializes the nodebuildxxxx stuff
 	MainSetDefaults();
+
+	ReadWadFile("ddd.wad");
+
+	FindNextLevel();
+	FindNextLevel();
+	FindNextLevel();
+	FindNextLevel();
+	FindNextLevel();
+	LoadLevel();
 
 	// handle drag and drop: a single non-option argument
 	//

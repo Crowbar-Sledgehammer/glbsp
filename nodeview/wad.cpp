@@ -23,7 +23,7 @@
 static FILE *in_file = NULL;
 
 
-#define DEBUG_DIR   0
+#define DEBUG_DIR   1
 #define DEBUG_LUMP  0
 
 #define APPEND_BLKSIZE  256
@@ -343,8 +343,10 @@ static void DetermineLevelNames(void)
 //
 static void ProcessDirEntry(lump_t *lump)
 {
+	// FIXME !!! handle separate GL_MAPxx markers
+
 	// ignore previous GL lump info
-	if (CheckGLLumpName(lump->name))
+	if (false) /// CheckGLLumpName(lump->name))
 	{
 #   if DEBUG_DIR
 		PrintDebug("Discarding previous GL info: %s\n", lump->name);
@@ -391,7 +393,7 @@ static void ProcessDirEntry(lump_t *lump)
 
 	if (wad.current_level)
 	{
-		if (CheckLevelLumpName(lump->name))
+		if (CheckLevelLumpName(lump->name) || CheckGLLumpName(lump->name))
 		{
 			// check for duplicates
 			if (FindLevelLump(lump->name))
