@@ -2,7 +2,7 @@
 // BOOKTEXT : Unix/FLTK Manual Text
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -20,34 +20,8 @@
 
 #include "local.h"
 
-// forward decls
-static const char * contents_text[];
-static const char * intro_text[];
-static const char * using_text[];
-static const char * note_tc_text[];
-static const char * howwork_text[];
-static const char * diff_text[];
-static const char * contact_text[];
-static const char * acknow_text[];
-
 #define GRN  "@C61"   // selection looks bad, oh well
 
-
-const book_page_t book_pages[] =
-{
-  { contents_text },   // #00
-  { intro_text },      // #01
-  { using_text },      // #02
-  { note_tc_text },    // #03
-  { howwork_text },    // #04
-  { diff_text },       // #05
-  { contact_text },    // #06
-  { acknow_text },     // #07
-  { NULL }
-};
-
-
-//------------------------------------------------------------------------
 
 static const char *contents_text[] =
 {
@@ -105,20 +79,14 @@ static const char *intro_text[] =
   "@m Status:",
   "",
   "#P00",
-  "The current version is 2.00. It has been tested and",
+  "The current version is 2.05. It has been tested and",
   "known to work on numerous large wads, including DOOM I, DOOM II,",
   "TeamTNT's Eternal III, Fanatic's QDOOM, and many others.",
-  "",
-  "@b NOTE:",
-  "#P10",
-  "This version is the *final* one.  I've completely finished with",
-  "everything relating to DOOM.  You're on your own now !  Bug",
-  "reports or other comments will be ignored.",
   "",
   "@m Legal stuff:",
   "",
   "#P00",
-  "glBSP and glBSPX are Copyright (C) 2000-2002 Andrew Apted.  It",
+  "glBSP and glBSPX are Copyright (C) 2000-2003 Andrew Apted.  It",
   "is based on `BSP 2.3' (C) Colin Reed and Lee Killough,",
   "which was created from the basic theory stated in DEU5 (OBJECTS.C)",
   "by Raphael Quinet.",
@@ -532,5 +500,21 @@ static const char *acknow_text[] =
   ". . . and everyone else who deserves it ! ",
   "",
   NULL
+};
+
+
+//------------------------------------------------------------------------
+
+const book_page_t book_pages[] =
+{
+  { contents_text },   // #00
+  { intro_text },      // #01
+  { using_text },      // #02
+  { note_tc_text },    // #03
+  { howwork_text },    // #04
+  { diff_text },       // #05
+  { contact_text },    // #06
+  { acknow_text },     // #07
+  { NULL }
 };
 
