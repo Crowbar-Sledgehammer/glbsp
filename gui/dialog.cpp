@@ -148,8 +148,11 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
   int but_width = left ? (120*3) : middle ? (120*2) : (120*1);
 
   // determine required size
-  int width = 360;
+  int width = 120 * 3;
   int height;
+
+  // set current font for fl_measure()
+  fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
 
   fl_measure(message, width, height);
 
@@ -185,7 +188,7 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
  
   // create the message area
   box = new Fl_Box(60, 10, width-60 - 20, height-10 - 40, message);
-  box->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+  box->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
   cur_diag->add(box);
   
   // create buttons

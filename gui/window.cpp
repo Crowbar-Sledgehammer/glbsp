@@ -26,9 +26,6 @@
 #endif
 
 
-#define MY_BG_COLOR  fl_gray_ramp(FL_NUM_GRAY * 9 / 24)
-
-
 Guix_MainWin *guix_win;
 
 
@@ -83,7 +80,7 @@ Guix_MainWin::Guix_MainWin(const char *title) :
   callback((Fl_Callback *) main_win_close_CB);
 
   // set a nice darkish gray for the space between main boxes
-  color(MY_BG_COLOR, MY_BG_COLOR);
+  color(MAIN_BG_COLOR, MAIN_BG_COLOR);
 
   want_quit = FALSE;
 

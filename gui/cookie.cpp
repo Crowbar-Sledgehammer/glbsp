@@ -25,11 +25,11 @@
 #define DEBUG_COOKIE  0
 
 
-// section numbers
-#define SECTION_NONE  0
-#define SECTION_BUILD_INFO  1
-#define SECTION_PREFS  2
+static const char *cookie_filename;
 
+// current section parser func
+static boolean_g (* cookie_section_parser)
+    (const char *name, const char *value) = NULL;
 
 
 static void CookieDebug(const char *str, ...)
@@ -151,6 +151,22 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
 
 static boolean_g CookieSetPrefVar(const char *name, const char *value)
 {
+  // overwrite warning
+  if (strcasecmp(name, "overwrite_warn") == 0)
+    return SetBooleanVar(guix_prefs.overwrite_warn, value);
+
+  // same file warning
+  if (strcasecmp(name, "same_file_warn") == 0)
+    return SetBooleanVar(guix_prefs.same_file_warn, value);
+
+
+  // Unknown preference variable !
+  CookieDebug("Unknown Pref VAR [%s]\n", name);
+  return FALSE;
+}
+
+static boolean_g CookieSetWinPosVar(const char *name, const char *value)
+{
   // main window position and size
   if (strcasecmp(name, "window_x") == 0)
     return SetIntegerVar(guix_prefs.win_x, value);
@@ -178,6 +194,14 @@ static boolean_g CookieSetPrefVar(const char *name, const char *value)
   if (strcasecmp(name, "dialog_y") == 0)
     return SetIntegerVar(guix_prefs.dialog_y, value);
 
+  if (strcasecmp(name, "other_x") == 0)
+    return SetIntegerVar(guix_prefs.other_x, value);
+
+  if (strcasecmp(name, "other_y") == 0)
+    return SetIntegerVar(guix_prefs.other_y, value);
+
+
+  // manual window positions
   if (strcasecmp(name, "manual_x") == 0)
     return SetIntegerVar(guix_prefs.manual_x, value);
 
@@ -190,18 +214,12 @@ static boolean_g CookieSetPrefVar(const char *name, const char *value)
   if (strcasecmp(name, "manual_h") == 0)
     return SetIntegerVar(guix_prefs.manual_h, value);
 
-
-  // overwrite warning
-  if (strcasecmp(name, "overwrite_warn") == 0)
-    return SetBooleanVar(guix_prefs.overwrite_warn, value);
-
-  // same file warning
-  if (strcasecmp(name, "same_file_warn") == 0)
-    return SetBooleanVar(guix_prefs.same_file_warn, value);
+  if (strcasecmp(name, "manual_page") == 0)
+    return SetIntegerVar(guix_prefs.manual_page, value);
 
 
-  // Unknown preference variable !
-  CookieDebug("Unknown Pref VAR [%s]\n", name);
+  // Unknown window pos variable !
+  CookieDebug("Unknown WindowPos VAR [%s]\n", name);
   return FALSE;
 }
 
@@ -210,7 +228,7 @@ static boolean_g CookieSetPrefVar(const char *name, const char *value)
 
 
 // returns TRUE if line parsed OK.  Note: modifies the buffer.
-static boolean_g CookieParseLine(char *buf, int& section)
+static boolean_g CookieParseLine(char *buf)
 {
   char *name;
   int len;
@@ -239,19 +257,25 @@ static boolean_g CookieParseLine(char *buf, int& section)
   {
     if (strncasecmp(buf+1, "BUILD_INFO]", 11) == 0)
     {
-      section = SECTION_BUILD_INFO;
+      cookie_section_parser = CookieSetBuildVar;
       return TRUE;
     }
 
     if (strncasecmp(buf+1, "PREFERENCES]", 12) == 0)
     {
-      section = SECTION_PREFS;
+      cookie_section_parser = CookieSetPrefVar;
+      return TRUE;
+    }
+
+    if (strncasecmp(buf+1, "WINDOW_POS]", 11) == 0)
+    {
+      cookie_section_parser = CookieSetWinPosVar;
       return TRUE;
     }
 
     // unknown section !
+    cookie_section_parser = NULL;
     CookieDebug("Unknown Section: %s\n", buf);
-    section = SECTION_NONE;
     return FALSE;
   }
 
@@ -284,42 +308,13 @@ static boolean_g CookieParseLine(char *buf, int& section)
 
   CookieDebug("Name: [%s]  Value: [%s]\n", name, buf);
 
-  switch (section)
+  if (cookie_section_parser)
   {
-    case SECTION_BUILD_INFO:
-      return CookieSetBuildVar(name, buf);
-
-    case SECTION_PREFS:
-      return CookieSetPrefVar(name, buf);
+    return (* cookie_section_parser)(name, buf);
   }
 
   // variables were found outside of any section
   return FALSE;
-}
-
-static const char *CookieFilename(void)
-{
-  static char filename[1024];
-
-#if defined(UNIX) || defined(LINUX)
-  
-  if (getenv("HOME"))
-    strcpy(filename, getenv("HOME"));
-  else
-    strcpy(filename, ".");
-
-  strcat(filename, "/.glbspX_rc");
-
-#else
-  
-  //!!! FIXME: make sure path is same as the EXE
-  strcpy(filename, "glbspX.ini");
-
-#endif
-  
-  CookieDebug("CookieFilename: `%s'\n", filename);
-
-  return filename;
 }
 
 //
@@ -357,6 +352,42 @@ void CookieCheckEm(int& problems)
 }
 
 //
+// CookieSetPath
+//
+// Determine the path and filename of the cookie file.
+//
+void CookieSetPath(const char *argv0)
+{
+  if (cookie_filename)
+    GlbspFree(cookie_filename);
+
+  char buffer[1024];
+
+#if defined(WIN32)
+
+  if (HelperFilenameValid(argv0))
+  {
+    strcpy(buffer, HelperReplaceExt(argv[0], "ini");
+  }
+  else
+    strcpy(buffer, "glbspX.ini");
+
+#else  // LINUX
+
+  if (getenv("HOME"))
+    strcpy(buffer, getenv("HOME"));
+  else
+    strcpy(buffer, ".");
+
+  strcat(buffer, "/.glbspX_rc");
+#endif
+ 
+  cookie_filename = GlbspStrDup(buffer);
+
+  CookieDebug("CookieFilename: `%s'\n", cookie_filename);
+}
+
+//
 // CookieReadAll
 //
 // Reads the cookie file.
@@ -371,21 +402,22 @@ cookie_status_t CookieReadAll(void)
   CookieDebug("CookieReadAll BEGUN.\n");
 
   // open file for reading
-  FILE *fp = fopen(CookieFilename(), "r");
+  FILE *fp = fopen(cookie_filename, "r");
 
   if (! fp)
     return COOKIE_E_NO_FILE;
 
+  cookie_section_parser = NULL;
+
   // simple line-by-line parser
   char buffer[2048];
 
-  int section = SECTION_NONE;
   int parse_probs = 0;
   int check_probs = 0;
 
   while (fgets(buffer, sizeof(buffer) - 2, fp))
   {
-    if (! CookieParseLine(buffer, section))
+    if (! CookieParseLine(buffer))
       parse_probs += 1;
   }
 
@@ -412,8 +444,8 @@ static void CookieWriteHeader(FILE *fp)
 {
   fprintf(fp, "# GLBSPX %s Persistent Data\n", GLBSP_VER);
   fprintf(fp, "# Editing this file by hand is not recommended.\n");
-  fprintf(fp, "\n");
 
+  fprintf(fp, "\n");
   fflush(fp);
 }
 
@@ -461,6 +493,18 @@ static void CookieWritePrefs(FILE *fp)
 {
   // identifying section
   fprintf(fp, "[PREFERENCES]\n");
+  
+  fprintf(fp, "overwrite_warn = %d\n", guix_prefs.overwrite_warn);
+  fprintf(fp, "same_file_warn = %d\n", guix_prefs.same_file_warn);
+
+  fprintf(fp, "\n");
+  fflush(fp);
+}
+
+static void CookieWriteWindowPos(FILE *fp)
+{
+  // identifying section
+  fprintf(fp, "[WINDOW_POS]\n");
 
   // main window position and size
   fprintf(fp, "window_x = %d\n", guix_prefs.win_x);
@@ -473,15 +517,17 @@ static void CookieWritePrefs(FILE *fp)
   fprintf(fp, "progress_y = %d\n", guix_prefs.progress_y);
   fprintf(fp, "dialog_x = %d\n", guix_prefs.dialog_x);
   fprintf(fp, "dialog_y = %d\n", guix_prefs.dialog_y);
+  fprintf(fp, "other_x = %d\n", guix_prefs.other_x);
+  fprintf(fp, "other_y = %d\n", guix_prefs.other_y);
 
   fprintf(fp, "manual_x = %d\n", guix_prefs.manual_x);
   fprintf(fp, "manual_y = %d\n", guix_prefs.manual_y);
   fprintf(fp, "manual_w = %d\n", guix_prefs.manual_w);
   fprintf(fp, "manual_h = %d\n", guix_prefs.manual_h);
-  
-  // miscellaneous stuff
-  fprintf(fp, "overwrite_warn = %d\n", guix_prefs.overwrite_warn);
-  fprintf(fp, "save_file_warn = %d\n", guix_prefs.save_file_warn);
+  fprintf(fp, "manual_page = %d\n", guix_prefs.manual_page);
+
+  fprintf(fp, "\n");
+  fflush(fp);
 }
 
 
@@ -496,7 +542,7 @@ cookie_status_t CookieWriteAll(void)
   CookieDebug("CookieWriteAll BEGUN.\n");
   
   // create file (overwrite if exists)
-  FILE *fp = fopen(CookieFilename(), "w");
+  FILE *fp = fopen(cookie_filename, "w");
 
   if (! fp)
     return COOKIE_E_NO_FILE;
@@ -504,6 +550,7 @@ cookie_status_t CookieWriteAll(void)
   CookieWriteHeader(fp);
   CookieWriteBuildInfo(fp);
   CookieWritePrefs(fp);
+  CookieWriteWindowPos(fp);
 
   // all done
   fclose(fp);

@@ -74,7 +74,8 @@ Guix_Book::Guix_Book() : Fl_Window(guix_prefs.manual_w,
   callback((Fl_Callback *) book_quit_CB);
   
   want_quit = FALSE;
-  want_page = -2;
+  want_page = BOOK_NO_PAGE;
+  want_reformat = FALSE;
   cur_page = 0;
 
   // create buttons in top row
@@ -140,12 +141,14 @@ Guix_Book::~Guix_Book()
     guix_prefs.manual_w = w();
     guix_prefs.manual_h = h();
   }
+
+  guix_prefs.manual_page = cur_page;
 }
 
 
 void Guix_Book::resize(int X, int Y, int W, int H)
 {
-  if (W != w())
+  if (W != w() || H != h())
     want_reformat = TRUE;
 
   Fl_Window::resize(X, Y, W, H);
@@ -171,7 +174,9 @@ void Guix_Book::LoadPage(int new_num)
     return;
 
   cur_page = new_num;
-  want_page = -2;
+
+  want_page = BOOK_NO_PAGE;
+  want_reformat = FALSE;
 
   if (cur_page == 0)
     prev->deactivate();
@@ -189,17 +194,15 @@ void Guix_Book::LoadPage(int new_num)
 
   int i;
   const char ** lines = book_pages[cur_page].text;
-  const char *L;
+
+  ParaStart();
 
   for (i=0; lines[i]; i++)
   {
-    L = lines[i];
-
-    if (L[0] == '#' && L[1] == 'L')
-      L += 4;
-    
-    browser->add(L);
+    ParaAddLine(lines[i]);
   }
+
+  ParaEnd();
 
   browser->position(0);
 }
@@ -225,6 +228,136 @@ void Guix_Book::FollowLink(int line)
     // hold selection.
     //
     browser->deselect();
+  }
+}
+
+
+void Guix_Book::Update()
+{
+  if (want_page != BOOK_NO_PAGE)
+    LoadPage(want_page);
+  else if (want_reformat)
+    LoadPage(cur_page);
+}
+
+
+//
+//  PARAGRAPH CODE
+//
+
+void Guix_Book::ParaStart()
+{
+  in_paragraph = FALSE;
+}
+
+
+void Guix_Book::ParaEnd()
+{
+  if (in_paragraph && para_buf[0] != 0)
+  {
+    browser->add(para_buf);
+  }
+
+  in_paragraph = FALSE;
+}
+
+
+void Guix_Book::ParaAddWord(const char *word)
+{
+  // set current font for fl_width()
+  fl_font(browser->textfont(), browser->textsize());
+ 
+  // need to wrap ?
+  if (para_buf[0] != 0 && (fl_width(para_buf) + fl_width(' ') +
+      fl_width(word) > para_width))
+  {
+    browser->add(para_buf);
+    para_buf[0] = 0;
+    first_line = FALSE;
+  }
+
+  if (para_buf[0] == 0)
+  {
+    // prefix with spaces to indent paragraph
+    int count = major_indent + (first_line ? 0 : minor_indent);
+
+    para_buf[count] = 0;
+
+    for (count--; count >= 0; count--)
+      para_buf[count] = ' ';
+  }
+  else
+    strcat(para_buf, " ");
+
+  strcat(para_buf, word);
+}
+
+
+void Guix_Book::ParaAddLine(const char *line)
+{
+  if (line[0] == 0 || line[0] == '#' || line[0] == '@')
+    ParaEnd();
+
+  if (line[0] == '#' && line[1] == 'L')
+  {
+    browser->add(line + 4);
+    return;
+  }
+
+  if (! in_paragraph)
+  {
+    if (! (line[0] == '#' && line[1] == 'P'))
+    {
+      browser->add(line);
+      return;
+    }
+    
+    major_indent = (line[2] - '0') * 6 + 1;
+    minor_indent = (line[3] - '0');
+
+    line += 4;
+
+    in_paragraph = TRUE;
+    first_line = TRUE;
+
+    para_buf[0] = 0;
+    para_width = browser->w() - 24 - (int)fl_width(' ') * major_indent;
+  }
+ 
+  // OK, we must be in paragraph mode here
+
+  for (;;)
+  {
+    while (isspace(*line))
+      line++;
+
+    if (line[0] == 0)
+      return;
+
+    char word_buf[100];
+    int word_len = 0;
+
+    while (*line && word_len < 98)
+    {
+      // handle escapes:
+      //   #-  : non-break space.
+
+      if (line[0] == '#' && line[1] == '-')
+      {
+        word_buf[word_len++] = ' ';
+        line += 2;
+        continue;
+      }
+
+      if (isspace(*line))
+        break;
+
+      word_buf[word_len++] = *line++;
+    }
+
+    word_buf[word_len] = 0;
+    
+    ParaAddWord(word_buf);
   }
 }
 

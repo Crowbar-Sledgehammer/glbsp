@@ -83,11 +83,12 @@ typedef struct guix_preferences_s
   
   // positions & sizes of other windows
   int progress_x, progress_y;
-
   int dialog_x, dialog_y;
+  int other_x, other_y;
 
   int manual_x, manual_y;
   int manual_w, manual_h;
+  int manual_page;
   
   // warn about overwriting files
   boolean_g overwrite_warn;
@@ -102,6 +103,8 @@ extern guix_preferences_t guix_prefs;
 extern nodebuildinfo_t guix_info;
 extern volatile nodebuildcomms_t guix_comms;
 extern const nodebuildfuncs_t guix_funcs;
+
+void MainSetDefaults(void);
 
 
 //
@@ -123,6 +126,9 @@ typedef struct book_page_s
 {
   // array of lines, ends with NULL.
   // Link lines start with `#L' and two decimal digits.
+  // Paragraphcs start with `#P' and two digits, first digit is major
+  // indent level, second digit is minor indent level.
+  // 
   const char ** text;
 }
 book_page_t;
@@ -146,9 +152,9 @@ public:
   
   Fl_Hold_Browser *browser;
 
-  int cur_page;
-
   boolean_g want_quit;
+
+  int cur_page;
 
   // total number of pages ?
   int PageCount();
@@ -160,26 +166,46 @@ public:
   //
   void LoadPage(int new_num);
 
-  // handle various internal "to do" items.  (Because modifying
-  // widgets directly from within their callbacks seems like risky
-  // business to me).  Should be called in the Fl::wait() loop.
-  //
-  void UpdateState();
-    
   // take the appropriate action for the given line number.
   void FollowLink(int line);
 
-protected:
+  // handle various internal "to do" items.  This is here since
+  // modifying widgets (esp. clearing and adding lines to the hold
+  // browser) from within their callbacks seems like a risky business
+  // to me.  Should be called in the Fl::wait() loop.
+  //
+  void Update();
 
-  // page to change to, otherwise -2
+  // page to change to, otherwise BOOK_NO_PAGE
   int want_page;
+
+protected:
 
   boolean_g want_reformat;
 
   // initial window position and size
   int init_x, init_y;
   int init_w, init_h;
+
+  // -- paragraph code --
+  
+  boolean_g in_paragraph;
+  boolean_g first_line;
+  
+  int major_indent;
+  int minor_indent;
+
+  char para_buf[1024];
+  int para_width;
+
+  void ParaStart();
+  void ParaEnd();
+
+  void ParaAddWord(const char *word);
+  void ParaAddLine(const char *line);
 };
+
+#define BOOK_NO_PAGE  -50
 
 extern const book_page_t book_pages[];
 extern Guix_Book * guix_book_win;
@@ -198,6 +224,7 @@ typedef enum
 }
 cookie_status_t;
 
+void CookieSetPath(const char *argv0);
 cookie_status_t CookieReadAll(void);
 cookie_status_t CookieWriteAll(void);
 
@@ -292,6 +319,7 @@ public:
 
 int HelperCaseCmp(const char *A, const char *B);
 
+boolean_g HelperFilenameValid(const char *filename);
 boolean_g HelperHasExt(const char *filename);
 boolean_g HelperCheckExt(const char *filename, const char *ext);
 char *HelperReplaceExt(const char *filename, const char *ext);
@@ -374,7 +402,48 @@ public:
 
   // routine to change the build-info to match the buttons.
   void WriteInfo();
+  
+  // routine to call when GWA mode changes state.
+  void GWA_Changed();
 };
+
+
+//
+//  PREFS
+//
+
+class Guix_PrefWin : public Fl_Window
+{
+public:
+  // constructor reads the guix_pref values.
+  // destructor writes them.
+ 
+  Guix_PrefWin();
+  virtual ~Guix_PrefWin();
+
+  boolean_g want_quit;
+
+  // child widgets
+  Fl_Group *groups[3];
+
+  Fl_Round_Button *overwrite;
+  Fl_Round_Button *same_file;
+
+  // color stuff ??
+ 
+  Fl_Button *reset_all;
+  Fl_Button *quit;
+
+  // routine called by "reset all" button
+  void PrefsChanged();
+ 
+protected:
+
+  // initial window position
+  int init_x, init_y;
+};
+
+extern Guix_PrefWin * guix_pref_win;
 
 
 //
@@ -440,7 +509,8 @@ public:
   virtual ~Guix_TextBox();
 
   // adds the message to the text box.  The message may contain
-  // newlines ('\n').
+  // newlines ('\n').  The message doesn't need a trailing `\n', i.e.
+  // it is implied.
   //
   void AddMsg(const char *msg, Fl_Color col = FL_BLACK, 
       boolean_g bold = FALSE);
@@ -463,6 +533,8 @@ void GUI_PrintMsg(const char *str, ...);
 //
 //  WINDOW
 //
+
+#define MAIN_BG_COLOR  fl_gray_ramp(FL_NUM_GRAY * 9 / 24)
 
 #define MAIN_WINDOW_MIN_W  540
 #define MAIN_WINDOW_MIN_H  440

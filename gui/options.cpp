@@ -32,12 +32,15 @@
 static void build_mode_radio_CB(Fl_Widget *w, void *data)
 {
   boolean_g old_gwa = guix_info.gwa_mode;
-  
+ 
   guix_win->build_mode->WriteInfo();
 
   // communicate with output file widget, for GWA mode
   if (old_gwa != guix_info.gwa_mode)
+  {
     guix_win->files->GWA_Changed();
+    guix_win->misc_opts->GWA_Changed();
+  }
 }
 
 
@@ -229,14 +232,16 @@ void Guix_MiscOptions::ReadInfo()
   v1_vert->value(guix_info.v1_vert ? 1 : 0);
   v1_vert->redraw();
 
-  no_reject->value(guix_info.no_reject ? 1 : 0);
-  no_reject->redraw();
-
   warnings->value(guix_info.mini_warnings ? 1 : 0);
   warnings->redraw();
 
+  no_reject->value(guix_info.no_reject ? 1 : 0);
+  no_reject->redraw();
+
   pack_sides->value(guix_info.pack_sides ? 1 : 0);
   pack_sides->redraw();
+
+  GWA_Changed();
 }
 
 
@@ -246,5 +251,20 @@ void Guix_MiscOptions::WriteInfo()
   guix_info.no_reject = no_reject->value() ? TRUE : FALSE;
   guix_info.mini_warnings = warnings->value() ? TRUE : FALSE;
   guix_info.pack_sides = pack_sides->value() ? TRUE : FALSE;
+}
+
+
+void Guix_MiscOptions::GWA_Changed()
+{
+  if (guix_info.gwa_mode)
+  {
+    no_reject->hide();   /// deactivate
+    pack_sides->hide();
+  }
+  else
+  {
+    no_reject->show();   /// activate
+    pack_sides->show();
+  }
 }
 

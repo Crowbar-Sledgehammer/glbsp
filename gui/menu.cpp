@@ -30,10 +30,10 @@ static void menu_quit_CB(Fl_Widget *w, void *data)
   menu_want_to_quit = TRUE;
 }
 
-static void menu_do_reset(Fl_Widget *w, void * data)
-{
-  /// FIXME
-}
+///---static void menu_do_reset(Fl_Widget *w, void * data)
+///---{
+///---  /// FIXME
+///---}
 
 static void menu_do_clear_log(Fl_Widget *w, void * data)
 {
@@ -43,6 +43,20 @@ static void menu_do_clear_log(Fl_Widget *w, void * data)
 static void menu_do_exit(Fl_Widget *w, void * data)
 {
   guix_win->want_quit = TRUE;
+}
+
+
+//------------------------------------------------------------------------
+
+static void menu_do_prefs(Fl_Widget *w, void * data)
+{
+  guix_pref_win = new Guix_PrefWin();
+
+  // run the GUI until the user closes
+  while (! guix_pref_win->want_quit)
+    Fl::wait();
+
+  delete guix_pref_win;
 }
 
 
@@ -95,13 +109,11 @@ static void menu_do_about(Fl_Widget *w, void * data)
   box->labelsize(24);
   ab_win->add(box);
 
- 
+  // about text
   box = new Fl_Box(240, 60, 350, 270, about_Info);
   box->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP);
   ab_win->add(box);
    
-  //
-  // FIXME: add text...
  
   // finally add an "OK" button
   Fl_Button *button = new Fl_Button(ab_win->w()-10-60, ab_win->h()-10-30, 
@@ -109,7 +121,6 @@ static void menu_do_about(Fl_Widget *w, void * data)
   button->callback((Fl_Callback *) menu_quit_CB);
   ab_win->add(button);
     
-
   ab_win->set_modal();
   ab_win->show();
   
@@ -140,13 +151,12 @@ static void menu_do_manual(Fl_Widget *w, void * data)
 {
   guix_book_win = new Guix_Book();
 
-  guix_book_win->LoadPage(0);
+  guix_book_win->LoadPage(guix_prefs.manual_page);
 
   // run the GUI until the user closes
   while (! guix_book_win->want_quit)
   {
-    if (guix_book_win->want_page != -2)
-      guix_book_win->LoadPage(guix_book_win->want_page);
+    guix_book_win->Update();
 
     Fl::wait();
   }
@@ -219,7 +229,8 @@ static void menu_do_license(Fl_Widget *w, void * data)
 static Fl_Menu_Item menu_items[] = 
 {
   { "&File", 0, 0, 0, FL_SUBMENU },
-    { "&Reset All Options", 0, FCAL menu_do_reset },
+    { "&Preferences...",    0, FCAL menu_do_prefs },
+/// { "&Reset All Options", 0, FCAL menu_do_reset },
     { "&Clear Log",         0, FCAL menu_do_clear_log, 0, FL_MENU_DIVIDER },
 /// { "&Save Log...",       0, FCAL menu_do_save_log, 0, FL_MENU_DIVIDER },
     { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },

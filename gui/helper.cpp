@@ -46,15 +46,54 @@ int HelperCaseCmp(const char *A, const char *B)
 
 
 //
+// HelperFilenameValid
+//
+boolean_g HelperFilenameValid(const char *filename)
+{
+  if (! filename)
+    return FALSE;
+
+  int len = strlen(filename);
+
+  if (len == 0)
+    return FALSE;
+
+#ifdef WIN32
+  // check drive letter
+  if (len >= 2 && filename[1] == ':')
+  {
+    if (! isalpha(filename[0]))
+      return FALSE;
+
+    if (len == 2)
+      return FALSE;
+  }
+#endif
+
+  switch (filename[len - 1])
+  {
+    case '.':
+    case '/':
+    case '\\':
+      return FALSE;
+      
+    default:
+      break;
+  }
+
+  return TRUE;
+}
+
+//
 // HelperHasExt
 //
 boolean_g HelperHasExt(const char *filename)
 {
   int A = strlen(filename) - 1;
 
-  if (A > 0 && filename[A] == ',')
+  if (A > 0 && filename[A] == '.')
     return FALSE;
-      
+
   for (; A >= 0; A--)
   {
     if (filename[A] == '.')
@@ -144,7 +183,7 @@ char *HelperGuessOutput(const char *filename)
     dot_pos = buffer + strlen(buffer);
   
   // check for existing modification ("_b" etc) and update it when
-  // found rather than getting xxxx_b_b_b_b.wad :)
+  // found rather than getting level_b_b_b_b.wad :)
   
   dot_pos -= 2;
 

@@ -292,13 +292,41 @@ static boolean_g BuildValidateOptions(void)
     return FALSE;
   }
  
+  if (! HelperFilenameValid(guix_info.input_file))
+  {
+    sprintf(buffer,
+        "Invalid Input filename:\n"
+        "\n"
+        "      %s\n"
+        "\n"
+        "Please check the filename and try again.",
+        guix_info.input_file);
+
+    DialogShowAndGetChoice(ALERT_TXT, skull_image, buffer);
+    return FALSE;
+  }
+
+  if (! HelperFilenameValid(guix_info.output_file))
+  {
+    sprintf(buffer,
+        "Invalid Output filename:\n"
+        "\n"
+        "      %s\n"
+        "\n"
+        "Please check the filename and try again.",
+        guix_info.output_file);
+
+    DialogShowAndGetChoice(ALERT_TXT, skull_image, buffer);
+    return FALSE;
+  }
+
   
   // b) Missing extensions
  
   if (! HelperHasExt(guix_info.input_file))
   {
     sprintf(buffer,
-        "The input file you selected has no extension.\n"
+        "The Input file you selected has no extension.\n"
         "\n"
         "Do you want to add \".WAD\" and continue ?");
 
@@ -317,7 +345,7 @@ static boolean_g BuildValidateOptions(void)
   if (! HelperHasExt(guix_info.output_file))
   {
     sprintf(buffer,
-        "The output file you selected has no extension.\n"
+        "The Output file you selected has no extension.\n"
         "\n"
         "Do you want to add \".%s\" and continue ?",
         guix_info.gwa_mode ? "GWA" : "WAD");
@@ -341,8 +369,10 @@ static boolean_g BuildValidateOptions(void)
   if (! HelperFileExists(guix_info.input_file))
   {
     sprintf(buffer,
-        "Could not open the input file:\n"
-        "    %s\n\n"
+        "Could not open the Input file:\n"
+        "\n"
+        "      %s\n"
+        "\n"
         "Please check the filename and try again.",
         guix_info.input_file);
 
@@ -356,9 +386,9 @@ static boolean_g BuildValidateOptions(void)
   if (HelperCheckExt(guix_info.input_file, "gwa"))
   {
     DialogShowAndGetChoice(ALERT_TXT, skull_image, 
-        "The input file you selected has the GWA extension.\n"
-        "GWA files do not contain any level data, so there\n"
-        "wouldn't be anything to build nodes for.\n"
+        "The Input file you selected has the GWA extension, "
+        "but GWA files do not contain any level data, so "
+        "there wouldn't be anything to build nodes for.\n"
         "\n"
         "Please choose another Input filename.");
     return FALSE;
@@ -368,10 +398,10 @@ static boolean_g BuildValidateOptions(void)
       ! guix_info.gwa_mode)
   {
     choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-        "The output file you selected has the GWA extension,\n"
+        "The Output file you selected has the GWA extension, "
         "but the GWA Mode option is not enabled.\n"
         "\n"
-        "Do you want to enable GWA Mode and continue ?\n".
+        "Do you want to enable GWA Mode and continue ?",
         "OK", "Cancel");
 
     if (choice != 0)
@@ -384,6 +414,7 @@ static boolean_g BuildValidateOptions(void)
 
     guix_win->build_mode->ReadInfo();
     guix_win->files->GWA_Changed();
+    guix_win->misc_opts->GWA_Changed();
   }
 
 
@@ -397,26 +428,22 @@ static boolean_g BuildValidateOptions(void)
     if (guix_prefs.same_file_warn)
     {
       sprintf(buffer,
-          "Warning: the input and output files are the same.\n"
+          "Warning: Input and Output files are the same.\n"
           "\n"
-          "This will use a lot more memory than normal, since the\n"
-          "whole input wad must be loaded in.  On a low memory\n"
-          "machine, the node building may fail (especially if the\n"
-          "WAD is very large, e.g. DOOM2.WAD).  It is also slightly\n"
-          "risky: if something goes wrong during saving, your WAD\n"
-          "file will be toast.\n"
+          "This will use a lot more memory than normal, since the "
+          "whole input file must be loaded in.  On a low memory "
+          "machine, the node building may fail (especially if the "
+          "wad is very large, e.g. DOOM2.WAD).  There is also a "
+          "small risk: if something goes wrong during saving, your "
+          "wad file will be toast.\n"
           "\n"
-          "Do you want to continue ?\n"
-          "Choose Always to disable this warning in the future.");
+          "Do you want to continue ?");
 
       choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-          buffer, "OK", "Always", "Cancel");
+          buffer, "OK", "Cancel");
        
-      if (choice < 0 || choice == 2)
+      if (choice != 0)
         return FALSE;
-
-      if (choice == 1)
-        guix_prefs.same_file_warn = FALSE;
     }
     
     guix_info.load_all = TRUE; 
@@ -425,20 +452,18 @@ static boolean_g BuildValidateOptions(void)
       guix_prefs.overwrite_warn)
   {
     sprintf(buffer,
-        "Warning: the chosen output file already exists:\n\n"
-        "    %s\n\n"
-        "Do you want to overwrite it ?\n"
-        "Choose Always to disable this warning in the future.",
+        "Warning: the chosen Output file already exists:\n"
+        "\n"
+        "      %s\n"
+        "\n"
+        "Do you want to overwrite it ?",
         guix_info.output_file);
 
     choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-        buffer, "Overwrite", "Always", "Cancel");
+        buffer, "OK", "Cancel");
 
-    if (choice < 0 || choice == 2)
+    if (choice != 0)
       return FALSE;
-
-    if (choice == 1)
-      guix_prefs.overwrite_warn = FALSE;
   }
 
   return TRUE;  
@@ -458,9 +483,11 @@ static boolean_g BuildCheckInfo(void)
     if (ret != GLBSP_E_BadInfoFixed)
     {
       sprintf(buffer, 
-          "The following problem was detected with the current\n"
-          "options:\n\n"
-          "    %s\n\n"
+          "The following problem was detected with the current "
+          "options:\n"
+          "\n"
+          "      %s\n"
+          "\n"
           "Please fix the problem and try again.",
           guix_comms.message ? guix_comms.message : MISSING_COMMS);
 
@@ -472,9 +499,11 @@ static boolean_g BuildCheckInfo(void)
     }
 
     sprintf(buffer,
-        "The following problem was detected with the current\n"
-        "options:\n\n"
-        "    %s\n\n"
+        "The following problem was detected with the current "
+        "options:\n"
+        "\n"
+        "      %s\n"
+        "\n"
         "However, the option causing the problem has been changed.\n"
         "Do you want to continue ?",
         guix_comms.message ? guix_comms.message : MISSING_COMMS);
@@ -527,26 +556,26 @@ static void BuildDoBuild(void)
 
     case GLBSP_E_Unknown:
     default:
-      guix_win->text_box->AddMsg("\n*** Unknown Error ***\n", FL_BLUE, TRUE);
-      err_short = "Unknown";
+      guix_win->text_box->AddMsg("\n*** Error ***\n", FL_BLUE, TRUE);
+      err_short = "";
       break;
   }
 
   char buffer[1024];
 
   sprintf(buffer, 
-      "The following %s Error occurred when trying to build\n"
-      "the nodes:\n"
+      "The following Error occurred when trying to "
+      "build the nodes:\n"
       "\n"
-      "   %s\n"
+      "      %s\n"
       "\n"
-      "For Read errors, check that the input file is a valid\n"
-      "WAD file, and is not corrupt.  For Write errors, check\n"
-      "that your hard disk (or floppy, etc) has not run out\n"
-      "of storage space."
-      comms->message ? comms->message : MISSING_COMMS);
+      "For Read errors, check that the input file is a valid "
+      "wad file, and is not corrupt. For Write errors, check "
+      "that your hard disk (or floppy, etc) has not run out of "
+      "storage space.",
+      guix_comms.message ? guix_comms.message : MISSING_COMMS);
 
-  DialogShowAndGetChoice(ALERT_TXT, skull_image, buffer);
+  DialogShowAndGetChoice("glBSP Error", pldie_image, buffer);
 }
 
 static void build_button_CB(Fl_Widget *w, void *data)
@@ -560,9 +589,9 @@ static void build_button_CB(Fl_Widget *w, void *data)
 
   // sleight of hand for GWA mode: we remember the old output name in
   // the nodebuildinfo and replace it with the gwa name.  The memory
-  // stuff is messy -- we can't be 100% sure that `output_file' field
-  // won't be freed and assigned a new value.
- 
+  // stuff is messy, since we can't be 100% sure that `output_file'
+  // field won't be freed and assigned a new value by the main code.
+
   const char *old_output = guix_info.output_file;
   boolean_g gwa_hack = FALSE;
 
@@ -572,9 +601,10 @@ static void build_button_CB(Fl_Widget *w, void *data)
     gwa_hack = TRUE;
   }
  
-//!!!
-fprintf(stderr, "BUILD\n  INPUT = [%s]\n  OUTPUT = [%s]\n\n",
-    guix_info.input_file, guix_info.output_file);
+#if 0  // DEBUG
+  fprintf(stderr, "BUILD\n  INPUT = [%s]\n  OUTPUT = [%s]\n\n",
+      guix_info.input_file, guix_info.output_file);
+#endif
 
   if (BuildValidateOptions())
   {

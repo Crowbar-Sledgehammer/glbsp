@@ -24,8 +24,6 @@
 
 #define MY_TITLE  ("glBSP Node Builder " GLBSP_VER)
 
-#define DUMMY_FILENAME  "____dumm.wad"
-
 
 // Node building info
 
@@ -57,12 +55,13 @@ const guix_preferences_t default_guiprefs =
   40,  0,      // win_x, win_y
   560, 480,    // win_w, win_h;
 
-  0, 0,        // progress_x, progress_y   // FIXME
+  120, 200,    // progress_x, progress_y
+  90, 200,     // dialog_x, dialog_y
+  80, 100,     // other_x, other_y
 
-  0, 0,        // dialog_x, dialog_y  // FIXME
-
-  0, 0,        // manual_x, manual_y
+  20, 0,       // manual_x, manual_y
   610, 400,    // manual_w, manual_h
+  0,           // manual_page
 
   TRUE,        // overwrite_warn
   TRUE         // same_file_warn
@@ -88,8 +87,8 @@ static void ShowInfo(void)
     "from the basic theory stated in DEU5 (OBJECTS.C)\n"
     "\n"
     "Credits should go to :-\n"
-    "  Janis Legzdinsh            for fixing up Hexen support\n"
     "  Andy Baker & Marc Pullen   for their invaluable help\n"
+    "  Janis Legzdinsh            for fixing up Hexen support\n"
     "  Colin Reed & Lee Killough  for creating the original BSP\n"
     "  Matt Fell                  for the Doom Specs\n"
     "  Raphael Quinet             for DEU and the original idea\n"
@@ -99,50 +98,15 @@ static void ShowInfo(void)
     "Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
     "accompanying documentation for more details.\n"
     "\n"
-    "For a list of the available options, type: glbspX -options\n"
+    "Note: glbspX is the GUI (graphical user interface) version.\n"
+    "Try plain \"glbsp\" if you want the command-line version.\n"
   );
 }
 
-static void ShowOptions(void)
+
+void MainSetDefaults(void)
 {
-  GUI_PrintMsg(
-    "Usage: glbspX [ [options] input.wad [ -o output.wad ] ]\n"
-    "\n"
-    "General Options:\n"
-    "  -factor <nnn>    Changes the cost assigned to SEG splits\n"
-    "  -noreject        Does not clobber the reject map\n"
-    "  -noprog          Does not show progress indicator\n"
-    "  -warn            Show extra warning messages\n"
-    "  -packsides       Pack sidedefs (remove duplicates)\n"
-    "  -v1              Output V1.0 vertices (backwards compat.)\n"
-    "\n"
-    "Rarely Useful:\n"
-    "  -loadall         Loads all data from source wad (don't copy)\n"
-    "  -nogl            Does not compute the GL-friendly nodes\n"
-    "  -nonormal        Does not add (if missing) the normal nodes\n"
-    "  -forcenormal     Forces the normal nodes to be recomputed\n"
-    "  -forcegwa        Forces the output file to be GWA style\n"
-    "  -keepsect        Don't prune unused sectors\n"
-    "  -noprune         Don't prune anything that is unused\n"
-    "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"
-  );
-}
-
-static void FatalError(const char *str, ...)
-{
-  va_list args;
-
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  va_end(args);
-
-  exit(5);
-}
-
-
-static void MainSetDefaults(void)
-{
-  // this is much more messy than it was in C
+  // this is more messy than it was in C
   memcpy((nodebuildinfo_t  *) &guix_info,  &default_buildinfo,  
       sizeof(guix_info));
 
@@ -151,8 +115,6 @@ static void MainSetDefaults(void)
 
   memcpy((guix_preferences_t *) &guix_prefs, &default_guiprefs,
       sizeof(guix_prefs));
-
-  // FIXME: update all GUI elements !!! (not here tho)
 }
 
 
@@ -172,50 +134,43 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  if (argc > 1 &&
-      (strcmp(argv[1], "-options")  == 0 || 
-       strcmp(argv[1], "--options") == 0 ||
-       strcmp(argv[1], "-OPTIONS")  == 0 || 
-       strcmp(argv[1], "--OPTIONS") == 0))
-  {
-    ShowTitle();
-    ShowOptions();
-    exit(1);
-  }
-
   // set defaults, also initializes the nodebuildxxxx stuff
   MainSetDefaults();
 
   // read persistent data
+  CookieSetPath(argv[0]);
+
   cookie_status_t cookie_ret = CookieReadAll();
 
-  if (argc > 1)
+  // handle drag and drop: a single non-option argument
+  //
+  // NOTE: there is no support for giving options to glbspX via the
+  // command line.  I think that users can just use plain `glbsp' if
+  // they want to give options this way.  The difficult here lies in
+  // possible conflicts between given options and those already set
+  // from within the GUI.  Plus we may want to handle a drag-n-drop of
+  // multiple files one day.
+  //
+  boolean_g unused_args = FALSE;
+
+  if (argc > 1 && argv[1][0] != '-')
   {
-    // if run with arguments (presumably from a terminal window),
-    // parse the arguments so that the values appear in the main
-    // window.  We need to re-initialise the build-info in case the
-    // given options conflict with those in the cookie file.
+    GlbspFree(guix_info.input_file);
+    GlbspFree(guix_info.output_file);
 
-    memcpy((nodebuildinfo_t *) &guix_info, &default_buildinfo,  
-        sizeof(guix_info));
+    guix_info.input_file = GlbspStrDup(argv[1]);
 
-    if (GLBSP_E_OK != GlbspParseArgs(&guix_info, &guix_comms, 
-        (const char **)(argv+1), argc-1))
-    {
-      FatalError("Error: %s\n", guix_comms.message ?
-          guix_comms.message : "(Unknown error parsing arguments)");
-    }
-  
-    // check if arguments were valid.  This will balk if there was no
-    // input file present -- ideally you could set options without
-    // one, but it's gonna get too messy.  Besides this a GUI tool.
-
-    if (GLBSP_E_OK != GlbspCheckInfo(&guix_info, &guix_comms))
-    {
-      FatalError("Error: %s\n", guix_comms.message ?
-          guix_comms.message : "(Unknown error parsing arguments)");
-    }
+    // guess an output name too
+    
+    guix_info.output_file = GlbspStrDup(
+        HelperGuessOutput(guix_info.input_file));
+ 
+    if (argc > 2)
+      unused_args = TRUE;
   }
+  else if (argc > 1)
+    unused_args = TRUE;
+
 
   guix_win = new Guix_MainWin(MY_TITLE);
    
@@ -239,6 +194,10 @@ int main(int argc, char **argv)
           FL_RED, TRUE);
       break;
   }
+
+  if (unused_args)
+    guix_win->text_box->AddMsg("** Warning: Ignoring extra arguments to glbspX **", FL_RED, TRUE);
+ 
 
   // run the GUI until the user quits
   while (! guix_win->want_quit)
