@@ -78,6 +78,7 @@
 //
 #include "system.h"
 #include "asserts.h"
+#include "lists.h"
 #include "structs.h"
 #include "util.h"
 #include "wad.h"

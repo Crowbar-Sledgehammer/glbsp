@@ -22,6 +22,7 @@ OBJS=./main.o     \
      ./dialog.o   \
      ./grid.o     \
      ./level.o    \
+     ./lists.o    \
      ./menu.o     \
      ./system.o   \
      ./util.o     \
