@@ -1,17 +1,20 @@
 
-GL-NodeView TODO list
-=====================
+NodeView TODO list
+==================
+
+- integrate lib_ and sys_ code from mp_server.  [partially done]
+
+DONE: catch exceptions (assertions) in main.
+
+- command-line options to select WAD and MAP.
 
 - start: center screen on map (or player#1), select zoom to fit map.
 
 - class-ify the wad structures.
 
-- allow multiple wad files (at least: wad + gwa).
+- support GWA files.
 
 - fix drawing bugs at high zoom levels.
 
 TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
-
-DONE: class-ify the level structures.
-DONE: move class definitions from defs.h into own header files.
 
