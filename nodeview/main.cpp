@@ -81,9 +81,25 @@ int main(int argc, char **argv)
 		// set defaults, also initializes the nodebuildxxxx stuff
 		MainSetDefaults();
 
-		ReadWadFile("hhh.wad");
+		const char *filename = "doom2.wad";
 
-		FindNextLevel();
+		if (arg_count > 0 && ! ArgvIsOption(0))
+			filename = arg_list[0];
+		else
+		{
+			int params;
+			int idx = ArgvFind(0, "file", &params);
+
+			if (idx >= 0 && params >= 1)
+				filename = arg_list[idx + 1];
+		}
+
+		if (ReadWadFile(filename) < 0)
+		{
+			fl_alert("Unable to read file: %s\n", filename);
+			exit(2);
+		}
+
 		FindNextLevel();
 
 		LoadLevel();
