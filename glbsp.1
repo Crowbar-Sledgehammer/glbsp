@@ -78,16 +78,18 @@ smaller PWAD.
 NOTE: this may make your level a lot harder to edit !
 Therefore this option is most useful when producing the
 final WAD for public release.
-.TP
-.BI \-v1
-Backwards compatibility.  The current version of the
-"GL Nodes" spec (V2.0) introduces a new format for the
-GL_VERT lump designed to prevent slime trails.  Some
-engines may not support this at first, so use this
-option to produce the old (V1.0) format.
 .PP
 These next set of options normally don't need to be used, but they are
 provided to allow complete control or for special circumstances:
+.TP
+\-v1 .. \-v3
+Specify the version of the "GL Nodes" spec to use.
+Using -v1 provides backwards compatibility.
+The default is -v2.
+Giving -v3 will force certain lumps
+to use the new V3.0 formats, but is only useful for
+testing since glBSP will automatically switch to these
+formats when certain limits are exceeded.
 .TP
 .BI \-loadall
 glBSP will normally try to copy lumps from the input

@@ -121,12 +121,21 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
   if (strcasecmp(name, "pack_sides") == 0)
     return SetBooleanVar(guix_info.pack_sides, value);
 
-  if (strcasecmp(name, "v1_vert") == 0)
-    return SetBooleanVar(guix_info.v1_vert, value);
-
   // API change to main glbsp code: 'choose_fresh' --> 'fast'.
   if (strcasecmp(name, "choose_fresh") == 0)
     return SetBooleanVar(guix_info.fast, ! value);
+
+  // API change in main glbsp code: 'v1_vert' --> 'spec_version'.
+  if (strcasecmp(name, "v1_vert") == 0)
+  {
+    boolean_g v1_vert;
+
+    if (! SetBooleanVar(v1_vert, value))
+      return FALSE;
+
+    guix_info.spec_version = v1_vert ? 1 : 2;
+    return TRUE;
+  }
 
 
   // block limit
@@ -508,8 +517,8 @@ static void CookieWriteBuildInfo(FILE *fp)
   fprintf(fp, "no_reject = %d\n", guix_info.no_reject ? 1 : 0); 
   fprintf(fp, "mini_warnings = %d\n", guix_info.mini_warnings ? 1 : 0); 
   fprintf(fp, "pack_sides = %d\n", guix_info.pack_sides ? 1 : 0); 
-  fprintf(fp, "v1_vert = %d\n", guix_info.v1_vert ? 1 : 0); 
   fprintf(fp, "choose_fresh = %d\n", guix_info.fast ? 0 : 1);  // API change
+  fprintf(fp, "v1_vert = %d\n", (guix_info.spec_version == 1) ? 1 : 0);  // API change
 
   // block limit
   fprintf(fp, "block_limit = %d\n", guix_info.block_limit); 

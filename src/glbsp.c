@@ -59,8 +59,9 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // mini_warnings
   FALSE,   // force_hexen
   FALSE,   // pack_sides
-  FALSE,   // v1_vert
   FALSE,   // fast
+
+  2,   // spec_version
 
   FALSE,   // load_all
   FALSE,   // no_gl
@@ -231,6 +232,14 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
+    if (tolower(opt_str[0]) == 'v' && isdigit(opt_str[1]))
+    {
+      info->spec_version = (opt_str[1] - '0');
+
+      argv++; argc--;
+      continue;
+    }
+
     if (UtilStrCaseCmp(opt_str, "maxblock") == 0)
     {
       if (argc < 2)
@@ -254,7 +263,6 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("packsides",   pack_sides)
     HANDLE_BOOLEAN("normal",      force_normal)
 
-    HANDLE_BOOLEAN("v1",          v1_vert)
     HANDLE_BOOLEAN("loadall",     load_all)
     HANDLE_BOOLEAN("nogl",        no_gl)
     HANDLE_BOOLEAN("nonormal",    no_normal)
@@ -280,8 +288,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     // backwards compatibility
     HANDLE_BOOLEAN("forcenormal", force_normal)
 
-    // The -hexen option is only kept for backwards compat.
-    HANDLE_BOOLEAN("hexen",       force_hexen)
+    // The -hexen option is only kept for backwards compatibility
+    HANDLE_BOOLEAN("hexen", force_hexen)
 
     sprintf(glbsp_message_buf, "Unknown option: %s", argv[0]);
     SetErrorMsg(glbsp_message_buf);
@@ -368,6 +376,13 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
   {
     info->factor = DEFAULT_FACTOR;
     SetErrorMsg("Bad factor value !");
+    return GLBSP_E_BadInfoFixed;
+  }
+
+  if (info->spec_version <= 0 || info->spec_version > 3)
+  {
+    info->spec_version = 2;
+    SetErrorMsg("Bad GL-Nodes version number !");
     return GLBSP_E_BadInfoFixed;
   }
 

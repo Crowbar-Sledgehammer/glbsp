@@ -92,7 +92,7 @@ static void ShowOptions(void)
     "  -normal          Forces the normal nodes to be recomputed\n"
     "\n"
     "Rarely Useful:\n"
-    "  -v1              Output V1.0 vertices (backwards compat.)\n"
+    "  -v1 .. -v3       Version of GL-Nodes to use (1, 2 or 3)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"
     "  -nogl            Don't compute the GL-friendly nodes\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"

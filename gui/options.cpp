@@ -289,7 +289,7 @@ void Guix_MiscOptions::ReadInfo()
   choose_fresh->value(guix_info.fast ? 0 : 1);  // API change
   choose_fresh->redraw();
 
-  v1_vert->value(guix_info.v1_vert ? 1 : 0);
+  v1_vert->value((guix_info.spec_version == 1) ? 1 : 0);  // API change
   v1_vert->redraw();
 
   warnings->value(guix_info.mini_warnings ? 1 : 0);
@@ -307,8 +307,8 @@ void Guix_MiscOptions::ReadInfo()
 
 void Guix_MiscOptions::WriteInfo()
 {
+  guix_info.spec_version = v1_vert->value() ? 1 : 2;  // API change
   guix_info.fast = choose_fresh->value() ? FALSE : TRUE;  // API change
-  guix_info.v1_vert = v1_vert->value() ? TRUE : FALSE;
   guix_info.no_reject = no_reject->value() ? TRUE : FALSE;
   guix_info.mini_warnings = warnings->value() ? TRUE : FALSE;
   guix_info.pack_sides = pack_sides->value() ? TRUE : FALSE;
