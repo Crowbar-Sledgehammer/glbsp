@@ -411,6 +411,10 @@ superblock_t *CreateSegs(void)
     if (line->right && line->right->sector && line->right->sector->is_dummy)
       continue;
 
+    // ignore overlapping lines
+    if (line->overlap)
+      continue;
+
     // check for Humungously long lines
     if (ABS(line->start->x - line->end->x) >= 10000 ||
         ABS(line->start->y - line->end->y) >= 10000)
@@ -483,6 +487,14 @@ static void DetermineMiddle(subsec_t *sub)
   sub->mid_y = mid_y / total;
 }
 
+static int LinedefSelfRef(const linedef_t *L)
+{
+  if (! L->left || ! L->right)
+    return FALSE;
+
+  return (L->left->sector == L->right->sector) ? TRUE : FALSE;
+}
+
 //
 // ClockwiseOrder
 //
@@ -497,6 +509,9 @@ static void ClockwiseOrder(subsec_t *sub)
 
   int i;
   int total = 0;
+
+  int first = 0;
+  int score = -1;
 
 # if DEBUG_SUBSEC
   PrintDebug("Subsec: Clockwising %d\n", sub->index);
@@ -550,13 +565,34 @@ static void ClockwiseOrder(subsec_t *sub)
     }
   }
 
+  // choose the seg that will be first (the game engine will typically use
+  // that to determine the sector).  In particular, we don't like self
+  // referencing linedefs (they are often used for deep-water effects).
+  for (i=0; i < total; i++)
+  {
+    int cur_score = 2;
+
+    if (! array[i]->linedef)
+      cur_score = 0;
+    else if (LinedefSelfRef(array[i]->linedef))
+      cur_score = 1;
+
+    if (cur_score > score)
+    {
+      first = i;
+      score = cur_score;
+    }
+  }
+
   // transfer sorted array back into sub
   sub->seg_list = NULL;
 
   for (i=total-1; i >= 0; i--)
   {
-    array[i]->next = sub->seg_list;
-    sub->seg_list  = array[i];
+    int j = (i + first) % total;
+
+    array[j]->next = sub->seg_list;
+    sub->seg_list  = array[j];
   }
  
   if (total > 32)
