@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-// SYSTEM : System specific code (memory, I/O, etc).
+// SYSTEM : System specific code
 //------------------------------------------------------------------------
 //
 //  GL-Friendly Node Builder (C) 2000 Andrew Apted
@@ -29,86 +29,117 @@
 #include <limits.h>
 #include <assert.h>
 
-#if defined(MSDOS) || defined(__MSDOS__)
-#include <dos.h>
-#endif
-
-#if defined(__TURBOC__)
-#include <alloc.h>
-#endif
-
-#if defined(UNIX) || defined(__UNIX__)
-#include <unistd.h>  // Unix: isatty()
-#endif
-
 
 #define DEBUG_ENABLED   0
-#define DEBUG_COREDUMP  0
 
 
-int mini_warnings=0;
-int no_progress = 0;
-
-static int progress_target;
-static int progress_current;
-static int progress_shown;
+static char message_buf[1024];
 
 
 //
-// PrintMsg
+// FatalError
 //
-void PrintMsg(char *str, ...)
+void FatalError(const char *str, ...)
 {
   va_list args;
 
   va_start(args, str);
-  vprintf(str, args);
+  vsprintf(message_buf, str, args);
   va_end(args);
 
-  fflush(stdout);
+  (* cur_funcs->fatal_error)("\nError: *** %s ***\n\n", message_buf);
+}
+
+//
+// InternalError
+//
+void InternalError(const char *str, ...)
+{
+  va_list args;
+
+  va_start(args, str);
+  vsprintf(message_buf, str, args);
+  va_end(args);
+
+  (* cur_funcs->fatal_error)("\nINTERNAL ERROR: *** %s ***\n\n", message_buf);
+}
+
+//
+// PrintMsg
+//
+void PrintMsg(const char *str, ...)
+{
+  va_list args;
+
+  va_start(args, str);
+  vsprintf(message_buf, str, args);
+  va_end(args);
+
+  (* cur_funcs->print_msg)("%s", message_buf);
 }
 
 //
 // PrintWarn
 //
-void PrintWarn(char *str, ...)
+void PrintWarn(const char *str, ...)
 {
   va_list args;
 
-  printf("Warning: ");
-
   va_start(args, str);
-  vprintf(str, args);
+  vsprintf(message_buf, str, args);
   va_end(args);
 
-  fflush(stdout);
+  (* cur_funcs->print_msg)("Warning: %s", message_buf);
 }
 
 //
 // PrintMiniWarn
 //
-void PrintMiniWarn(char *str, ...)
+void PrintMiniWarn(const char *str, ...)
 {
-  if (mini_warnings)
+  if (cur_info->mini_warnings)
   {
     va_list args;
 
-    printf("Warning: ");
-
     va_start(args, str);
-    vprintf(str, args);
+    vsprintf(message_buf, str, args);
     va_end(args);
 
-    fflush(stdout);
+    (* cur_funcs->print_msg)("Warning: %s", message_buf);
   }
+}
+
+
+/* -------- debugging code ----------------------------- */
+
+//
+// InitDebug
+//
+void InitDebug(void)
+{
+#if DEBUG_ENABLED
+  //!!!!
+#endif
+}
+
+//
+// TermDebug
+//
+void TermDebug(void)
+{
+#if DEBUG_ENABLED
+  //!!!!
+#endif
 }
 
 //
 // PrintDebug
 //
-void PrintDebug(char *str, ...)
+void PrintDebug(const char *str, ...)
 {
 #if DEBUG_ENABLED
+  //!!! FIXME TO WRITE INTO FILE
+
   va_list args;
 
   fprintf(stderr, "Debug: ");
@@ -119,256 +150,5 @@ void PrintDebug(char *str, ...)
 #else
   (void) str;
 #endif
-}
-
-//
-// FatalError
-//
-// Terminate the program reporting an error.
-//
-void FatalError(char *str, ...)
-{
-  va_list args;
-
-  fprintf(stderr, " \nProgram Error: *** ");
-
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  va_end(args);
-
-  fprintf(stderr, " ***\n\n");
-
-  #if DEBUG_COREDUMP
-  raise(11);
-  #endif
-
-  exit(5);
-}
-
-//
-// InternalError
-//
-// Terminate the program reporting an internal error.
-//
-void InternalError(char *str, ...)
-{
-  va_list args;
-
-  fprintf(stderr, " \nINTERNAL ERROR: *** ");
-
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  va_end(args);
-
-  fprintf(stderr, " ***\n\n");
-
-  #if DEBUG_COREDUMP
-  raise(11);
-  #endif
-
-  exit(6);
-}
-
-//
-// SysCalloc
-//
-// Allocate memory with error checking.  Zeros the memory.
-//
-void *SysCalloc(int size)
-{
-  void *ret = calloc(1, size);
-  
-  if (!ret)
-    FatalError("Out of memory (cannot allocate %d bytes)", size);
-
-  return ret;
-}
-
-//
-// SysRealloc
-//
-// Reallocate memory with error checking.
-//
-void *SysRealloc(void *old, int size)
-{
-  void *ret = realloc(old, size);
-
-  if (!ret)
-    FatalError("Out of memory (cannot reallocate %d bytes)", size);
-
-  return ret;
-}
-
-//
-// SysFree
-//
-// Free the memory with error checking.
-//
-void SysFree(void *data)
-{
-  if (data == NULL)
-    InternalError("Trying to free a NULL pointer");
-  
-  free(data);
-}
-
-//
-// SysStrdup
-//
-// Duplicate a string with error checking.
-//
-char *SysStrdup(const char *str)
-{
-  char *result;
-  int len = strlen(str);
-
-  result = SysCalloc(len+1);
-
-  if (len > 0)
-    memcpy(result, str, len);
-  
-  result[len] = 0;
-
-  return result;
-}
-
-//
-// SysStrndup
-//
-// Duplicate a limited length string.
-//
-char *SysStrndup(const char *str, int size)
-{
-  char *result;
-  int len;
-
-  for (len=0; len < size && str[len]; len++)
-  { }
-
-  result = SysCalloc(len+1);
-
-  if (len > 0)
-    memcpy(result, str, len);
-  
-  result[len] = 0;
-
-  return result;
-}
-
-int StrCaseCmp(const char *A, const char *B)
-{
-  for (; *A || *B; A++, B++)
-  {
-    if (toupper(*A) != toupper(*B))
-      return (toupper(*A) - toupper(*B));
-  }
-
-  // strings are equal
-  return 0;
-}
-
-
-//
-// InitProgress
-//
-void InitProgress(void)
-{
-  setbuf(stdout, NULL);
-
-#ifdef UNIX  
-  // Unix: no whirling baton if stderr is redirected
-  if (! isatty(2))
-    no_progress=1;
-#endif
-}
-
-//
-// TermProgress
-//
-void TermProgress(void)
-{
-  /* nothing to do */
-}
-
-//
-// StartProgress
-//
-void StartProgress(int target)
-{
-  progress_target  = target;
-  progress_current = 0;
-  progress_shown   = -1;
-}
-
-//
-// ShowProgress
-//
-void ShowProgress(int step)
-{
-  int perc;
-  
-  if (no_progress)
-    return;
- 
-  // whirling baton ?
-  if (progress_target == 0)
-  {
-    progress_current += step ? 128 : 1;
-
-    if (step || (progress_current & 127) == 0)
-      fprintf(stderr, "%c\b", "/-\\|"[((progress_current)>>7) & 3]);
-
-    return;
-  }
- 
-  progress_current += step;
-
-  if (progress_current > progress_target)
-    InternalError("Progress went past target !");
- 
-  perc = progress_current * 100 / progress_target;
-
-  if (perc == progress_shown)
-    return;
-
-  fprintf(stderr, "--%3d%%--\b\b\b\b\b\b\b\b", perc);
-
-  progress_shown = perc;
-}
-
-//
-// ClearProgress
-//
-void ClearProgress(void)
-{
-  if (no_progress)
-    return;
-
-  // whirling baton ?
-  if (progress_target == 0)
-  {
-    fprintf(stderr, " \b");
-    return;
-  }
-
-  fprintf(stderr, "                \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-}
-
-//
-// RoundPOW2
-//
-int RoundPOW2(int x)
-{
-  int tmp;
-
-  if (x <= 2)
-    return x;
-
-  x--;
-  
-  for (tmp=x / 2; tmp; tmp /= 2)
-    x |= tmp;
-  
-  return (x + 1);
 }
 

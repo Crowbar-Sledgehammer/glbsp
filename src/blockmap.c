@@ -34,7 +34,9 @@
 #include "node.h"
 #include "seg.h"
 #include "structs.h"
+#include "util.h"
 #include "wad.h"
+
 
 
 #define DEBUG_BLOCKMAP  0
@@ -132,7 +134,7 @@ static int CheckLinedefInside(int xmin, int ymin, int xmax, int ymax,
 #define BK_XOR    2
 #define BK_FIRST  3
 
-#define BK_QUANTUM  16
+#define BK_QUANTUM  32
 
 static void BlockAdd(int blk_num, int line_index)
 {
@@ -148,7 +150,7 @@ static void BlockAdd(int blk_num, int line_index)
   if (! cur)
   {
     // create empty block
-    block_lines[blk_num] = cur = SysCalloc(BK_QUANTUM * 
+    block_lines[blk_num] = cur = UtilCalloc(BK_QUANTUM * 
         sizeof(uint16_g));
     cur[BK_NUM] = 0;
     cur[BK_MAX] = BK_QUANTUM;
@@ -160,7 +162,7 @@ static void BlockAdd(int blk_num, int line_index)
     // no more room, so allocate some more...
     cur[BK_MAX] += BK_QUANTUM;
 
-    block_lines[blk_num] = cur = SysRealloc(cur, cur[BK_MAX] * 
+    block_lines[blk_num] = cur = UtilRealloc(cur, cur[BK_MAX] * 
         sizeof(uint16_g));
   }
 
@@ -245,7 +247,7 @@ static void CreateBlockmap(void)
 {
   int i;
 
-  block_lines = SysCalloc(block_count * sizeof(uint16_g *));
+  block_lines = UtilCalloc(block_count * sizeof(uint16_g *));
 
   for (i=0; i < num_linedefs; i++)
   {
@@ -295,8 +297,8 @@ static void CompressBlockmap(void)
 
   int orig_size, new_size;
 
-  block_ptrs = SysCalloc(block_count * sizeof(uint16_g));
-  block_dups = SysCalloc(block_count * sizeof(uint16_g));
+  block_ptrs = UtilCalloc(block_count * sizeof(uint16_g));
+  block_dups = UtilCalloc(block_count * sizeof(uint16_g));
 
   // sort duplicate-detecting array.  After the sort, all duplicates
   // will be next to each other.  The duplicate array gives the order
@@ -341,7 +343,7 @@ static void CompressBlockmap(void)
       block_dups[i] = DUMMY_DUP;
 
       // free the memory of the duplicated block
-      SysFree(block_lines[blk_num]);
+      UtilFree(block_lines[blk_num]);
       block_lines[blk_num] = NULL;
       
       dup_count++;
@@ -440,12 +442,12 @@ static void FreeBlockmap(void)
   for (i=0; i < block_count; i++)
   {
     if (block_lines[i])
-      SysFree(block_lines[i]);
+      UtilFree(block_lines[i]);
   }
 
-  SysFree(block_lines);
-  SysFree(block_ptrs);
-  SysFree(block_dups);
+  UtilFree(block_lines);
+  UtilFree(block_ptrs);
+  UtilFree(block_dups);
 }
 
 

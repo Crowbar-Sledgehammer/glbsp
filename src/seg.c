@@ -51,10 +51,11 @@
 #include "node.h"
 #include "seg.h"
 #include "structs.h"
+#include "util.h"
 #include "wad.h"
 
 
-int factor = 5;
+///---  int factor = 7;
 
 #define PRECIOUS_MULTIPLY  64
 
@@ -117,7 +118,7 @@ static intersection_t *NewIntersection(void)
   }
   else
   {
-    cut = SysCalloc(sizeof(intersection_t));
+    cut = UtilCalloc(sizeof(intersection_t));
   }
 
   return cut;
@@ -133,7 +134,7 @@ void FreeQuickAllocCuts(void)
     intersection_t *cut = quick_alloc_cuts;
     quick_alloc_cuts = cut->next;
 
-    SysFree(cut);
+    UtilFree(cut);
   }
 }
 
@@ -365,6 +366,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
   float_g a, b, fa, fb;
 
   int num;
+  int factor = cur_info->factor;
 
   // -AJA- this is the heart of my superblock idea, it tests the
   //       _whole_ block against the partition line to quickly handle
@@ -636,7 +638,10 @@ static void PickNodeWorker(superblock_t *part_list,
     (*progress) += 1;
 
     if ((*progress % prog_step) == 0)
-      ShowProgress(1);
+    {
+      cur_build_pos++;
+      DisplaySetBar(1, cur_build_pos);
+    }
 
     // ignore minisegs as partition candidates
     if (! part->linedef)
@@ -694,7 +699,10 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
     prog_step = 1 + ((total - 1) / want);
 
     if (total / prog_step < want)
-      ShowProgress(want - total / prog_step);
+    {
+      cur_build_pos += want - total / prog_step;
+      DisplaySetBar(1, cur_build_pos);
+    }
   }
  
   PickNodeWorker(seg_list, seg_list, &best, &best_cost, &progress,
@@ -821,32 +829,6 @@ void SeparateSegs(superblock_t *seg_list, seg_t *part,
 {
   int num;
 
-  // -AJA- Another optimisation (pretty small this time), we can save
-  //       time by checking the superblock against the partition line,
-  //       and transferring the whole block if it lies totally on the
-  //       left or the right.
- 
-#if 0
-  num = BoxOnLineSide(seg_list, part);
-
-  if (num < 0)
-  {
-    // LEFT
-
-    AddSuperToSuper(lefts, seg_list);
-    return;
-  }
-  else if (num > 0)
-  {
-    // RIGHT
-
-    AddSuperToSuper(rights, seg_list);
-    return;
-  }
-#endif
- 
-  // test the segs individually
-  
   while (seg_list->segs)
   {
     seg_t *cur = seg_list->segs;
@@ -857,6 +839,7 @@ void SeparateSegs(superblock_t *seg_list, seg_t *part,
     DivideOneSeg(cur, part, lefts, rights, cut_list);
   }
 
+  // recursively handle sub-blocks
   for (num=0; num < 2; num++)
   {
     superblock_t *A = seg_list->subs[num];

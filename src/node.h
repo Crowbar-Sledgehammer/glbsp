@@ -32,12 +32,6 @@ int BoxOnLineSide(superblock_t *box, seg_t *part);
 // add the seg to the given list
 void AddSegToSuper(superblock_t *block, seg_t *seg);
 
-// add the _whole block_ to the destination superblock.  Will clean
-// out the source superblock (may even transfer some of its sub-blocks
-// to the destination holus bolus).
-//
-void AddSuperToSuper(superblock_t *dest, superblock_t *src);
-
 // increase the counts within the superblock, to account for the given
 // seg being split.
 //

@@ -34,29 +34,22 @@
 #include "node.h"
 #include "seg.h"
 #include "structs.h"
+#include "util.h"
 #include "wad.h"
+
+
+FILE *in_file = NULL;
+FILE *out_file = NULL;
 
 
 #define DEBUG_DIR   0
 #define DEBUG_LUMP  0
 
+#define APPEND_BLKSIZE  256
 
-int hexen_mode=0;
-int load_all=0;
-int no_reject=0;
-int no_gl=0;
-int no_normal=0;
-int force_normal=0;
-int gwa_mode=0;
-int v1_vert=0;
-int keep_sect=0;
-int no_prune=0;
-int pack_sides=0;
 
-FILE *in_file = NULL;
-FILE *out_file = NULL;
-
-wad_t wad;
+// current wad info
+static wad_t wad;
 
 
 /* ---------------------------------------------------------------- */
@@ -181,7 +174,7 @@ static lump_t *NewLump(char *name)
 {
   lump_t *cur;
 
-  cur = SysCalloc(sizeof(lump_t));
+  cur = UtilCalloc(sizeof(lump_t));
 
   cur->name = name;
   cur->start = cur->new_start = -1;
@@ -230,10 +223,10 @@ static void FreeLump(lump_t *lump)
 
   // check `data' here, since it gets freed in WriteLumpData()
   if (lump->data)
-    SysFree(lump->data);
+    UtilFree(lump->data);
   
-  SysFree(lump->name);
-  SysFree(lump);
+  UtilFree(lump->name);
+  UtilFree(lump);
 }
 
 
@@ -275,14 +268,12 @@ static void ReadDirEntry(void)
   raw_wad_entry_t entry;
   lump_t *lump;
   
-  ShowProgress(0);
-
   len = fread(&entry, sizeof(entry), 1, in_file);
 
   if (len != 1)
     FatalError("Trouble reading wad directory");
 
-  lump = NewLump(SysStrndup(entry.name, 8));
+  lump = NewLump(UtilStrNDup(entry.name, 8));
 
   lump->start = UINT32(entry.start);
   lump->length = UINT32(entry.length);
@@ -301,7 +292,7 @@ static void ReadDirEntry(void)
   }
 
   // mark the lump as `ignorable' when in GWA mode.
-  if (gwa_mode)
+  if (cur_info->gwa_mode)
     lump->flags |= LUMP_IGNORE_ME;
 
   // --- LEVEL MARKERS ---
@@ -309,7 +300,7 @@ static void ReadDirEntry(void)
   if (CheckLevelName(lump->name))
   {
     // NOTE !  Level marks can have data (in Hexen anyway).
-    if (load_all)
+    if (cur_info->load_all)
       lump->flags |= LUMP_READ_ME;
     else
       lump->flags |= LUMP_COPY_ME;
@@ -389,7 +380,7 @@ static void ReadDirEntry(void)
     PrintWarn("Level lump `%s' found outside any level\n", lump->name);
 
   // maybe load data
-  if (load_all)
+  if (cur_info->load_all)
     lump->flags |= LUMP_READ_ME;
   else
     lump->flags |= LUMP_COPY_ME;
@@ -431,7 +422,8 @@ static void ReadLumpData(lump_t *lump)
 {
   int len;
 
-  ShowProgress(0);
+  cur_file_pos++;
+  DisplaySetBar(1, cur_file_pos);
 
   #if DEBUG_LUMP
   PrintDebug("Reading... %s (%d)\n", lump->name, lump->length);
@@ -440,7 +432,7 @@ static void ReadLumpData(lump_t *lump)
   if (lump->length == 0)
     return;
 
-  lump->data = SysCalloc(lump->length);
+  lump->data = UtilCalloc(lump->length);
 
   fseek(in_file, lump->start, SEEK_SET);
 
@@ -492,6 +484,42 @@ static int ReadAllLumps(void)
 }
 
 
+//
+// CountLumpTypes
+//
+// Returns number of entries with matching flags.  Used to predict how
+// many ReadLumpData() or WriteLumpData() calls will be made (for the
+// progress bars).
+//
+static int CountLumpTypes(int flag_mask, int flag_match)
+{
+  lump_t *cur, *L;
+  int count = 0;
+
+  for (cur=wad.dir_head; cur; cur=cur->next)
+  {
+    if ((cur->flags & flag_mask) == flag_match)
+      count++;
+
+    if (cur->flags & LUMP_IS_LEVEL)
+    {
+      for (L=cur->level_list; L; L=L->next)
+        if ((L->flags & flag_mask) == flag_match)
+          count++;
+    }
+
+    if (cur->flags & LUMP_IS_GL_LEVEL)
+    {
+      for (L=cur->level_gl_list; L; L=L->next)
+        if ((L->flags & flag_mask) == flag_match)
+          count++;
+    }
+  }
+
+  return count;
+}
+
+
 /* ---------------------------------------------------------------- */
 
 
@@ -534,7 +562,7 @@ lump_t *CreateGLMarker(lump_t *level)
 
   sprintf(name_buf, "GL_%s", level->name);
 
-  cur = NewLump(SysStrdup(name_buf));
+  cur = NewLump(UtilStrDup(name_buf));
   cur->flags = LUMP_IS_GL_LEVEL;
 
   // link it in
@@ -663,7 +691,8 @@ static void WriteLumpData(lump_t *lump)
 {
   int len;
 
-  ShowProgress(0);
+  cur_file_pos++;
+  DisplaySetBar(1, cur_file_pos);
 
   #if DEBUG_LUMP
   if (lump->flags & LUMP_COPY_ME)
@@ -681,7 +710,7 @@ static void WriteLumpData(lump_t *lump)
 
   if (lump->flags & LUMP_COPY_ME)
   {
-    lump->data = SysCalloc(lump->length);
+    lump->data = UtilCalloc(lump->length);
 
     fseek(in_file, lump->start, SEEK_SET);
 
@@ -696,7 +725,7 @@ static void WriteLumpData(lump_t *lump)
   if (len != 1)
     PrintWarn("Trouble writing lump %s\n", lump->name);
   
-  SysFree(lump->data);
+  UtilFree(lump->data);
 
   lump->data = NULL;
 }
@@ -758,8 +787,6 @@ static void WriteDirEntry(lump_t *lump)
 {
   int len;
   raw_wad_entry_t entry;
-
-  ShowProgress(0);
 
   strncpy(entry.name, lump->name, 8);
 
@@ -881,7 +908,7 @@ char *ReplaceExtension(const char *filename, const char *ext)
   
   strcat(buffer, ext);
 
-  return SysStrdup(buffer);
+  return UtilStrDup(buffer);
 }
 
 
@@ -906,7 +933,7 @@ lump_t *CreateLevelLump(const char *name)
   if (cur)
   {
     if (cur->data)
-      SysFree(cur->data);
+      UtilFree(cur->data);
     
     cur->data = NULL;
     cur->length = 0;
@@ -916,7 +943,7 @@ lump_t *CreateLevelLump(const char *name)
   }
 
   // nope, allocate new one
-  cur = NewLump(SysStrdup(name));
+  cur = NewLump(UtilStrDup(name));
 
   // link it in
   cur->next = wad.current_level->level_list;
@@ -959,7 +986,7 @@ lump_t *CreateGLLump(const char *name)
   if (cur)
   {
     if (cur->data)
-      SysFree(cur->data);
+      UtilFree(cur->data);
     
     cur->data = NULL;
     cur->length = 0;
@@ -969,7 +996,7 @@ lump_t *CreateGLLump(const char *name)
   }
 
   // nope, allocate new one
-  cur = NewLump(SysStrdup(name));
+  cur = NewLump(UtilStrDup(name));
 
   // link it in
   cur->next = gl_level->level_gl_list;
@@ -994,13 +1021,13 @@ void AppendLevelLump(lump_t *lump, void *data, int length)
 
   if (lump->length == 0)
   {
-    lump->space = MAX(length, 64);
-    lump->data = SysCalloc(lump->space);
+    lump->space = MAX(length, APPEND_BLKSIZE);
+    lump->data = UtilCalloc(lump->space);
   }
   else if (lump->space < length)
   {
-    lump->space = MAX(length, 64);
-    lump->data = SysRealloc(lump->data, lump->length + lump->space);
+    lump->space = MAX(length, APPEND_BLKSIZE);
+    lump->data = UtilRealloc(lump->data, lump->length + lump->space);
   }
 
   memcpy(((char *)lump->data) + lump->length, data, length);
@@ -1009,6 +1036,23 @@ void AppendLevelLump(lump_t *lump, void *data, int length)
   lump->space  -= length;
 }
 
+
+//
+// CountLevels
+//
+int CountLevels(void)
+{
+  lump_t *cur;
+  int result = 0;
+  
+  for (cur=wad.dir_head; cur; cur=cur->next)
+  {
+    if (cur->flags & LUMP_IS_LEVEL)
+      result++;
+  }
+
+  return result;
+}
 
 //
 // FindNextLevel
@@ -1030,6 +1074,16 @@ int FindNextLevel(void)
   return (cur != NULL);
 }
 
+//
+// GetLevelName
+//
+const char *GetLevelName(void)
+{
+  if (!wad.current_level)
+    InternalError("GetLevelName: no current level");
+    
+  return wad.current_level->name;
+}
 
 //
 // FindLevelLump
@@ -1044,11 +1098,31 @@ lump_t *FindLevelLump(const char *name)
   return cur;
 }
 
+//
+// CheckLevelLumpZero
+//
+int CheckLevelLumpZero(lump_t *lump)
+{
+  int i;
+  
+  if (lump->length == 0)
+    return TRUE;
+  
+  // ASSERT(lump->data)
+
+  for (i=0; i < lump->length; i++)
+  {
+    if (((uint8_g *)lump->data)[i])
+      return FALSE;
+  }
+
+  return TRUE;
+}
 
 //
 // ReadWadFile
 //
-void ReadWadFile(char *filename)
+void ReadWadFile(const char *filename)
 {
   int check;
 
@@ -1065,10 +1139,17 @@ void ReadWadFile(char *filename)
   PrintMsg("Reading %d dir entries at 0x%X\n", wad.num_entries, 
       wad.dir_start);
 
-  StartProgress(0);
-
   // read directory
   ReadDirectory();
+
+  DisplayOpen(DIS_FILEPROGRESS);
+  DisplaySetTitle("Reading wad file");
+  
+  DisplaySetBarText(1, "Progress:");
+  DisplaySetBarLimit(1, CountLumpTypes(LUMP_READ_ME, LUMP_READ_ME));
+  DisplaySetBar(1, 0);
+
+  cur_file_pos = 0;
 
   // now read lumps
   check = ReadAllLumps();
@@ -1079,16 +1160,18 @@ void ReadWadFile(char *filename)
   
   wad.current_level = NULL;
 
-  ClearProgress();
+  DisplayClose();
 }
 
 
 //
 // WriteWadFile
 //
-void WriteWadFile(char *filename)
+void WriteWadFile(const char *filename)
 {
   int check1, check2;
+
+  PrintMsg("\nSaving WAD as %s\n", filename);
 
   RecomputeDirectory();
 
@@ -1100,10 +1183,19 @@ void WriteWadFile(char *filename)
 
   WriteHeader();
 
-  StartProgress(0);
+  DisplayOpen(DIS_FILEPROGRESS);
+  DisplaySetTitle("Writing wad file");
+  
+  DisplaySetBarText(1, "Progress:");
+  DisplaySetBarLimit(1, CountLumpTypes(LUMP_IGNORE_ME, 0));
+  DisplaySetBar(1, 0);
+
+  cur_file_pos = 0;
 
   // now write all the lumps to the output wad
   check1 = WriteAllLumps();
+
+  DisplayClose();
 
   // finally, write out the directory
   check2 = WriteDirectory();
@@ -1112,9 +1204,7 @@ void WriteWadFile(char *filename)
     PrintWarn("Write directory count consistency failure (%d,%d,%d\n",
       check1, check2, wad.num_entries);
 
-  ClearProgress();
-
-  PrintMsg("\nSaved WAD as %s\n", filename);
+//  PrintMsg("All done.\n");
 }
 
 

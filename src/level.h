@@ -37,10 +37,7 @@ typedef struct wall_tip_s
   struct wall_tip_s *next;
   struct wall_tip_s *prev;
   
-  // delta coordinates (away from vertex) to other end
-  float_g dx, dy;
-
-  // angle that (dx, dy) makes from vertex (degrees).
+  // angle that line makes at vertex (degrees).
   angle_g angle;
 
   // sectors on each side of wall.  Left is the side of increasing

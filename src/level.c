@@ -34,6 +34,7 @@
 #include "node.h"
 #include "seg.h"
 #include "structs.h"
+#include "util.h"
 #include "wad.h"
 
 
@@ -42,6 +43,8 @@
 #define DEBUG_SORTER    0
 #define DEBUG_WALLTIPS  0
 #define DEBUG_POLYOBJ   0
+
+#define ALLOC_BLKNUM  1024
 
 
 // per-level variables
@@ -75,9 +78,13 @@ int num_complete_seg = 0;
 
 #define ALLIGATOR(TYPE, BASEVAR, NUMVAR)  \
 {  \
+  if ((NUMVAR % ALLOC_BLKNUM) == 0)  \
+  {  \
+    BASEVAR = UtilRealloc(BASEVAR, (NUMVAR + ALLOC_BLKNUM) *   \
+        sizeof(TYPE *));  \
+  }  \
+  BASEVAR[NUMVAR] = (TYPE *) UtilCalloc(sizeof(TYPE));  \
   NUMVAR += 1;  \
-  BASEVAR = SysRealloc(BASEVAR, NUMVAR * sizeof(TYPE *));  \
-  BASEVAR[NUMVAR - 1] = (TYPE *) SysCalloc(sizeof(TYPE));  \
   return BASEVAR[NUMVAR - 1];  \
 }
 
@@ -113,9 +120,9 @@ wall_tip_t *NewWallTip(void)
 {  \
   int i;  \
   for (i=0; i < NUMVAR; i++)  \
-    SysFree(BASEVAR[i]);  \
+    UtilFree(BASEVAR[i]);  \
   if (BASEVAR)  \
-    SysFree(BASEVAR);  \
+    UtilFree(BASEVAR);  \
   BASEVAR = NULL; NUMVAR = 0;  \
 }
 
@@ -187,17 +194,18 @@ int CheckForNormalNodes(void)
 {
   lump_t *lump;
   
+  // Note: an empty NODES lump can be valid.
   if (FindLevelLump("NODES") == NULL)
     return FALSE;
   
   lump = FindLevelLump("SEGS");
   
-  if (! lump || lump->length == 0)
+  if (! lump || lump->length == 0 || CheckLevelLumpZero(lump))
     return FALSE;
 
   lump = FindLevelLump("SSECTORS");
   
-  if (! lump || lump->length == 0)
+  if (! lump || lump->length == 0 || CheckLevelLumpZero(lump))
     return FALSE;
 
   return TRUE;
@@ -237,8 +245,6 @@ void GetVertices(void)
   num_normal_vert = num_vertices;
   num_gl_vert = 0;
   num_complete_seg = 0;
-
-  ShowProgress(1);
 }
 
 //
@@ -281,8 +287,6 @@ void GetSectors(void)
     // sector indices never change
     sector->index = i;
   }
-
-  ShowProgress(1);
 }
 
 //
@@ -326,8 +330,6 @@ void GetSidedefs(void)
     // sidedef indices never change
     side->index = i;
   }
-
-  ShowProgress(1);
 }
 
 //
@@ -396,8 +398,6 @@ void GetLinedefs(void)
 
     line->index = i;
   }
-
-  ShowProgress(1);
 }
 
 //
@@ -467,8 +467,6 @@ void GetLinedefsHexen(void)
       line->polyobj = 1;
     }
   }
-
-  ShowProgress(1);
 }
 
 
@@ -540,7 +538,7 @@ static int SidedefCompare(const void *p1, const void *p2)
 static void DetectDuplicateVertices(void)
 {
   int i;
-  uint16_g *array = SysCalloc(num_vertices * sizeof(uint16_g));
+  uint16_g *array = UtilCalloc(num_vertices * sizeof(uint16_g));
 
   // sort array of indices
   for (i=0; i < num_vertices; i++)
@@ -567,13 +565,13 @@ static void DetectDuplicateVertices(void)
     }
   }
 
-  SysFree(array);
+  UtilFree(array);
 }
 
 static void DetectDuplicateSidedefs(void)
 {
   int i;
-  uint16_g *array = SysCalloc(num_sidedefs * sizeof(uint16_g));
+  uint16_g *array = UtilCalloc(num_sidedefs * sizeof(uint16_g));
 
   // sort array of indices
   for (i=0; i < num_sidedefs; i++)
@@ -598,7 +596,7 @@ static void DetectDuplicateSidedefs(void)
     }
   }
 
-  SysFree(array);
+  UtilFree(array);
 }
 
 static void PruneLinedefs(void)
@@ -647,7 +645,7 @@ static void PruneLinedefs(void)
       L->start->ref_count--;
       L->end->ref_count--;
 
-      SysFree(L);
+      UtilFree(L);
       continue;
     }
 
@@ -663,8 +661,6 @@ static void PruneLinedefs(void)
 
   if (new_num == 0)
     FatalError("Couldn't find any Linedefs");
-
-  ShowProgress(1);
 }
 
 static void PruneVertices(void)
@@ -686,7 +682,7 @@ static void PruneVertices(void)
       if (V->equiv == NULL)
         unused++;
 
-      SysFree(V);
+      UtilFree(V);
       continue;
     }
 
@@ -712,8 +708,6 @@ static void PruneVertices(void)
     FatalError("Couldn't find any Vertices");
  
   num_normal_vert = num_vertices;
-
-  ShowProgress(1);
 }
 
 static void PruneSidedefs(void)
@@ -738,7 +732,7 @@ static void PruneSidedefs(void)
       if (S->equiv == NULL)
         unused++;
 
-      SysFree(S);
+      UtilFree(S);
       continue;
     }
 
@@ -761,8 +755,6 @@ static void PruneSidedefs(void)
 
   if (new_num == 0)
     FatalError("Couldn't find any Sidedefs");
- 
-  ShowProgress(1);
 }
 
 static void PruneSectors(void)
@@ -780,7 +772,7 @@ static void PruneSectors(void)
     
     if (S->ref_count == 0)
     {
-      SysFree(S);
+      UtilFree(S);
       continue;
     }
 
@@ -796,8 +788,6 @@ static void PruneSectors(void)
 
   if (new_num == 0)
     FatalError("Couldn't find any Sectors");
- 
-  ShowProgress(1);
 }
 
 static INLINE_G int TransformSegDist(const seg_t *seg)
@@ -843,11 +833,7 @@ static void VertexAddWallTip(vertex_t *vert, float_g dx, float_g dy,
   wall_tip_t *tip = NewWallTip();
   wall_tip_t *after;
 
-  tip->dx = dx;
-  tip->dy = dy;
-
   tip->angle = ComputeAngle(dx, dy);
-
   tip->left  = left;
   tip->right = right;
 
@@ -908,15 +894,12 @@ static void CalculateWallTips(void)
 
     for (tip=vert->tip_set; tip; tip=tip->next)
     {
-      PrintDebug("  dx=%1.1f dy=%1.1f angle=%1.1f left=%d right=%d\n",
-        tip->dx, tip->dy, tip->angle,
+      PrintDebug("  Angle=%1.1f left=%d right=%d\n", tip->angle,
         tip->left ? tip->left->index : -1,
         tip->right ? tip->right->index : -1);
     }
   }
   #endif
-
-  ShowProgress(1);
 }
 
 //
@@ -931,7 +914,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   vert->ref_count = seg->partner ? 4 : 2;
 
-  if (doing_gl && (!v1_vert || !doing_normal))
+  if (doing_gl && (!cur_info->v1_vert || !doing_normal))
   {
     vert->index = num_gl_vert | 0x8000;
     num_gl_vert++;
@@ -952,7 +935,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   // create a duplex vertex if needed
 
-  if (doing_normal && doing_gl && !v1_vert)
+  if (doing_normal && doing_gl && !cur_info->v1_vert)
   {
     vert->normal_dup = NewVertex();
 
@@ -1145,8 +1128,6 @@ void PutVertices(char *name, int do_gl)
   if (count != (do_gl ? num_gl_vert : num_normal_vert))
     InternalError("PutVertices miscounted (%d != %d)", count,
       do_gl ? num_gl_vert : num_normal_vert);
-
-  ShowProgress(1);
 }
 
 void PutV2Vertices(void)
@@ -1179,8 +1160,6 @@ void PutV2Vertices(void)
   if (count != num_gl_vert)
     InternalError("PutV2Vertices miscounted (%d != %d)", count,
       num_gl_vert);
-
-  ShowProgress(1);
 }
 
 void PutSectors(void)
@@ -1205,8 +1184,6 @@ void PutSectors(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
-
-  ShowProgress(1);
 }
 
 void PutSidedefs(void)
@@ -1231,8 +1208,6 @@ void PutSidedefs(void)
  
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
-
-  ShowProgress(1);
 }
 
 void PutLinedefs(void)
@@ -1257,8 +1232,6 @@ void PutLinedefs(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
-
-  ShowProgress(1);
 }
 
 void PutLinedefsHexen(void)
@@ -1286,8 +1259,6 @@ void PutLinedefsHexen(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
-
-  ShowProgress(1);
 }
 
 void PutSegs(void)
@@ -1330,8 +1301,6 @@ void PutSegs(void)
   if (count != num_complete_seg)
     InternalError("PutSegs miscounted (%d != %d)", count,
       num_complete_seg);
-
-  ShowProgress(1);
 }
 
 void PutGLSegs(void)
@@ -1380,8 +1349,6 @@ void PutGLSegs(void)
   if (count != num_complete_seg)
     InternalError("PutGLSegs miscounted (%d != %d)", count,
       num_complete_seg);
-
-  ShowProgress(1);
 }
 
 void PutSubsecs(char *name, int do_gl)
@@ -1409,8 +1376,6 @@ void PutSubsecs(char *name, int do_gl)
       sub->index, UINT16(raw.first), UINT16(raw.num));
     #endif
   }
-
-  ShowProgress(1);
 }
 
 static int node_cur_index;
@@ -1464,8 +1429,6 @@ static void PutOneNode(node_t *node, lump_t *lump)
     UINT16(raw.right), node->x, node->y,
     node->x + node->dx, node->y + node->dy);
   #endif
-
-  ShowProgress(1);
 }
 
 void PutNodes(char *name, int do_gl, node_t *root)
@@ -1485,8 +1448,6 @@ void PutNodes(char *name, int do_gl, node_t *root)
   if (node_cur_index != num_nodes)
     InternalError("PutNodes miscounted (%d != %d)",
       node_cur_index, num_nodes);
-
-  ShowProgress(1);
 }
 
 
@@ -1497,31 +1458,34 @@ void PutNodes(char *name, int do_gl, node_t *root)
 //
 void LoadLevel(void)
 {
-  char *level_name = wad.current_level->name;
+  char message[256];
+
+  const char *level_name = GetLevelName();
 
   normal_exists = CheckForNormalNodes();
 
-  doing_normal = !gwa_mode && (force_normal || 
-    (!no_normal && !normal_exists));
+  doing_normal = !cur_info->gwa_mode && (cur_info->force_normal || 
+    (!cur_info->no_normal && !normal_exists));
 
-  doing_gl = gwa_mode || !no_gl;
+  doing_gl = cur_info->gwa_mode || !cur_info->no_gl;
 
   if (doing_normal && doing_gl)
-    PrintMsg("\n\nBuilding normal and GL nodes on %s\n\n", level_name);
+    sprintf(message, "Building normal and GL nodes on %s", level_name);
   else if (doing_normal)
-    PrintMsg("\n\nBuilding normal nodes only on %s\n\n", level_name);
+    sprintf(message, "Building normal nodes only on %s", level_name);
   else if (doing_gl)
-    PrintMsg("\n\nBuilding GL nodes on %s\n\n", level_name);
+    sprintf(message, "Building GL nodes on %s", level_name);
   else
-    PrintMsg("\n\nBuilding nothing on %s\n\n", level_name);
+    sprintf(message, "Building _nothing_ on %s", level_name);
   
-  StartProgress(0);
+  DisplaySetBarText(1, message);
+  PrintMsg("\n\n%s\n\n", message);
 
   GetVertices();
   GetSectors();
   GetSidedefs();
 
-  if (hexen_mode)
+  if (cur_info->hexen_mode)
     GetLinedefsHexen();
   else
     GetLinedefs();
@@ -1529,27 +1493,25 @@ void LoadLevel(void)
   PrintMsg("Loaded %d vertices, %d sectors, %d sides, %d lines\n", 
       num_vertices, num_sectors, num_sidedefs, num_linedefs);
 
-  if (doing_normal && !no_prune)
+  if (doing_normal && !cur_info->no_prune)
   {
     DetectDuplicateVertices();
 
-    if (pack_sides)
+    if (cur_info->pack_sides)
       DetectDuplicateSidedefs();
 
     PruneLinedefs();
     PruneVertices();
     PruneSidedefs();
     
-    if (!keep_sect)
+    if (!cur_info->keep_sect)
       PruneSectors();
   }
 
-  if (hexen_mode)
+  if (cur_info->hexen_mode)
     GroupPolyobjLinedefs();
 
   CalculateWallTips();
-
-  ClearProgress();
 }
 
 //
@@ -1572,51 +1534,47 @@ void FreeLevel(void)
 //
 void SaveLevel(node_t *root_node)
 {
-  StartProgress(0);
-
-  if (v1_vert)
+  if (cur_info->v1_vert)
     RoundOffBspTree(root_node);
  
   if (doing_gl)
   {
-    if (v1_vert)
-      PutVertices("GL_VERT", 1);
+    if (cur_info->v1_vert)
+      PutVertices("GL_VERT", TRUE);
     else
       PutV2Vertices();
 
     PutGLSegs();
-    PutSubsecs("GL_SSECT", 1);
-    PutNodes("GL_NODES", 1, root_node);
+    PutSubsecs("GL_SSECT", TRUE);
+    PutNodes("GL_NODES", TRUE, root_node);
   }
 
   if (doing_normal)
   {
-    if (! v1_vert)
+    if (! cur_info->v1_vert)
       RoundOffBspTree(root_node);
  
     NormaliseBspTree(root_node);
 
-    PutVertices("VERTEXES", 0);
+    PutVertices("VERTEXES", FALSE);
     PutSectors();
     PutSidedefs();
 
-    if (hexen_mode)
+    if (cur_info->hexen_mode)
       PutLinedefsHexen();
     else
       PutLinedefs();
  
     PutSegs();
-    PutSubsecs("SSECTORS", 0);
-    PutNodes("NODES", 0, root_node);
+    PutSubsecs("SSECTORS", FALSE);
+    PutNodes("NODES", FALSE, root_node);
   }
 
-  ClearProgress();
-
-  if (!gwa_mode)
+  if (!cur_info->gwa_mode)
   {
     PutBlockmap();
 
-    if (!no_reject || !FindLevelLump("REJECT"))
+    if (!cur_info->no_reject || !FindLevelLump("REJECT"))
       PutReject();
   }
 }

@@ -23,7 +23,8 @@
 
 #include "structs.h"
 
-extern int factor;
+
+#define DEFAULT_FACTOR  7
 
 #define IFFY_LEN  4.0
 

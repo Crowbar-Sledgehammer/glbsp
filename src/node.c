@@ -49,6 +49,7 @@
 #include "node.h"
 #include "seg.h"
 #include "structs.h"
+#include "util.h"
 #include "wad.h"
 
 
@@ -139,7 +140,7 @@ static superblock_t *NewSuperBlock(void)
   superblock_t *block;
 
   if (quick_alloc_supers == NULL)
-    return SysCalloc(sizeof(superblock_t));
+    return UtilCalloc(sizeof(superblock_t));
 
   block = quick_alloc_supers;
   quick_alloc_supers = block->subs[0];
@@ -160,7 +161,7 @@ void FreeQuickAllocSupers(void)
     superblock_t *block = quick_alloc_supers;
     quick_alloc_supers = block->subs[0];
 
-    SysFree(block);
+    UtilFree(block);
   }
 }
 
@@ -230,90 +231,91 @@ void TestSuper(superblock_t *block)
 //
 void AddSegToSuper(superblock_t *block, seg_t *seg)
 {
-  int p1, p2;
-  int child;
-
-  int x_mid = (block->x1 + block->x2) / 2;
-  int y_mid = (block->y1 + block->y2) / 2;
-
-  superblock_t *sub;
-
-  // update seg counts
-  if (seg->linedef)
-    block->real_num++;
-  else
-    block->mini_num++;
- 
-  if (SUPER_IS_LEAF(block))
+  for (;;)
   {
-    // block is a leaf -- no subdivision possible
+    int p1, p2;
+    int child;
 
-    seg->next = block->segs;
-    seg->block = block;
+    int x_mid = (block->x1 + block->x2) / 2;
+    int y_mid = (block->y1 + block->y2) / 2;
 
-    block->segs = seg;
-    return;
-  }
+    superblock_t *sub;
 
-  if (block->x2 - block->x1 >= block->y2 - block->y1)
-  {
-    // block is wider than it is high, or square
+    // update seg counts
+    if (seg->linedef)
+      block->real_num++;
+    else
+      block->mini_num++;
+   
+    if (SUPER_IS_LEAF(block))
+    {
+      // block is a leaf -- no subdivision possible
 
-    p1 = seg->start->x >= x_mid;
-    p2 = seg->end->x   >= x_mid;
-  }
-  else
-  {
-    // block is higher than it is wide
+      seg->next = block->segs;
+      seg->block = block;
 
-    p1 = seg->start->y >= y_mid;
-    p2 = seg->end->y   >= y_mid;
-  }
-
-  if (p1 && p2)
-    child = 1;
-  else if (!p1 && !p2)
-    child = 0;
-  else
-  {
-    // line crosses midpoint -- link it in and return
-
-    seg->next = block->segs;
-    seg->block = block;
-
-    block->segs = seg;
-
-    return;
-  }
-
-  // OK, the seg lies in one half of this block.  Recursively add it
-  // to the destination block, creating the block if it doesn't
-  // already exist.
-
-  if (! block->subs[child])
-  {
-    block->subs[child] = sub = NewSuperBlock();
-    sub->parent = block;
+      block->segs = seg;
+      return;
+    }
 
     if (block->x2 - block->x1 >= block->y2 - block->y1)
     {
-      sub->x1 = child ? x_mid : block->x1;
-      sub->y1 = block->y1;
+      // block is wider than it is high, or square
 
-      sub->x2 = child ? block->x2 : x_mid;
-      sub->y2 = block->y2;
+      p1 = seg->start->x >= x_mid;
+      p2 = seg->end->x   >= x_mid;
     }
     else
     {
-      sub->x1 = block->x1;
-      sub->y1 = child ? y_mid : block->y1;
+      // block is higher than it is wide
 
-      sub->x2 = block->x2;
-      sub->y2 = child ? block->y2 : y_mid;
+      p1 = seg->start->y >= y_mid;
+      p2 = seg->end->y   >= y_mid;
     }
-  }
 
-  AddSegToSuper(block->subs[child], seg);
+    if (p1 && p2)
+      child = 1;
+    else if (!p1 && !p2)
+      child = 0;
+    else
+    {
+      // line crosses midpoint -- link it in and return
+
+      seg->next = block->segs;
+      seg->block = block;
+
+      block->segs = seg;
+      return;
+    }
+
+    // OK, the seg lies in one half of this block.  Create the block
+    // if it doesn't already exist, and loop back to add the seg.
+
+    if (! block->subs[child])
+    {
+      block->subs[child] = sub = NewSuperBlock();
+      sub->parent = block;
+
+      if (block->x2 - block->x1 >= block->y2 - block->y1)
+      {
+        sub->x1 = child ? x_mid : block->x1;
+        sub->y1 = block->y1;
+
+        sub->x2 = child ? block->x2 : x_mid;
+        sub->y2 = block->y2;
+      }
+      else
+      {
+        sub->x1 = block->x1;
+        sub->y1 = child ? y_mid : block->y1;
+
+        sub->x2 = block->x2;
+        sub->y2 = child ? block->y2 : y_mid;
+      }
+    }
+
+    block = block->subs[child];
+  }
 }
 
 //
@@ -332,109 +334,6 @@ void SplitSegInSuper(superblock_t *block, seg_t *seg)
     block = block->parent;
   }
   while (block != NULL);
-}
-
-//
-// AddSuperToSuper
-//
-void AddSuperToSuper(superblock_t *dest, superblock_t *src)
-{
-  int child;
-
-  int x_mid = (dest->x1 + dest->x2) / 2;
-  int y_mid = (dest->y1 + dest->y2) / 2;
-
-  superblock_t *sub;
-
-  if (src->x1 < dest->x1 || src->y1 < dest->y1 ||
-      src->x2 > dest->x2 || src->y2 > dest->y2)
-  {
-    InternalError("AddSuperToSuper: src larger than dest");
-  }
-
-  // update seg counts
-
-  dest->real_num += src->real_num;
-  dest->mini_num += src->mini_num;
- 
-  // recurse into dest, when src is smaller than dest
-
-  if (src->x1 != dest->x1 || src->y1 != dest->y1 ||
-      src->x2 != dest->x2 || src->y2 != dest->y2)
-  {
-    if (SUPER_IS_LEAF(dest))
-      InternalError("AddSuperToSuper: src smaller than leaf ?");
-    
-    if (dest->x2 - dest->x1 >= dest->y2 - dest->y1)
-      child = src->x1 >= x_mid;
-    else
-      child = src->y1 >= y_mid;
-
-    // if child doesn't exist yet, create it
-    if (dest->subs[child] == NULL)
-    {
-      int new_x1 = dest->x1;
-      int new_y1 = dest->y1;
-      int new_x2 = dest->x2;
-      int new_y2 = dest->y2;
-      
-      if (dest->x2 - dest->x1 >= dest->y2 - dest->y1)
-      {
-        new_x1 = child ? x_mid : dest->x1;
-        new_x2 = child ? dest->x2 : x_mid;
-      }
-      else
-      {
-        new_y1 = child ? y_mid : dest->y1;
-        new_y2 = child ? dest->y2 : y_mid;
-      }
-
-      // create new sub-block
-      dest->subs[child] = sub = NewSuperBlock();
-      sub->parent = dest;
-
-      sub->x1 = new_x1;
-      sub->y1 = new_y1;
-      sub->x2 = new_x2;
-      sub->y2 = new_y2;
-    }
-
-    AddSuperToSuper(dest->subs[child], src);
-    return;
-  }
-
-  // transfer segs
-
-  while (src->segs)
-  {
-    seg_t *cur = src->segs;
-    src->segs = cur->next;
-
-    cur->next = dest->segs;
-    cur->block = dest;
-
-    dest->segs = cur;
-  }
-
-  src->real_num = src->mini_num = 0;
-
-  // recurse into source
-
-  for (child=0; child < 2; child++)
-  {
-    superblock_t *A = src->subs[child];
-
-    if (A)
-    {
-      AddSuperToSuper(dest, A);
-
-      if (A->real_num + A->mini_num > 0)
-        InternalError("AddSuperToSuper: child %d not empty !", child);
-
-      FreeSuper(A);
-      src->subs[child] = NULL;
-    }
-  }
 }
 
 static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
@@ -589,7 +488,7 @@ static void ClockwiseOrder(subsec_t *sub)
   if (total <= 32)
     array = seg_buffer;
   else
-    array = SysCalloc(total * sizeof(seg_t *));
+    array = UtilCalloc(total * sizeof(seg_t *));
 
   for (cur=sub->seg_list, i=0; cur; cur=cur->next, i++)
     array[i] = cur;
@@ -639,7 +538,7 @@ static void ClockwiseOrder(subsec_t *sub)
   }
  
   if (total > 32)
-    SysFree(array);
+    UtilFree(array);
 
   #if DEBUG_SORTER
   PrintDebug("Sorted SEGS around (%1.1f,%1.1f)\n", sub->mid_x, sub->mid_y);
