@@ -269,8 +269,23 @@ void W_Grid::draw_child(const child_t *ch)
 		MapToWin(seg->start->x, seg->start->y, &sx1, &sy1);
 		MapToWin(seg->end  ->x, seg->end  ->y, &sx2, &sy2);
 		
-		fl_color(seg->linedef ? seg->linedef->left ? 
-			(ABS(seg->linedef->left->sector->floor_h - seg->linedef->right->sector->floor_h) > 24) ? FL_GREEN : FL_GRAY_RAMP+15 : FL_WHITE : fl_color_cube(0,4,3));
+		if (! seg->linedef)
+			fl_color(fl_color_cube(0,4,3));  // miniseg
+		else if (! seg->linedef->left || ! seg->linedef->right)
+			fl_color(FL_WHITE);  // 1-sided line
+		else
+		{
+			sector_c *front = seg->linedef->right->sector;
+			sector_c *back  = seg->linedef->left->sector;
+
+			if (front->ceil_h <= back->floor_h || back->ceil_h <= front->floor_h)
+				fl_color(FL_RED);  // closed door
+			else if (ABS(front->floor_h - back->floor_h) > 24)
+				fl_color(FL_GREEN);  // unclimbable floor change
+			else
+				fl_color(FL_GRAY_RAMP+14);  // everything else
+		}
+
 		fl_line(sx1, sy1, sx2, sy2);
 	}
 }
