@@ -8,9 +8,9 @@ NodeView TODO list
 
 - start: center screen on map (or player#1), select zoom to fit map.
 
-- debugging: make it run-time enablable.
+- debugging: make it run-time selectable.
 
-- class-ify the wad structures.
+- class-ify the wad structures.  [partially done]
 
 - fix drawing bugs at high zoom levels.
 
