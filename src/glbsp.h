@@ -23,6 +23,7 @@
 
 
 #define GLBSP_VER  "2.10"
+#define GLBSP_VER_HEX  0x210
 
 
 // certain GCC attributes can be useful
