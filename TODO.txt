@@ -2,19 +2,5 @@
 TODO
 ====
 
-*  website: reorganise !!
-
-*  compile packages:
-
-   Y  Linux Cmdline
-   Y  Linux GUI
-   -  Win32 Cmdline
-   -  Win32 GUI
-   Y  DOS Cmdline
-
--  glBSPX: check IDI_XXX icon stuff.
-
 -  glBSPX: Fix modal windows not having close buttons in Win32.
-
--  Put CHANGES.txt on website.
 
