@@ -585,50 +585,6 @@ lump_t *CreateGLMarker(lump_t *level)
 
 /* ---------------------------------------------------------------- */
 
-
-//
-// CheckExtension
-//
-bool CheckExtension(const char *filename, const char *ext)
-{
-	int A = (int)strlen(filename) - 1;
-	int B = (int)strlen(ext) - 1;
-
-	for (; B >= 0; B--, A--)
-	{
-		if (A < 0)
-			return false;
-
-		if (toupper(filename[A]) != toupper(ext[B]))
-			return false;
-	}
-
-	return (A >= 1) && (filename[A] == '.');
-}
-
-//
-// ReplaceExtension
-//
-char *ReplaceExtension(const char *filename, const char *ext)
-{
-	char *dot_pos;
-	char buffer[512];
-
-	strcpy(buffer, filename);
-
-	dot_pos = strrchr(buffer, '.');
-
-	if (dot_pos)
-		dot_pos[1] = 0;
-	else
-		strcat(buffer, ".");
-
-	strcat(buffer, ext);
-
-	return UtilStrDup(buffer);
-}
-
-
 //
 // CreateLevelLump
 //
@@ -885,19 +841,6 @@ int ReadWadFile(const char *filename)
 	return 0;
 }
 
-
-//
-// DeleteGwaFile
-//
-void DeleteGwaFile(const char *base_wad_name)
-{
-	char *gwa_file = ReplaceExtension(base_wad_name, "gwa");
-
-	if (remove(gwa_file) == 0)
-		PrintMsg("Deleted GWA file : %s\n", gwa_file);
-
-	UtilFree(gwa_file);
-}
 
 
 //

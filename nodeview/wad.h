@@ -75,25 +75,6 @@ level_t;
 /* this level information holds GL lumps */
 #define LEVEL_IS_GL   0x0002
 
-/* limit flags, to show what went wrong */
-#define LIMIT_VERTEXES     0x000001
-#define LIMIT_SECTORS      0x000002
-#define LIMIT_SIDEDEFS     0x000004
-#define LIMIT_LINEDEFS     0x000008
-
-#define LIMIT_SEGS         0x000010
-#define LIMIT_SSECTORS     0x000020
-#define LIMIT_NODES        0x000040
-
-#define LIMIT_GL_VERT      0x000100
-#define LIMIT_GL_SEGS      0x000200
-#define LIMIT_GL_SSECT     0x000400
-#define LIMIT_GL_NODES     0x000800
-
-#define LIMIT_BAD_SIDE     0x001000
-#define LIMIT_BMAP_TRUNC   0x002000
-#define LIMIT_BLOCKMAP     0x004000
-
 
 // directory entry
 
@@ -140,16 +121,6 @@ lump_t;
 
 /* ----- function prototypes --------------------- */
 
-// check if the filename has the given extension.  Returns 1 if yes,
-// otherwise zero.
-//
-bool CheckExtension(const char *filename, const char *ext);
-
-// remove any extension from the given filename, and add the given
-// extension, and return the newly creating filename.
-//
-char *ReplaceExtension(const char *filename, const char *ext);
-
 // open the input wad file and read the contents into memory.  When
 // `load_all' is false, lumps other than level info will be marked as
 // copyable instead of loaded.
@@ -162,11 +133,6 @@ int ReadWadFile(const char *filename);
 
 // close all wad files and free any memory.
 void CloseWads(void);
-
-// delete the GWA file that is associated with the given normal
-// wad file.  It doesn't have to exist.
-//
-void DeleteGwaFile(const char *base_wad_name);
 
 // returns the number of levels found in the wad.
 int CountLevels(void);

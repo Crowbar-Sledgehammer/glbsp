@@ -119,7 +119,6 @@ int UtilStrCaseCmp(const char *A, const char *B)
 	return 0;
 }
 
-
 //
 // UtilRoundPOW2
 //
@@ -163,22 +162,6 @@ angle_g UtilComputeAngle(double dx, double dy)
 
 
 //
-// UtilFileExists
-//
-bool UtilFileExists(const char *filename)
-{
-	FILE *fp = fopen(filename, "rb");
-
-	if (fp)
-	{
-		fclose(fp);
-		return true;
-	}
-
-	return false;
-}
-
-//
 // UtilGetMillis
 //
 // Be sure to handle the result overflowing (it WILL happen !).
@@ -196,4 +179,152 @@ unsigned int UtilGetMillis()
 
 	return (unsigned int) ((tm.tv_sec * 1000) + (tm.tv_usec / 1000));
 #endif
+}
+
+//------------------------------------------------------------------------
+//  FILE UTILITIES
+//------------------------------------------------------------------------
+
+//
+// FileExists
+//
+bool FileExists(const char *filename)
+{
+	FILE *fp = fopen(filename, "rb");
+
+	if (fp)
+	{
+		fclose(fp);
+		return true;
+	}
+
+	return false;
+}
+
+//
+// HasExtension
+//
+bool HasExtension(const char *filename)
+{
+	int A = (int)strlen(filename) - 1;
+
+	if (A > 0 && filename[A] == '.')
+		return false;
+
+	for (; A >= 0; A--)
+	{
+		if (filename[A] == '.')
+			return true;
+
+		if (filename[A] == '/')
+			break;
+
+#ifdef WIN32
+		if (filename[A] == '\\' || filename[A] == ':')
+			break;
+#endif
+	}
+
+	return false;
+}
+
+//
+// CheckExtension
+//
+// When ext is NULL, checks if the file has no extension.
+//
+bool CheckExtension(const char *filename, const char *ext)
+{
+	if (! ext)
+		return ! HasExtension(filename);
+
+	int A = (int)strlen(filename) - 1;
+	int B = (int)strlen(ext) - 1;
+
+	for (; B >= 0; B--, A--)
+	{
+		if (A < 0)
+			return false;
+
+		if (toupper(filename[A]) != toupper(ext[B]))
+			return false;
+	}
+
+	return (A >= 1) && (filename[A] == '.');
+}
+
+//
+// ReplaceExtension
+//
+// When ext is NULL, any existing extension is removed.
+// NOTE: returned string is static storage.
+//
+const char *ReplaceExtension(const char *filename, const char *ext)
+{
+	char *dot_pos;
+	static char buffer[1024];
+
+	SYS_ASSERT(strlen(filename)+(ext ? strlen(ext) : 0)+4 < sizeof(buffer));
+	SYS_ASSERT(filename[0] != 0);
+
+	strcpy(buffer, filename);
+
+	dot_pos = buffer + strlen(buffer) - 1;
+
+	for (; dot_pos >= buffer && *dot_pos != '.'; dot_pos--)
+	{
+		if (*dot_pos == '/')
+			break;
+
+#ifdef WIN32
+		if (*dot_pos == '\\' || *dot_pos == ':')
+			break;
+#endif
+	}
+
+	if (dot_pos < buffer || *dot_pos != '.')
+		dot_pos = NULL;
+
+	if (! ext)
+	{
+		if (dot_pos)
+			dot_pos[0] = 0;
+
+		return buffer;
+	}
+
+	if (dot_pos)
+		dot_pos[1] = 0;
+	else
+		strcat(buffer, ".");
+
+	strcat(buffer, ext);
+
+	return buffer;
+}
+
+//
+// FileBaseName
+//
+// Find the base name of the file (i.e. without any path).
+// The result always points within the given string.
+//
+// Example:  "C:\Foo\Bar.wad"  ->  "Bar.wad"
+// 
+const char *FileBaseName(const char *filename)
+{
+	const char *pos = filename + strlen(filename) - 1;
+
+	for (; pos >= filename; pos--)
+	{
+		if (*pos == '/')
+			return pos + 1;
+
+#ifdef WIN32
+		if (*pos == '\\' || *pos == ':')
+			return pos + 1;
+#endif
+	}
+
+	return filename;
 }

@@ -79,10 +79,14 @@ angle_g UtilComputeAngle(double dx, double dy);
     (((x) * (part)->pdy - (y) * (part)->pdx + (part)->p_perp)  \
      / (part)->p_length)
 
-// check if the file exists.
-bool UtilFileExists(const char *filename);
-
 // return the millisecond counter.  Note: it WILL overflow.
 unsigned int UtilGetMillis();
+
+// --- file utilities ---
+bool FileExists(const char *filename);
+bool HasExtension(const char *filename);
+bool CheckExtension(const char *filename, const char *ext);
+const char *ReplaceExtension(const char *filename, const char *ext);
+const char *FileBaseName(const char *filename);
 
 #endif /* __NODEVIEW_UTIL_H__ */
