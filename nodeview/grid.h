@@ -55,13 +55,14 @@ private:
 
 	void draw_grid(int spacing);
 	void draw_partition(const node_c *nd);
-	void draw_node(const node_c *nd);
-	void draw_child(const child_t *ch);
+	void draw_node(const node_c *nd, int foo);
+	void draw_child(const child_t *ch, int foo);
 
+	bool set_seg_color(seg_c *seg, bool on);
 	void draw_line(double x1, double y1, double x2, double y2);
 
 	void scroll(int dx, int dy);
-	// scroll the map
+	// scroll the map.
 
 public:
 	int handle_key(int key);
@@ -79,6 +80,10 @@ private:
 
 	double mid_x;
 	double mid_y;
+
+	bool grid_MODE;
+	bool partition_MODE;
+	int  miniseg_MODE;
 
 	static inline int GRID_FIND(double x, double y)
 	{

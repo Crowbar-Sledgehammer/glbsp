@@ -31,7 +31,8 @@ static void foo_win_close_CB(Fl_Widget *w, void *data)
 W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) : 
         Fl_Widget(X, Y, W, H, label),
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
-        mid_x(0), mid_y(0)
+        mid_x(0), mid_y(0),
+		grid_MODE(true), partition_MODE(true), miniseg_MODE(2)
 {
 }
 
@@ -153,13 +154,16 @@ void W_Grid::draw()
 	node_c *root = lev_nodes.Get(lev_nodes.num - 1);
 
 	draw_partition(root);
-	draw_node(root);
+	draw_node(root, -1);
 
 	fl_pop_clip();
 }
 
 void W_Grid::draw_grid(int spacing)
 {
+	if (! grid_MODE)
+		return;
+
 	double mlx = mid_x - w() * 0.5 / zoom_mul;
 	double mly = mid_y - h() * 0.5 / zoom_mul;
 	double mhx = mid_x + w() * 0.5 / zoom_mul;
@@ -215,6 +219,9 @@ void W_Grid::draw_grid(int spacing)
 
 void W_Grid::draw_partition(const node_c *nd)
 {
+	if (! partition_MODE)
+		return;
+
 	double mlx = mid_x - w() * 0.5 / zoom_mul;
 	double mly = mid_y - h() * 0.5 / zoom_mul;
 	double mhx = mid_x + w() * 0.5 / zoom_mul;
@@ -262,28 +269,80 @@ void W_Grid::draw_partition(const node_c *nd)
 		break;
 	}
 
-	fl_color(FL_MAGENTA);
+	fl_color(fl_color_cube(3,0,3));
 
 	fl_line(nx1, ny1, nx2, ny2);
 }
 
-void W_Grid::draw_node(const node_c *nd)
+void W_Grid::draw_node(const node_c *nd, int foo)
 {
 	for (int side = 0; side < 2; side++)
 	{
 		const child_t *ch = (side == 0) ? &nd->r  : &nd->l;
 		
-		draw_child(ch);
+		draw_child(ch, (foo == -1) ? side : foo);
 	}
 }
 
-void W_Grid::draw_child(const child_t *ch)
+bool W_Grid::set_seg_color(seg_c *seg, bool on)
+{
+	if (! seg->linedef)  // miniseg
+	{
+		if (miniseg_MODE < 2)
+			return false;
+
+		 fl_color(on ? fl_color_cube(0,4,3) : fl_color_cube(0,2,2));
+		 return true;
+	}
+
+	if (! seg->linedef->left || ! seg->linedef->right)  // 1-sided line
+	{
+		fl_color(on ? FL_WHITE : FL_GRAY_RAMP+12);  
+		return true;
+	}
+
+	sector_c *front = seg->linedef->right->sector;
+	sector_c *back  = seg->linedef->left->sector;
+
+	int floor_max = MAX(front->floor_h, back->floor_h);
+	int ceil_min = MIN(front->ceil_h, back->ceil_h);
+
+	// closed door ?
+	if (front->ceil_h <= back->floor_h || back->ceil_h <= front->floor_h)
+	{
+		fl_color(on ? FL_RED : fl_color_cube(2,0,0));
+		return true;
+	}
+	if (ABS(front->floor_h - back->floor_h) > 24)  // unclimbable dropoff ?
+	{
+		fl_color(on ? FL_GREEN : fl_color_cube(0,3,0));
+		return true;
+	}
+	if (ceil_min > floor_max && ceil_min < floor_max+56)  // narrow gap ?
+	{
+		fl_color(on ? fl_color_cube(4,4,0) : fl_color_cube(2,2,0));
+		return true;
+	}
+	if (seg->linedef->flags & 1)  // marked impassable ?
+	{
+		fl_color(on ? FL_YELLOW : fl_color_cube(2,2,0));
+		return true;
+	}
+	
+	if (miniseg_MODE < 1)
+		return false;
+
+	fl_color(FL_GRAY_RAMP + (on ? 14 : 6));  // everything else
+	return true;
+}
+
+void W_Grid::draw_child(const child_t *ch, int foo)
 {
 	//!!! FIXME: bbox check
 
 	if (ch->node)
 	{
-		draw_node(ch->node);
+		draw_node(ch->node, foo);
 		return;
 	}
 
@@ -295,29 +354,8 @@ void W_Grid::draw_child(const child_t *ch)
 		if (seg->side)
 			continue;
 
-		if (! seg->linedef)
-			/* continue; */ fl_color(fl_color_cube(0,4,3));  // miniseg
-		else if (! seg->linedef->left || ! seg->linedef->right)
-			fl_color(FL_WHITE);  // 1-sided line
-		else
-		{
-			sector_c *front = seg->linedef->right->sector;
-			sector_c *back  = seg->linedef->left->sector;
-
-			int floor_max = MAX(front->floor_h, back->floor_h);
-			int ceil_min = MIN(front->ceil_h, back->ceil_h);
-
-			if (front->ceil_h <= back->floor_h || back->ceil_h <= front->floor_h)
-				fl_color(FL_RED);  // closed door
-			else if (ABS(front->floor_h - back->floor_h) > 24)
-				fl_color(FL_GREEN);  // unclimbable floor change
-			else if (ceil_min > floor_max && ceil_min < floor_max+56)
-				fl_color(fl_color_cube(4,4,0));  // gap too narrow
-			else if (seg->linedef->flags & 1)
-				fl_color(FL_YELLOW);  // impassable
-			else
-				/* continue; */ fl_color(FL_GRAY_RAMP+14);  // everything else
-		}
+		if (! set_seg_color(seg, foo == 0))
+			continue;
 
 		draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 	}
@@ -497,6 +535,21 @@ int W_Grid::handle_key(int key)
 
 		case FL_Down:
 			scroll(0, -1);
+			return 1;
+
+		case 'g': case 'G':
+			grid_MODE = ! grid_MODE;
+			redraw();
+			return 1;
+
+		case 'p': case 'P':
+			partition_MODE = ! partition_MODE;
+			redraw();
+			return 1;
+
+		case 'm': case 'M':
+			miniseg_MODE = (miniseg_MODE + 2) % 3;
+			redraw();
 			return 1;
 
 		case 'x':
