@@ -915,6 +915,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
 
   *N = node = NewNode();
 
+  // FIXME: This could be source of round-off error
   node->x  = (int)best->psx;
   node->y  = (int)best->psy;
   node->dx = (int)best->pdx;
@@ -1091,8 +1092,8 @@ static void RoundOffSubsector(subsec_t *sub)
       cur->end = cur->end->normal_dup;
 
     // is the seg degenerate ?
-    if ((int)cur->start->x == (int)cur->end->x &&
-        (int)cur->start->y == (int)cur->end->y)
+    if (I_ROUND(cur->start->x) == I_ROUND(cur->end->x) &&
+        I_ROUND(cur->start->y) == I_ROUND(cur->end->y))
     {
       cur->degenerate = 1;
 
@@ -1131,8 +1132,10 @@ static void RoundOffSubsector(subsec_t *sub)
 
 #   if DEBUG_SUBSEC
     PrintDebug("Degenerate after:  (%d,%d) -> (%d,%d)\n", 
-        (int)last_real_degen->start->x, (int)last_real_degen->start->y,
-        (int)last_real_degen->end->x, (int)last_real_degen->end->y);
+        I_ROUND(last_real_degen->start->x),
+        I_ROUND(last_real_degen->start->y),
+        I_ROUND(last_real_degen->end->x),
+        I_ROUND(last_real_degen->end->y));
 #   endif
 
     last_real_degen->degenerate = 0;
@@ -1198,20 +1201,6 @@ void RoundOffBspTree(node_t *root)
     RenumberSubsecSegs(sub);
   }
 }
-
-
-//---------------------------------------------------------------------------
-//
-//    This log message by Colin Phipps:
-//
-// Make rounding better in DivideSegs()
-// Fix logic errors in IsItConvex:
-// - Even if both ends of a seg are the same side of a possible
-// dividing seg, we must check that both are not on the wrong side
-// still (one could be on the line)
-// - Even if a split would be near the end of a line, the other end
-// must be on the right side still
-//
 
 
 //---------------------------------------------------------------------------

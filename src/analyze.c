@@ -981,7 +981,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   vert->ref_count = seg->partner ? 4 : 2;
 
-  if (lev_doing_gl && !(cur_info->v1_vert && lev_doing_normal))
+  if (lev_doing_gl && !(cur_info->spec_version == 1 && lev_doing_normal))
   {
     vert->index = num_gl_vert | IS_GL_VERTEX;
     num_gl_vert++;
@@ -1002,7 +1002,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   // create a duplex vertex if needed
 
-  if (lev_doing_normal && lev_doing_gl && !cur_info->v1_vert)
+  if (lev_doing_normal && lev_doing_gl && cur_info->spec_version >= 2)
   {
     vert->normal_dup = NewVertex();
 
@@ -1053,8 +1053,8 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
   dx /= dlen;
   dy /= dlen;
 
-  while ((int)vert->x == (int)start->x && 
-         (int)vert->y == (int)start->y)
+  while (I_ROUND(vert->x) == I_ROUND(start->x) && 
+         I_ROUND(vert->y) == I_ROUND(start->y))
   {
     vert->x += dx;
     vert->y += dy;

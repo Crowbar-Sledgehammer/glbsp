@@ -724,8 +724,8 @@ void PutVertices(char *name, int do_gl)
       continue;
     }
 
-    raw.x = SINT16((int)vert->x);
-    raw.y = SINT16((int)vert->y);
+    raw.x = SINT16(I_ROUND(vert->x));
+    raw.y = SINT16(I_ROUND(vert->y));
 
     AppendLevelLump(lump, &raw, sizeof(raw));
 
@@ -1232,7 +1232,8 @@ void LoadLevel(void)
   // -JL- Identify Hexen mode by presence of BEHAVIOR lump
   lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
-  lev_v3_segs = lev_v3_subsecs = FALSE;
+  lev_v3_segs = (cur_info->spec_version == 3) ? TRUE : FALSE;
+  lev_v3_subsecs = lev_v3_segs;
 
   if (lev_doing_normal && lev_doing_gl)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
@@ -1330,7 +1331,7 @@ void SaveLevel(node_t *root_node)
   // Note: RoundOffBspTree will covert the GL vertices in segs to their
   // normal counterparts (pointer change: use normal_dup).
 
-  if (cur_info->v1_vert)
+  if (cur_info->spec_version == 1)
     RoundOffBspTree(root_node);
 
   if (lev_doing_gl)
@@ -1347,7 +1348,7 @@ void SaveLevel(node_t *root_node)
       MarkV3Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
     }
 
-    if (cur_info->v1_vert)
+    if (cur_info->spec_version == 1)
       PutVertices("GL_VERT", TRUE);
     else
       PutV2Vertices();
@@ -1370,7 +1371,7 @@ void SaveLevel(node_t *root_node)
 
   if (lev_doing_normal)
   {
-    if (! cur_info->v1_vert)
+    if (cur_info->spec_version != 1)
       RoundOffBspTree(root_node);
  
     NormaliseBspTree(root_node);
