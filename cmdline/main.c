@@ -2,7 +2,7 @@
 // MAIN : Command-line version main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -48,7 +48,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2000 Andrew Apted.  ***\n"
+    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2001 Andrew Apted.  ***\n"
     "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
   );
 }
@@ -56,7 +56,7 @@ static void ShowTitle(void)
 static void ShowUsage(void)
 {
   TextPrintMsg(
-    "This GL Node Builder is based on BSP 2.3, which was created\n"
+    "This GL node builder is based on BSP 2.3, which was created\n"
     "from the basic theory stated in DEU5 (OBJECTS.C)\n"
     "\n"
     "Credits should go to :-\n"
@@ -107,10 +107,14 @@ static void ShowHelp(void)
 
 int main(int argc, char **argv)
 {
+  
   TextStartup();
 
   ShowTitle();
 
+  // skip program name itself
+  argv++, argc--;
+  
   if (argc == 0)
   {
     ShowUsage();
@@ -130,25 +134,22 @@ int main(int argc, char **argv)
   info  = default_buildinfo;
   comms = default_buildcomms;
 
-  // skip program name
-  argv++; argc--;
-
   if (GLBSP_E_OK != GlbspParseArgs(&info, &comms, 
       (const char **)argv, argc))
   {
-    TextFatalError("Bad args 1 !!! %s\n", comms.message ?
+    TextFatalError("%s\n", comms.message ?
         comms.message : "");
   }
 
   if (GLBSP_E_OK != GlbspCheckInfo(&info, &comms)) 
   {
-    TextFatalError("Bad args 2 !!! %s\n", comms.message ?
+    TextFatalError("Bad args: %s\n", comms.message ?
         comms.message : "");
   }
 
   if (GLBSP_E_OK != GlbspBuildNodes(&info, &cmdline_funcs, &comms))
   {
-    TextFatalError("Bad build !!! %s\n", comms.message ?
+    TextFatalError("Bad build !! %s\n", comms.message ?
         comms.message : "");
   }
 
