@@ -211,8 +211,6 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     info->output_file = ReplaceExtension(info->input_file, "gwa");
     info->gwa_mode = 1;
     info->missing_output = TRUE;
-
-    PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
   }
   else if (CheckExtension(info->output_file, "gwa"))
   {

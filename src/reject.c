@@ -38,7 +38,7 @@
 #include "wad.h"
 
 
-#define DEBUG_REJECT  1
+#define DEBUG_REJECT  0
 
 
 //
@@ -93,15 +93,12 @@ static void GroupSectors(void)
     if (sec1->rej_group == sec2->rej_group)
       continue;
 
-    // swap sectors so that the maximal group is added to the minimal
+    // swap sectors so that the smallest group is added to the biggest
     // group.  This is based on the assumption that sector numbers in
     // wads will generally increase over the set of linedefs, and so
     // (by swapping) we'll tend to add small groups into larger
     // groups, thereby minimising the updates to `rej_group' fields
     // that is required when merging.
-    //
-    // This optimisation might be improved by first sorting the
-    // linedefs, e.g. into order of increasing minimum sector.
 
     if (sec1->rej_group > sec2->rej_group)
     {

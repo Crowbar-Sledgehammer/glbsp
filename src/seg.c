@@ -58,9 +58,9 @@
 #define PRECIOUS_MULTIPLY  64
 
 
-#define DEBUG_PICKNODE  1
-#define DEBUG_SPLIT     1
-#define DEBUG_CUTLIST   1
+#define DEBUG_PICKNODE  0
+#define DEBUG_SPLIT     0
+#define DEBUG_CUTLIST   0
 
 
 typedef struct eval_info_s
@@ -84,7 +84,7 @@ static intersection_t *quick_alloc_cuts = NULL;
 //
 // ComputeAngle
 //
-// Translate (dx, dy) into an angle value (radians)
+// Translate (dx, dy) into an angle value (degrees)
 //
 angle_g ComputeAngle(float_g dx, float_g dy)
 {

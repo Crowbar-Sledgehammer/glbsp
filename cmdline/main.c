@@ -107,7 +107,6 @@ static void ShowHelp(void)
 
 int main(int argc, char **argv)
 {
-  
   TextStartup();
 
   ShowTitle();
@@ -115,7 +114,7 @@ int main(int argc, char **argv)
   // skip program name itself
   argv++, argc--;
   
-  if (argc == 0)
+  if (argc <= 0)
   {
     ShowUsage();
     TextShutdown();

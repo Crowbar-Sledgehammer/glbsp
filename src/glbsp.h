@@ -57,6 +57,8 @@ typedef int boolean_g;
 
 /* ----- complex types --------------------------- */
 
+// FIXME: need semantics for memory usage !
+
 // Node Build Information Structure 
 typedef struct nodebuildinfo_s
 {

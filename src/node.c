@@ -53,9 +53,9 @@
 #include "wad.h"
 
 
-#define DEBUG_BUILDER  1
-#define DEBUG_SORTER   1
-#define DEBUG_SUBSEC   1
+#define DEBUG_BUILDER  0
+#define DEBUG_SORTER   0
+#define DEBUG_SUBSEC   0
 
 
 static superblock_t *quick_alloc_supers = NULL;
@@ -562,7 +562,7 @@ static void ClockwiseOrder(subsec_t *sub)
     angle_g angle = ComputeAngle(cur->start->x - sub->mid_x,
         cur->start->y - sub->mid_y);
     
-    PrintDebug("  Seg %p: Angle %1.9f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
+    PrintDebug("  Seg %p: Angle %1.6f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
       cur, angle, cur->start->x, cur->start->y, cur->end->x, cur->end->y);
   }
   #endif

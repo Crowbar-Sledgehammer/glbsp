@@ -47,7 +47,7 @@
 #endif
 
 
-#define FATAL_COREDUMP  1
+#define FATAL_COREDUMP  0
 
 
 static boolean_g disable_progress = FALSE;

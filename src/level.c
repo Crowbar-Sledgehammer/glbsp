@@ -287,7 +287,8 @@ void GetSectors(void)
     sector->special = UINT16(raw->special);
     sector->tag = SINT16(raw->tag);
 
-    sector->coalesce = (sector->tag >= 900) ? TRUE : FALSE;
+    sector->coalesce = (sector->tag >= 900 && sector->tag < 1000) ?
+        TRUE : FALSE;
 
     // sector indices never change
     sector->index = i;
@@ -388,7 +389,8 @@ void GetLinedefs(void)
     line->tag  = SINT16(raw->tag);
 
     line->two_sided = (line->flags & LINEFLAG_TWO_SIDED) ? TRUE : FALSE;
-    line->is_precious = (line->tag >= 900) ? TRUE : FALSE;
+    line->is_precious = (line->tag >= 900 && line->tag < 1000) ? 
+        TRUE : FALSE;
 
     line->right = (SINT16(raw->sidedef1) < 0) ? NULL :
         LookupSidedef(SINT16(raw->sidedef1));
