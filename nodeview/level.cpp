@@ -76,7 +76,7 @@ vertex_c::~vertex_c()
 //
 void GetVertices(void)
 {
-	lump_t *lump = FindLevelLump("VERTEXES");
+	lump_c *lump = FindLevelLump("VERTEXES");
 	int count = -1;
 
 	if (lump)
@@ -121,7 +121,7 @@ void GetV2Verts(const uint8_g *data, int length)
 //
 void GetGLVerts(void)
 {
-	lump_t *lump = FindLevelLump("GL_VERT");
+	lump_c *lump = FindLevelLump("GL_VERT");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -173,7 +173,7 @@ sector_c::~sector_c()
 void GetSectors(void)
 {
 	int count = -1;
-	lump_t *lump = FindLevelLump("SECTORS");
+	lump_c *lump = FindLevelLump("SECTORS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_sector_t);
@@ -233,7 +233,7 @@ void GetThings(void)
 	}
 	
 	int count = -1;
-	lump_t *lump = FindLevelLump("THINGS");
+	lump_c *lump = FindLevelLump("THINGS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_thing_t);
@@ -266,7 +266,7 @@ void GetThings(void)
 void GetThingsHexen(void)
 {
 	int count = -1;
-	lump_t *lump = FindLevelLump("THINGS");
+	lump_c *lump = FindLevelLump("THINGS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_hexen_thing_t);
@@ -318,7 +318,7 @@ sidedef_c::~sidedef_c()
 void GetSidedefs(void)
 {
 	int count = -1;
-	lump_t *lump = FindLevelLump("SIDEDEFS");
+	lump_c *lump = FindLevelLump("SIDEDEFS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_sidedef_t);
@@ -414,7 +414,7 @@ void GetLinedefs(void)
 	}
 	
 	int count = -1;
-	lump_t *lump = FindLevelLump("LINEDEFS");
+	lump_c *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_linedef_t);
@@ -442,7 +442,7 @@ void GetLinedefs(void)
 void GetLinedefsHexen(void)
 {
 	int count = -1;
-	lump_t *lump = FindLevelLump("LINEDEFS");
+	lump_c *lump = FindLevelLump("LINEDEFS");
 
 	if (lump)
 		count = lump->length / sizeof(raw_hexen_linedef_t);
@@ -585,7 +585,7 @@ void GetV3Segs(const uint8_g *data, int length)
 //
 void GetGLSegs(void)
 {
-	lump_t *lump = FindLevelLump("GL_SEGS");
+	lump_c *lump = FindLevelLump("GL_SEGS");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -701,7 +701,7 @@ void GetV3Subsecs(const uint8_g *data, int length)
 //
 void GetGLSubsecs(void)
 {
-	lump_t *lump = FindLevelLump("GL_SSECT");
+	lump_c *lump = FindLevelLump("GL_SSECT");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -775,7 +775,7 @@ node_c::~node_c()
 void GetGLNodes(void)
 {
 	int count = -1;
-	lump_t *lump = FindLevelLump("GL_NODES");
+	lump_c *lump = FindLevelLump("GL_NODES");
 
 	if (lump)
 		count = lump->length / sizeof(raw_node_t);

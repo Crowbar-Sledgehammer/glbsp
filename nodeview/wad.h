@@ -20,15 +20,19 @@
 #define __NODEVIEW_WAD_H__
 
 
-struct lump_s;
+class lump_c;
 
 
 typedef enum { IWAD, PWAD } wad_kind_e;
 
 // wad header
 
-typedef struct wad_s
+class wad_c
 {
+public:
+	wad_c();
+	~wad_c();
+
 	// kind of wad file
 	int kind;
 
@@ -39,38 +43,39 @@ typedef struct wad_s
 	int dir_start;
 
 	// current directory entries
-	struct lump_s *dir_head;
-	struct lump_s *dir_tail;
+	list_c dir;
 
 	// current level
-	struct lump_s *current_level;
+	lump_c *current_level;
 
 	// array of level names found
 	const char ** level_names;
 	int num_level_names;
-}
-wad_t;
+};
 
 
 // level information
 
-typedef struct level_s
+class level_c
 {
+public:
+	level_c();
+	~level_c();
+
 	// various flags
 	int flags;
 
 	// the child lump list
-	struct lump_s *children;
+	list_c children;
 
 	// for normal levels, this is the associated GL level lump
-	struct lump_s *buddy;
+	lump_c *buddy;
 
 	// information on overflow
 	int soft_limit;
 	int hard_limit;
 	int v3_switch;
-}
-level_t;
+};
 
 /* this level information holds GL lumps */
 #define LEVEL_IS_GL   0x0002
@@ -78,14 +83,14 @@ level_t;
 
 // directory entry
 
-typedef struct lump_s
+class lump_c : public listnode_c
 {
-	// link in list
-	struct lump_s *next;
-	struct lump_s *prev;
+public:
+	lump_c();
+	~lump_c();
 
 	// name of lump
-	char *name;
+	const char *name;
 
 	// offset to start of lump
 	int start;
@@ -102,9 +107,8 @@ typedef struct lump_s
 	void *data;
 
 	// level information, usually NULL
-	level_t *lev_info;
-}
-lump_t;
+	level_c *lev_info;
+};
 
 /* this lump should be copied from the input wad */
 #define LUMP_COPY_ME       0x0004
@@ -152,21 +156,21 @@ const char *GetLevelName(void);
 // Level lumps are always present in memory (i.e. never marked
 // copyable).
 //
-lump_t *FindLevelLump(const char *name);
+lump_c *FindLevelLump(const char *name);
 
 // tests if the level lump contains nothing but zeros.
-bool CheckLevelLumpZero(lump_t *lump);
+bool CheckLevelLumpZero(lump_c *lump);
 
 // create a new lump in the current level with the given name.  If
 // such a lump already exists, it is truncated to zero length.
 //
-lump_t *CreateLevelLump(const char *name);
-lump_t *CreateGLLump(const char *name);
+lump_c *CreateLevelLump(const char *name);
+lump_c *CreateGLLump(const char *name);
 
 // append some raw data to the end of the given level lump (created
 // with the above function).
 //
-void AppendLevelLump(lump_t *lump, void *data, int length);
+void AppendLevelLump(lump_c *lump, void *data, int length);
 
 
 /* ----- conversion macros ----------------------- */
