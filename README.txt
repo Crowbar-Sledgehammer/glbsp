@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted.  4th July 2004.
+by Andrew Apted.  18th September 2004.
 
 
 Introduction

@@ -2,7 +2,7 @@
 USING glBSP
 ===========
 
-by Andrew Apted.  15th July 2004.
+by Andrew Apted.  18th September 2004.
 
 
 Running glBSP

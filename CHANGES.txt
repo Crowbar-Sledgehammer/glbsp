@@ -2,8 +2,8 @@
 CHANGELOG
 =========
 
-Changes in V2.10  (Unreleased)
-------------------------------
+Changes in V2.10  (21st September 2004)
+---------------------------------------
 
  - support V3 GL-Nodes (handle more than 65534 segs in GL_SEGS lump, and
    more than 32767 vertices in GL_VERT lump).
