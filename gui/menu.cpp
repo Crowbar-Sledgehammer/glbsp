@@ -30,11 +30,6 @@ static void menu_quit_CB(Fl_Widget *w, void *data)
   menu_want_to_quit = TRUE;
 }
 
-///---static void menu_do_reset(Fl_Widget *w, void * data)
-///---{
-///---  /// FIXME
-///---}
-
 static void menu_do_clear_log(Fl_Widget *w, void * data)
 {
   guix_win->text_box->ClearLog();
@@ -230,7 +225,6 @@ static Fl_Menu_Item menu_items[] =
 {
   { "&File", 0, 0, 0, FL_SUBMENU },
     { "&Preferences...",    0, FCAL menu_do_prefs },
-/// { "&Reset All Options", 0, FCAL menu_do_reset },
     { "&Clear Log",         0, FCAL menu_do_clear_log, 0, FL_MENU_DIVIDER },
 /// { "&Save Log...",       0, FCAL menu_do_save_log, 0, FL_MENU_DIVIDER },
     { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },

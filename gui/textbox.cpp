@@ -106,6 +106,10 @@ void Guix_TextBox::AddHorizBar()
   add("@-");
   add(" ");
   add(" ");
+ 
+  // move browser to last line
+  if (size() > 0)
+    bottomline(size());
 }
 
 
@@ -143,7 +147,6 @@ void GUI_PrintMsg(const char *str, ...)
   {
     guix_win->text_box->AddMsg(buffer,
         (strncmp(buffer, "Warning", 7) == 0) ? FL_RED : FL_BLACK);
-///--        (strstr(buffer, "***") != NULL));
   }
   else
   {
