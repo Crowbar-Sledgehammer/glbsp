@@ -2,12 +2,13 @@
 NodeView TODO list
 ==================
 
-- support GWA files.
++ support GWA files.
+
+- fix partition line drawing.
 
 - class-ify the wad structures.  [partially done]
 
-- fix drawing bugs at high zoom levels.
-
+DONE: fix drawing bugs at high zoom levels.
 DONE: start: center screen on map (or player#1), select zoom to fit map.
 DONE: debugging: make it run-time selectable.
 
