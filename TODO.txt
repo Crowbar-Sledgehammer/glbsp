@@ -2,10 +2,32 @@
 TODO
 ====
 
-*  WIN32 + FLTK: have a proper makefile.
+**  WIN32 + FLTK: have a proper makefile.
 
--  glBSPX: Fix modal windows not having close buttons in Win32.
-   Look for WS_SYSMENU in src/FL_win32.cxx
+*  Convert new icon from MacOSX into Win32 (and Linux ??).
 
-TOO COMPLEX:  -modify option: directly modifies the input wad.
+TEST: cookie under linux (use .glbspX_rc if exists, otherwise .glBSPX_rc).
+
+TOO COMPLEX: -modify option: directly modifies the input wad.
+
+LATER
+-----
+
+*  .GOR files (Glbsp ORganisation).  Applies parameters to WAD file
+   with the same base name.
+
+   Example:
+
+      glbsp X.wad -o Y.wad
+
+   With a file X.gor that exists and contains:
+
+     [PARAMS]
+     Factor = 11
+     NoReject = TRUE
+     Fresh = FALSE
+     Warn  = FALSE
+     Quiet = TRUE
+     Version = 1
+     DummyLineTypes = 280-281, 289, 400-417, 430-433
 
