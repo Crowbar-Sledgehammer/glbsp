@@ -66,7 +66,6 @@ const nodebuildfuncs_t cmdline_funcs =
 
   TextDisplayOpen,
   TextDisplaySetTitle,
-  TextDisplaySetText,
   TextDisplaySetBar,
   TextDisplaySetBarLimit,
   TextDisplaySetBarText,
@@ -174,14 +173,6 @@ boolean_g TextDisplayOpen(displaytype_e type)
 // TextDisplaySetTitle
 //
 void TextDisplaySetTitle(const char *str)
-{
-  /* does nothing */
-}
-
-//
-// TextDisplaySetText
-//
-void TextDisplaySetText(const char *str)
 {
   /* does nothing */
 }

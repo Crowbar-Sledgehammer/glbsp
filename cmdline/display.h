@@ -33,7 +33,6 @@ void TextTicker(void);
 
 boolean_g TextDisplayOpen(displaytype_e type);
 void TextDisplaySetTitle(const char *str);
-void TextDisplaySetText(const char *str);
 void TextDisplaySetBar(int barnum, int count);
 void TextDisplaySetBarLimit(int barnum, int limit);
 void TextDisplaySetBarText(int barnum, const char *str);

@@ -53,13 +53,14 @@ static void ShowTitle(void)
   );
 }
 
-static void ShowUsage(void)
+static void ShowInfo(void)
 {
   TextPrintMsg(
     "This GL node builder is based on BSP 2.3, which was created\n"
     "from the basic theory stated in DEU5 (OBJECTS.C)\n"
     "\n"
     "Credits should go to :-\n"
+    "  Janis Legzdinsh            for fixing up Hexen support\n"
     "  Andy Baker & Marc Pullen   for their invaluable help\n"
     "  Colin Reed & Lee Killough  for creating the original BSP\n"
     "  Matt Fell                  for the Doom Specs\n"
@@ -76,7 +77,7 @@ static void ShowUsage(void)
   );
 }
 
-static void ShowHelp(void)
+static void ShowOptions(void)
 {
   TextPrintMsg(
     "Usage: glbsp [options] input.wad [ -o output.wad ]\n"
@@ -86,7 +87,6 @@ static void ShowHelp(void)
     "  -noreject        Does not clobber the reject map\n"
     "  -noprog          Does not show progress indicator\n"
     "  -warn            Show extra warning messages\n"
-    "  -hexen           Handle Hexen wads\n"
     "  -packsides       Pack sidedefs (remove duplicates)\n"
     "  -v1              Output V1.0 vertices (backwards compat.)\n"
     "\n"
@@ -103,7 +103,7 @@ static void ShowHelp(void)
 }
 
 
-/* ----- user information ----------------------------- */
+/* ----- main program ----------------------------- */
 
 int main(int argc, char **argv)
 {
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
   
   if (argc <= 0)
   {
-    ShowUsage();
+    ShowInfo();
     TextShutdown();
     exit(1);
   }
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
       strcmp(argv[0], "-help") == 0 || strcmp(argv[0], "--help") == 0 ||
       strcmp(argv[0], "-HELP") == 0 || strcmp(argv[0], "--HELP") == 0)
   {
-    ShowHelp();
+    ShowOptions();
     TextShutdown();
     exit(1);
   }
@@ -136,20 +136,20 @@ int main(int argc, char **argv)
   if (GLBSP_E_OK != GlbspParseArgs(&info, &comms, 
       (const char **)argv, argc))
   {
-    TextFatalError("%s\n", comms.message ?
-        comms.message : "");
+    TextFatalError("Error: %s\n", comms.message ? comms.message : 
+        "(Unknown error when parsing args)");
   }
 
   if (GLBSP_E_OK != GlbspCheckInfo(&info, &comms)) 
   {
-    TextFatalError("Bad args: %s\n", comms.message ?
-        comms.message : "");
+    TextFatalError("Error: %s\n", comms.message ? comms.message : 
+        "(Unknown error when checking args)");
   }
 
   if (GLBSP_E_OK != GlbspBuildNodes(&info, &cmdline_funcs, &comms))
   {
-    TextFatalError("Bad build !! %s\n", comms.message ?
-        comms.message : "");
+    TextFatalError("Error: %s\n", comms.message ? comms.message : 
+        "(Unknown error during build)");
   }
 
   TextShutdown();
