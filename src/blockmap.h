@@ -2,7 +2,7 @@
 // BLOCKMAP : Generate the blockmap
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -36,8 +36,5 @@ void InitBlockmap(void);
 
 // build the blockmap and write the data into the BLOCKMAP lump
 void PutBlockmap(void);
-
-// build the reject table and write it into the REJECT lump
-void PutReject(void);
 
 #endif /* __GLBSP_BLOCKMAP_H__ */

@@ -2,7 +2,7 @@
 // BLOCKMAP : Generate the blockmap
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -568,27 +568,5 @@ void PutBlockmap(void)
       block_compression);
 
   FreeBlockmap();
-}
-
-//
-// PutReject
-//
-void PutReject(void)
-{
-  lump_t *lump;
-  int i, reject_size = (num_sectors * num_sectors + 7) / 8;
-
-  uint8_g zero = 0;
-
-  DisplayTicker();
-
-  lump = CreateLevelLump("REJECT");
-
-  for (i=0; i < reject_size; i++)
-  {
-    AppendLevelLump(lump, &zero, 1);
-  }
-
-  PrintMsg("Added empty reject lump\n");
 }
 
