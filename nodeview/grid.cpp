@@ -331,7 +331,7 @@ void W_Grid::draw_node(const node_c *nd, int pos, bool on_route)
 
 void W_Grid::draw_child(const child_t *ch, int pos, bool on_route)
 {
-	//!!! FIXME: bbox check
+	// OPTIMISATION: check the bounding box
 
 	if (ch->node)
 	{
@@ -344,7 +344,7 @@ void W_Grid::draw_child(const child_t *ch, int pos, bool on_route)
 		for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
 		{
 			if (on_route && pos == route_len-1)
-				fl_color(fl_color_cube(4,0,4));
+				fl_color(fl_color_cube(4,3,4));
 			else if (! set_seg_color(seg, on_route))
 				continue;
 
