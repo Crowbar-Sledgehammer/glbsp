@@ -41,12 +41,7 @@ void InternalError(const char *str, ...);
 
 // display normal messages & warnings to the screen
 void PrintMsg(const char *str, ...);
-void PrintVerbose(const char *str, ...);
 void PrintWarn(const char *str, ...);
-void PrintMiniWarn(const char *str, ...);
-
-// set message for certain errors
-void SetErrorMsg(const char *str);
 
 // argument handling
 extern const char **arg_list;
@@ -63,7 +58,7 @@ uint16_g Endian_U16(uint16_g);
 uint32_g Endian_U32(uint32_g);
 
 // these are only used for debugging
-void InitDebug(void);
+void InitDebug(bool enable);
 void TermDebug(void);
 void PrintDebug(const char *str, ...);
 

@@ -25,8 +25,9 @@
 #define GUI_PrintMsg  printf
 
 
+static bool inited_FLTK = false;
 
-/* ----- user information ----------------------------- */
+static int main_result = 0;
 
 
 static void ShowTitle(void)
@@ -49,39 +50,72 @@ void MainSetDefaults(void)
 {
 }
 
+void InitFLTK(void)
+{
+	Fl::scheme(NULL);
 
-/* ----- main program ----------------------------- */
+	fl_message_font(FL_HELVETICA, 18);
 
+	Fl_File_Icon::load_system_icons();
+
+	inited_FLTK = true;
+}
+
+static void DisplayError(const char *str, ...)
+{
+	va_list args;
+
+	if (inited_FLTK)
+	{
+		char buffer[1024];
+
+		va_start(args, str);
+		vsprintf(buffer, str, args);
+		va_end(args);
+
+		fl_alert("%s", buffer);
+	}
+	else
+	{
+		va_start(args, str);
+		vfprintf(stderr, str, args);
+		va_end(args);
+
+		fprintf(stderr, "\n");
+	}
+
+	main_result = 9;
+}
+
+//------------------------------------------------------------------------
+//  MAIN PROGRAM
+//------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
-	InitDebug();
-	InitEndian();
-
-    // skip program name
-    argv++, argc--;
-                                                                                            
-    ArgvInit(argc, (const char **)argv);
- 
-    if (ArgvFind('?', NULL) >= 0 || ArgvFind('h', "help") >= 0)
-    {
-		ShowTitle();
-        ShowInfo();
-        exit(1);
-    }
-
-	Fl::scheme(NULL);
-	fl_message_font(FL_HELVETICA /* _BOLD */, 18);
-
-	// load icons for file chooser
-	Fl_File_Icon::load_system_icons();
-
 	try
 	{
+		// skip program name
+		argv++, argc--;
+
+		ArgvInit(argc, (const char **)argv);
+	 
+		InitDebug(ArgvFind(0, "debug") >= 0);
+		InitEndian();
+
+		if (ArgvFind('?', NULL) >= 0 || ArgvFind('h', "help") >= 0)
+		{
+			ShowTitle();
+			ShowInfo();
+			exit(1);
+		}
+
+		InitFLTK();
+
 		// set defaults, also initializes the nodebuildxxxx stuff
 		MainSetDefaults();
 
-		const char *filename = "doom2.wad";
+		const char *filename = "data/doom2.wad";
 
 		if (arg_count > 0 && ! ArgvIsOption(0))
 			filename = arg_list[0];
@@ -96,8 +130,7 @@ int main(int argc, char **argv)
 
 		if (ReadWadFile(filename) < 0)
 		{
-			fl_alert("Unable to read file: %s\n", filename);
-			exit(2);
+			FatalError("Unable to read file: %s\n", filename);
 		}
 
 		const char *level_name = "MAP01";
@@ -114,8 +147,7 @@ int main(int argc, char **argv)
 
 		if (! FindLevel(level_name))
 		{
-			fl_alert("Unable to find level: %s\n", level_name);
-			exit(2);
+			FatalError("Unable to find level: %s\n", level_name);
 		}
 
 		LoadLevel();
@@ -126,18 +158,27 @@ int main(int argc, char **argv)
 		while (! guix_win->want_quit)
 			Fl::wait();
 	}
+	catch (const char * err)
+	{
+		DisplayError("%s", err);
+	}
 	catch (assert_fail_c err)
 	{
-		fl_alert("Sorry, an internal error occurred:\n%s", err.GetMessage());
+		DisplayError("Sorry, an internal error occurred:\n%s", err.GetMessage());
 	}
 	catch (...)
 	{
-		fl_alert("An unknown problem occurred (UI code)");
+		DisplayError("An unknown problem occurred (UI code)");
 	}
 
-	delete guix_win;
-	guix_win = NULL;
+	if (guix_win)
+	{
+		delete guix_win;
+		guix_win = NULL;
+	}
 
-	return 0;
+	TermDebug();
+
+	return main_result;
 }
 

@@ -138,9 +138,6 @@ int ReadWadFile(const char *filename);
 // close all wad files and free any memory.
 void CloseWads(void);
 
-// returns the number of levels found in the wad.
-int CountLevels(void);
-
 // find a particular level in the wad directory, and store the
 // reference in `wad.current_level'.  Returns false if not
 // found.

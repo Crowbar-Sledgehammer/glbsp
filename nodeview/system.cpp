@@ -19,39 +19,25 @@
 // this includes everything we need
 #include "defs.h"
 
-
-#define DEBUG_ENABLED   0
-
-#define DEBUGGING_FILE  "nv_debug.txt"
-
-#define DEBUG_ENDIAN  0
-
-static int cpu_big_endian = 0;
-
-
 static char message_buf[1024];
-
-#if DEBUG_ENABLED
-static FILE *debug_fp = NULL;
-#endif
-
-bool quiet_mode = false;
-bool mini_warnings = false;
-
 
 //
 // FatalError
 //
 void FatalError(const char *str, ...)
 {
+///	strcpy(message_buf, "\nFATAL ERROR: ");
+///	char *msg_end = message_buf + strlen(message_buf);
+
 	va_list args;
 
 	va_start(args, str);
 	vsprintf(message_buf, str, args);
 	va_end(args);
 
-	fprintf(stderr, "\nError: *** %s ***\n\n", message_buf);
-	exit(9);
+	PrintDebug(">> FATAL ERROR: %s", message_buf);
+
+	throw (const char *) message_buf;
 }
 
 //
@@ -59,14 +45,18 @@ void FatalError(const char *str, ...)
 //
 void InternalError(const char *str, ...)
 {
+	strcpy(message_buf, "\nINTERNAL ERROR: ");
+	char *msg_end = message_buf + strlen(message_buf);
+
 	va_list args;
 
 	va_start(args, str);
-	vsprintf(message_buf, str, args);
+	vsprintf(msg_end, str, args);
 	va_end(args);
 
-	fprintf(stderr, "\nINTERNAL ERROR: *** %s ***\n\n", message_buf);
-	exit(8);
+	PrintDebug(">> %s", message_buf);
+
+	throw (const char *) message_buf;
 }
 
 //
@@ -82,30 +72,7 @@ void PrintMsg(const char *str, ...)
 
 	printf("%s", message_buf);
 
-#if DEBUG_ENABLED
-	PrintDebug(">>> %s", message_buf);
-#endif
-}
-
-//
-// PrintVerbose
-//
-void PrintVerbose(const char *str, ...)
-{
-	va_list args;
-
-	if (! quiet_mode)
-	{
-		va_start(args, str);
-		vsprintf(message_buf, str, args);
-		va_end(args);
-
-		printf("%s", message_buf);
-	}
-
-#if DEBUG_ENABLED
-	PrintDebug(">>> %s", message_buf);
-#endif
+	PrintDebug(">> %s", message_buf);
 }
 
 //
@@ -121,45 +88,12 @@ void PrintWarn(const char *str, ...)
 
 	printf("Warning: %s", message_buf);
 
-#if DEBUG_ENABLED
 	PrintDebug("Warning: %s", message_buf);
-#endif
 }
 
-//
-// PrintMiniWarn
-//
-void PrintMiniWarn(const char *str, ...)
-{
-	va_list args;
-
-	if (mini_warnings)
-	{
-		va_start(args, str);
-		vsprintf(message_buf, str, args);
-		va_end(args);
-
-		printf("Warning: %s", message_buf);
-	}
-
-#if DEBUG_ENABLED
-	va_start(args, str);
-	vsprintf(message_buf, str, args);
-	va_end(args);
-
-	PrintDebug("MiniWarn: %s", message_buf);
-#endif
-}
-
-//
-// SetErrorMsg
-//
-void SetErrorMsg(const char *str)
-{
-}
-
-
-/* -------- argument code ----------------------------- */
+//------------------------------------------------------------------------
+//  ARGUMENT HANDLING
+//------------------------------------------------------------------------
 
 const char **arg_list = NULL;
 int arg_count = 0;
@@ -282,22 +216,31 @@ bool ArgvIsOption(int index)
 	return (str[0] == '-');
 }
 
+//------------------------------------------------------------------------
+//  DEBUGGING CODE
+//------------------------------------------------------------------------
 
-/* -------- debugging code ----------------------------- */
+#define DEBUGGING_FILE  "nv_debug.txt"
+
+static FILE *debug_fp = NULL;
 
 //
 // InitDebug
 //
-void InitDebug(void)
+void InitDebug(bool enable)
 {
-#if DEBUG_ENABLED
+	if (! enable)
+	{
+		debug_fp = NULL;
+		return;
+	}
+
 	debug_fp = fopen(DEBUGGING_FILE, "w");
 
 	if (! debug_fp)
 		PrintWarn("Unable to open DEBUG FILE: %s\n", DEBUGGING_FILE);
 
-	PrintDebug("=== START OF DEBUG FILE ===\n");
-#endif
+	PrintDebug("====== START OF DEBUG FILE ======\n\n");
 }
 
 //
@@ -305,15 +248,13 @@ void InitDebug(void)
 //
 void TermDebug(void)
 {
-#if DEBUG_ENABLED
 	if (debug_fp)
 	{
-		PrintDebug("=== END OF DEBUG FILE ===\n");
+		PrintDebug("\n====== END OF DEBUG FILE ======\n");
 
 		fclose(debug_fp);
 		debug_fp = NULL;
 	}
-#endif
 }
 
 //
@@ -321,7 +262,6 @@ void TermDebug(void)
 //
 void PrintDebug(const char *str, ...)
 {
-#if DEBUG_ENABLED
 	if (debug_fp)
 	{
 		va_list args;
@@ -332,13 +272,13 @@ void PrintDebug(const char *str, ...)
 
 		fflush(debug_fp);
 	}
-#else
-	(void) str;
-#endif
 }
 
+//------------------------------------------------------------------------
+//  ENDIAN CODE
+//------------------------------------------------------------------------
 
-/* -------- endian code ----------------------------- */
+static bool cpu_big_endian = false;
 
 //
 // InitEndian
@@ -375,26 +315,22 @@ void InitEndian(void)
 	u.mem[0] = 0x70;  u.mem[1] = 0x71;
 	u.mem[2] = 0x72;  u.mem[3] = 0x73;
 
-# if DEBUG_ENDIAN
 	PrintDebug("Endianness magic value: 0x%08x\n", u.val);
-# endif
 
 	if (u.val == 0x70717273)
-		cpu_big_endian = 1;
+		cpu_big_endian = true;
 	else if (u.val == 0x73727170)
-		cpu_big_endian = 0;
+		cpu_big_endian = false;
 	else
 		FatalError("Sanity check failed: weird endianness (0x%08x)", u.val);
 
-# if DEBUG_ENDIAN
 	PrintDebug("Endianness = %s\n", cpu_big_endian ? "BIG" : "LITTLE");
 
 	PrintDebug("Endianness check: 0x1234 --> 0x%04x\n", 
 			(int) Endian_U16(0x1234));
 
-	PrintDebug("Endianness check: 0x11223344 --> 0x%08x\n", 
+	PrintDebug("Endianness check: 0x11223344 --> 0x%08x\n\n", 
 			Endian_U32(0x11223344));
-# endif
 }
 
 //

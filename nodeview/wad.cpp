@@ -259,7 +259,7 @@ static int ReadHeader(const char *filename)
 		sprintf(strbuf, "Trouble reading wad header for %s : %s", 
 				filename, strerror(errno));
 
-		SetErrorMsg(strbuf);
+///		SetErrorMsg(strbuf);
 		return false;
 	}
 
@@ -268,7 +268,7 @@ static int ReadHeader(const char *filename)
 		sprintf(strbuf, "%s does not appear to be a wad file : bad magic", 
 				filename);
 
-		SetErrorMsg(strbuf);
+///		SetErrorMsg(strbuf);
 		return false;
 	}
 
@@ -536,23 +536,6 @@ static int ReadAllLumps(void)
 
 
 //
-// CountLevels
-//
-int CountLevels(void)
-{
-	lump_c *cur;
-	int result = 0;
-
-	for (cur = (lump_c*)wad->dir.begin(); cur; cur = (lump_c*)cur->NodeNext())
-	{
-		if (cur->lev_info && ! (cur->lev_info->flags & LEVEL_IS_GL))
-			result++;
-	}
-
-	return result;
-}
-
-//
 // FindLevel
 //
 bool FindLevel(const char *map_name)
@@ -637,8 +620,7 @@ int ReadWadFile(const char *filename)
 		sprintf(strbuf, "Cannot open WAD file %s : %s", filename, 
 				strerror(errno));
 
-		SetErrorMsg(strbuf);
-
+///		SetErrorMsg(strbuf);
 		return -1;
 	}
 
@@ -650,7 +632,7 @@ int ReadWadFile(const char *filename)
 
 	PrintMsg("Opened %cWAD file : %s\n", (wad->kind == IWAD) ? 'I' : 'P', 
 			filename); 
-	PrintVerbose("Reading %d dir entries at 0x%X\n", wad->num_entries, 
+	PrintMsg("Reading %d dir entries at 0x%X\n", wad->num_entries, 
 			wad->dir_start);
 
 	// read directory

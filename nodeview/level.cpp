@@ -822,7 +822,7 @@ void LoadLevel(void)
 	GetGLSubsecs();
 	GetGLNodes();
 
-///	PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
+///	PrintMsg("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
 ///			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
 }
