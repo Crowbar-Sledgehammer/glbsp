@@ -2,7 +2,7 @@
 Compiling glBSP
 ===============
 
-by Andrew Apted.  4th July 2004.
+by Andrew Apted.  21st September 2004.
 
 
 glBSP comes in three flavours: a text/command-line utility "glbsp",
@@ -121,7 +121,7 @@ MacOS X:
 Windows with Dev-C++:
 
     Note that the glBSPX project file (fltk/fltk.dev) assumes that
-    fltk-1.1.4 and glbsp-2.05 are in the same directory.
+    fltk-1.1.4 and glbsp-2.10 are in the same directory.
 
     First copy the files from the glbsp "patches/fltk_win32" directory
     into the fltk-1.1.4 directory.  (Copy "devcpp" whole, and copy
