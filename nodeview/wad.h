@@ -141,12 +141,11 @@ void CloseWads(void);
 // returns the number of levels found in the wad.
 int CountLevels(void);
 
-// find the next level lump in the wad directory, and store the
-// reference in `wad.current_level'.  Call this straight after
-// ReadWadFile() to get the first level.  Returns 1 if found,
-// otherwise 0 if there are no more levels in the wad.
+// find a particular level in the wad directory, and store the
+// reference in `wad.current_level'.  Returns false if not
+// found.
 //
-int FindNextLevel(void);
+bool FindLevel(const char *map_name);
 
 // return the current level name
 const char *GetLevelName(void);
@@ -160,17 +159,6 @@ lump_c *FindLevelLump(const char *name);
 
 // tests if the level lump contains nothing but zeros.
 bool CheckLevelLumpZero(lump_c *lump);
-
-// create a new lump in the current level with the given name.  If
-// such a lump already exists, it is truncated to zero length.
-//
-lump_c *CreateLevelLump(const char *name);
-lump_c *CreateGLLump(const char *name);
-
-// append some raw data to the end of the given level lump (created
-// with the above function).
-//
-void AppendLevelLump(lump_c *lump, void *data, int length);
 
 
 /* ----- conversion macros ----------------------- */

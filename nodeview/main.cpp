@@ -100,7 +100,23 @@ int main(int argc, char **argv)
 			exit(2);
 		}
 
-		FindNextLevel();
+		const char *level_name = "MAP01";
+		{
+			int params;
+			int idx = ArgvFind(0, "level", &params);
+
+			if (idx < 0)
+				idx = ArgvFind(0, "warp", &params);
+
+			if (idx >= 0 && params >= 1)
+				level_name = arg_list[idx + 1];
+		}
+
+		if (! FindLevel(level_name))
+		{
+			fl_alert("Unable to find level: %s\n", level_name);
+			exit(2);
+		}
 
 		LoadLevel();
 

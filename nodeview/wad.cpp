@@ -553,19 +553,23 @@ int CountLevels(void)
 }
 
 //
-// FindNextLevel
+// FindLevel
 //
-int FindNextLevel(void)
+bool FindLevel(const char *map_name)
 {
 	lump_c *cur;
 
-	if (wad->current_level)
-		cur = (lump_c*) wad->current_level->NodeNext();
-	else
-		cur = (lump_c*) wad->dir.begin();
+	for (cur = (lump_c*)wad->dir.begin(); cur; cur = (lump_c*)cur->NodeNext())
+	{
+		if (! cur->lev_info)
+			continue;
 
-	while (cur && ! (cur->lev_info && ! (cur->lev_info->flags & LEVEL_IS_GL)))
-		cur = (lump_c*) cur->NodeNext();
+		if (cur->lev_info->flags & LEVEL_IS_GL)  // @@@@
+			continue;
+
+		if (UtilStrCaseCmp(cur->name, map_name) == 0)
+			break;
+	}
 
 	wad->current_level = cur;
 
