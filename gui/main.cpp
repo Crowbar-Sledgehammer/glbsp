@@ -52,8 +52,12 @@ guix_preferences_t guix_prefs;
 
 const guix_preferences_t default_guiprefs =
 {
-  40,  0,      // win_x, win_y
-  560, 480,    // win_w, win_h;
+#ifdef WIN32
+  40,  20,     // win_x, win_y
+#else
+  40,  50,
+#endif
+  560, 450,    // win_w, win_h;
 
   120, 200,    // progress_x, progress_y
   90, 200,     // dialog_x, dialog_y
@@ -139,6 +143,13 @@ int main(int argc, char **argv)
     exit(1);
   }
 
+  int first_arg = 1;
+
+#ifdef MACOSX
+  if (first_arg < argc && (strncmp(argv[first_arg], "-psn", 4) == 0))
+    first_arg++;
+#endif
+
   // set defaults, also initializes the nodebuildxxxx stuff
   MainSetDefaults();
 
@@ -157,22 +168,22 @@ int main(int argc, char **argv)
   //
   boolean_g unused_args = FALSE;
 
-  if (argc > 1 && argv[1][0] != '-')
+  if (first_arg < argc && argv[first_arg][0] != '-')
   {
     GlbspFree(guix_info.input_file);
     GlbspFree(guix_info.output_file);
 
-    guix_info.input_file = GlbspStrDup(argv[1]);
+    guix_info.input_file = GlbspStrDup(argv[first_arg]);
 
     // guess an output name too
     
     guix_info.output_file = GlbspStrDup(
         HelperGuessOutput(guix_info.input_file));
  
-    if (argc > 2)
-      unused_args = TRUE;
+    first_arg++;
   }
-  else if (argc > 1)
+
+  if (first_arg < argc)
     unused_args = TRUE;
 
 
