@@ -31,6 +31,11 @@ public:
 	void SetPos(double new_x, double new_y);
 	// changes the current position.
 
+	void SetPath(path_c *p) { path = p; }
+	//  give a path for the grid to draw
+
+	void ClearPath() { SetPath(NULL); }
+
 	void FitBBox(double lx, double ly, double hx, double hy);
 	// set zoom and position so that the bounding area fits.
 
@@ -58,6 +63,7 @@ private:
 	void draw_all_partitions();
 	void draw_node(const node_c *nd, int pos, bool on_route);
 	void draw_child(const child_t *ch, int pos, bool on_route);
+	void draw_path();
 
 	bool set_seg_color(seg_c *seg, bool on);
 	void draw_line(double x1, double y1, double x2, double y2);
@@ -85,6 +91,8 @@ private:
 	int partition_MODE;
 	int miniseg_MODE;
 	int shade_MODE;
+
+	path_c *path;
 
 	static const int MAX_ROUTE = 2000;
 

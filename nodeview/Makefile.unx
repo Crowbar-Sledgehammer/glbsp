@@ -24,6 +24,7 @@ OBJS=./main.o     \
      ./level.o    \
      ./lists.o    \
      ./menu.o     \
+     ./path.o     \
      ./system.o   \
      ./util.o     \
      ./wad.o      \

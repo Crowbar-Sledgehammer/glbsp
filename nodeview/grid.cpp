@@ -35,7 +35,7 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
         mid_x(0), mid_y(0),
 		grid_MODE(1), partition_MODE(1), miniseg_MODE(2), shade_MODE(1),
-		route_len(0)
+		path(NULL), route_len(0)
 {
 	visit_route = new char[MAX_ROUTE];
 }
@@ -165,6 +165,9 @@ void W_Grid::draw()
 
 	if (partition_MODE == 2)
 		draw_all_partitions();
+
+	if (path)
+		draw_path();
 
 	fl_pop_clip();
 }
@@ -502,6 +505,39 @@ void W_Grid::draw_line(double x1, double y1, double x2, double y2)
 	MapToWin(x2, y2, &ex, &ey);
 
 	fl_line(sx, sy, ex, ey);
+}
+
+void W_Grid::draw_path()
+{
+	int p;
+
+	// first, render the lines
+	fl_color(fl_color_cube(0,7,4));
+
+	for (p = 0; p < path->point_num - 1; p++)
+	{
+		int x1, y1, x2, y2;
+
+		path->GetPoint(p,   &x1, &y1);
+		path->GetPoint(p+1, &x2, &y2);
+
+		draw_line(x1, y1, x2, y2);
+	}
+
+	// second, render the points themselves
+	fl_color(FL_YELLOW);
+
+	for (p = 0; p < path->point_num; p++)
+	{
+		int mx, my;
+		int wx, wy;
+
+		path->GetPoint(p, &mx, &my);
+
+		MapToWin(mx, my, &wx, &wy);
+
+		fl_rect(wx-1, wy-1, 3, 3);
+	}
 }
 
 void W_Grid::scroll(int dx, int dy)

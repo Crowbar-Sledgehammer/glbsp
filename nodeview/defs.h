@@ -85,6 +85,7 @@
 #include "dialog.h"
 #include "menu.h"
 #include "level.h"
+#include "path.h"
 #include "grid.h"
 #include "window.h"
 
