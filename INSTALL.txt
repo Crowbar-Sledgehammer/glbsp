@@ -107,7 +107,8 @@ Building FLTK
 Unix / Linux:
 
     Use the normal method (configure, make, make install).  Make sure the
-    static library is build (although dynamic should work).
+    static library is built (although dynamic should work).  Since OpenGL
+    isn't needed, I usually configure with "--disable-gl".
 
 MacOS X:
 
