@@ -48,7 +48,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "*** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ***\n\n"
+    "**** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ****\n\n"
   );
 }
 

@@ -81,7 +81,7 @@ static void ShowTitle(void)
 {
   GUI_PrintMsg(
     "\n"
-    "*** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ***\n\n"
+    "**** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ****\n\n"
   );
 }
 
