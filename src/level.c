@@ -2,7 +2,7 @@
 // LEVEL : Level structure read/write functions.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -1010,7 +1010,7 @@ static void PruneLinedefs(void)
 
   if (new_num < num_linedefs)
   {
-    PrintMsg("Pruned %d zero-length linedefs\n", num_linedefs - new_num);
+    PrintVerbose("Pruned %d zero-length linedefs\n", num_linedefs - new_num);
     num_linedefs = new_num;
   }
 
@@ -1052,11 +1052,11 @@ static void PruneVertices(void)
     int dup_num = num_vertices - new_num - unused;
 
     if (unused > 0)
-      PrintMsg("Pruned %d unused vertices "
+      PrintVerbose("Pruned %d unused vertices "
         "(this is normal if the nodes were built before)\n", unused);
 
     if (dup_num > 0)
-      PrintMsg("Pruned %d duplicate vertices\n", dup_num);
+      PrintVerbose("Pruned %d duplicate vertices\n", dup_num);
 
     num_vertices = new_num;
   }
@@ -1104,10 +1104,10 @@ static void PruneSidedefs(void)
     int dup_num = num_sidedefs - new_num - unused;
 
     if (unused > 0)
-      PrintMsg("Pruned %d unused sidedefs\n", unused);
+      PrintVerbose("Pruned %d unused sidedefs\n", unused);
 
     if (dup_num > 0)
-      PrintMsg("Pruned %d duplicate sidedefs\n", dup_num);
+      PrintVerbose("Pruned %d duplicate sidedefs\n", dup_num);
 
     num_sidedefs = new_num;
   }
@@ -1143,7 +1143,7 @@ static void PruneSectors(void)
 
   if (new_num < num_sectors)
   {
-    PrintMsg("Pruned %d unused sectors\n", num_sectors - new_num);
+    PrintVerbose("Pruned %d unused sectors\n", num_sectors - new_num);
     num_sectors = new_num;
   }
 
@@ -1883,6 +1883,9 @@ void LoadLevel(void)
 
   doing_gl = cur_info->gwa_mode || !cur_info->no_gl;
 
+  // -JL- Identify Hexen mode by presence of BEHAVIOR lump
+  doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
+
   if (doing_normal && doing_gl)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
   else if (doing_normal)
@@ -1892,18 +1895,17 @@ void LoadLevel(void)
   else
     sprintf(message, "Building _nothing_ on %s", level_name);
  
+  if (doing_hexen)
+    strcat(message, " (Hexen)");
+
+  doing_hexen |= cur_info->force_hexen;
+
   DisplaySetBarText(1, message);
-  PrintMsg("\n\n%s\n\n", message);
 
-  doing_hexen = cur_info->force_hexen;
+  PrintVerbose("\n\n");
+  PrintMsg("%s\n", message);
+  PrintVerbose("\n");
 
-  // -JL- Identify Hexen mode by presence of BEHAVIOR lump
-  if (!doing_hexen && FindLevelLump("BEHAVIOR") != NULL)
-  {
-    PrintMsg("Hexen level detected.\n");
-    doing_hexen = TRUE;
-  }
-  
   GetVertices();
   GetSectors();
   GetSidedefs();
@@ -1913,13 +1915,13 @@ void LoadLevel(void)
   else
     GetLinedefs();
 
-  PrintMsg("Loaded %d vertices, %d sectors, %d sides, %d lines\n", 
+  PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines\n", 
       num_vertices, num_sectors, num_sidedefs, num_linedefs);
 
   if (!cur_info->choose_fresh && !doing_normal &&
       normal_exists && num_sectors > 5 && num_linedefs > 100)
   {
-    PrintMsg("Using original nodes to speed things up\n");
+    PrintVerbose("Using original nodes to speed things up\n");
     GetStaleNodes();
   }
  

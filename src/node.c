@@ -2,7 +2,7 @@
 // NODE : Recursively create nodes and return the pointers.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -382,7 +382,7 @@ superblock_t *CreateSegs(void)
   seg_t *left, *right;
   superblock_t *block;
 
-  PrintMsg("Creating Segs...\n");
+  PrintVerbose("Creating Segs...\n");
 
   block = NewSuperBlock();
  
@@ -778,7 +778,7 @@ int ComputeHeight(node_t *node)
 }
 
 
-#ifdef DEBUG_BUILDER
+#if DEBUG_BUILDER
 
 static void DebugShowSegs(superblock_t *seg_list)
 {

@@ -2,7 +2,7 @@
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -83,7 +83,7 @@ void UtilFree(void *data)
 char *UtilStrDup(const char *str)
 {
   char *result;
-  int len = strlen(str);
+  int len = (int)strlen(str);
 
   result = UtilCalloc(len+1);
 
@@ -151,3 +151,21 @@ int RoundPOW2(int x)
   return (x + 1);
 }
 
+
+#if 0
+//
+// FileExists
+//
+int FileExists(const char *filename)
+{
+  FILE *fp = fopen(filename, "rb");
+
+  if (fp)
+  {
+    fclose(fp);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+#endif

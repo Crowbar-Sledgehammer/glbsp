@@ -2,7 +2,7 @@
 // UTILITY : general purpose functions
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -47,18 +47,20 @@ void *UtilCalloc(int size);
 // re-allocate some memory.  guaranteed not to fail.
 void *UtilRealloc(void *old, int size);
 
-// duplicate a string
+// duplicate a string.
 char *UtilStrDup(const char *str);
 char *UtilStrNDup(const char *str, int size);
 
-// free some memory or a string
+// free some memory or a string.
 void UtilFree(void *data);
 
-// compare two strings case insensitively
+// compare two strings case insensitively.
 int StrCaseCmp(const char *A, const char *B);
 
 // round a positive value up to the nearest power of two.
 int RoundPOW2(int x);
 
+// check if the file exists.
+int FileExists(const char *filename);
 
 #endif /* __GLBSP_UTIL_H__ */
