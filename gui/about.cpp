@@ -25,9 +25,6 @@
 //  
 //------------------------------------------------------------------------
 
-/// const int foo = 3;
-/// int bar = 7;
-
 #include "local.h"
 
 const unsigned char about_image_pal[256 * 3] =
