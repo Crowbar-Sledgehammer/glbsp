@@ -5,14 +5,19 @@ CHANGELOG
 Changes in V1.95  (unreleased)
 ------------------------------
 
+ - new GUI version using the FLTK toolkit.
+ 
  - many fixes for Hexen wads, thanks to Janis Legzdinsh, including
    auto-detection of a hexen wad (don't need -hexen option).
 
- - removed `display_setText' function from nodebuildfuncs API.
-
+ - level names (MAP01, E2M3, etc) are detected automatically now,
+   allowing arbitrary names (e.g. RUINS, QD05, etc).
+ 
  - improved wad.c to return error values instead of doing
    FatalError(), setting up the comms->message appropriately.
  
+ - removed `display_setText' function from nodebuildfuncs API.
+
  - fixed the memory semantics for the glbsp API, with new functions
    GlbspStrDup() and GlbspFree().
  
@@ -22,8 +27,6 @@ Changes in V1.95  (unreleased)
    new error code GLBSP_E_BadInfoFixed to show that (a) there was a
    problem but (b) the parameter causing it has been reset.
 
- - new GUI version using the FLTK toolkit.
- 
 
 Changes in V1.94  (6th June 2001)
 ---------------------------------

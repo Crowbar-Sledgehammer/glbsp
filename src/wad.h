@@ -47,6 +47,10 @@ typedef struct wad_s
 
   // current level
   struct lump_s *current_level;
+
+  // array of level names found
+  const char ** level_names;
+  int num_level_names;
 }
 wad_t;
 
