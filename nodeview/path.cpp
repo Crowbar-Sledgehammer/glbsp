@@ -38,7 +38,7 @@ path_c::~path_c()
 //
 // Path Reading
 //
-bool path_c::ReadFile(const char *filename)
+path_c * path_c::ReadFile(const char *filename)
 {
 	FILE *fp = fopen(filename, "r");
 
@@ -48,11 +48,13 @@ bool path_c::ReadFile(const char *filename)
 		return false;
 	}
 
-	points = new int[MAX_PTS * 2];
+	path_c *P = new path_c();
 
-	for (point_num = 0; point_num < MAX_PTS; point_num++)
+	P->points = new int[MAX_PTS * 2];
+
+	for (P->point_num = 0; P->point_num < MAX_PTS; P->point_num++)
 	{
-		int *cur_pt = points + (point_num * 2);
+		int *cur_pt = P->points + (P->point_num * 2);
 
 		if (fscanf(fp, " %d %d ", cur_pt, cur_pt+1) != 2)
 			break;
@@ -60,6 +62,6 @@ bool path_c::ReadFile(const char *filename)
 
 	fclose(fp);
 
-	return (point_num > 0);
+	return P;
 }
 

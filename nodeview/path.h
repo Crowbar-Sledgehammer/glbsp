@@ -32,7 +32,7 @@ private:
 	static const int MAX_PTS = 1024;
 
 public:
-	bool ReadFile(const char *filename);
+	static path_c * ReadFile(const char *filename);
 
 	void GetPoint(int index, int *x, int *y)
 	{
