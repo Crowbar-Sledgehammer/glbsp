@@ -2,17 +2,11 @@
 TODO
 ====
 
--  icon.xpm IS OLD !
-
-+  Retest installation on MacOS X and Win32.
-
-CHECK OVER: Rework INSTALL.txt
-
-DONE: glBSPX: manual and license windows: put buttons at bottom.
-
 
 LATER / IDEAS
 =============
+
+*  Unix/Linux: have 'make install' targets.
 
 +  Put Changelog on GLBSP page.
 
