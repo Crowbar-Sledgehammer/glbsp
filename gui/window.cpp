@@ -61,8 +61,6 @@ void WindowSmallDelay(void)
 Guix_MainWin::Guix_MainWin(const char *title) :
     Fl_Window(guix_prefs.win_w, guix_prefs.win_h, title)
 {
-  int hw;
-
   // turn off auto-add-widget mode
   end();
 
@@ -86,27 +84,30 @@ Guix_MainWin::Guix_MainWin(const char *title) :
 
 
   // create contents
-  hw = (w() - 8*2 - 4) / 2;
-    
+  int hw = (w() - 8*2 - 4) / 2;
+   
   menu_bar = MenuCreate(0, 0, w(), 28);
   add(menu_bar);
 
-  build_mode = new Guix_BuildMode(8, 32, hw, 140);
+  build_mode = new Guix_BuildMode(8, 32, hw, 160);
   add(build_mode);
 
-  misc_opts  = new Guix_MiscOptions(8+hw+4, 32, hw, 140);
+  misc_opts  = new Guix_MiscOptions(8+hw+4, 32, hw, 120);
   add(misc_opts);
    
-  files = new Guix_FileBox(8, 176, w()-8*2, 88);
-  add(files);
-
-  factor = new Guix_FactorBox(8, 268, hw, 40);
+  factor = new Guix_FactorBox(8+hw+4, 152, hw, 40);
   add(factor);
 
-  builder = new Guix_BuildButton(8+hw+4, 268, hw, 40);
+  files = new Guix_FileBox(8, 196, w()-8*2, 86);
+  add(files);
+
+  builder = new Guix_BuildButton(8, 286+10, hw, 60);
   add(builder);
 
-  text_box = new Guix_TextBox(0, 312, w(), h() - 312);
+  progress = new Guix_ProgressBox(8+hw+4, 286, hw, 74);
+  add(progress);
+
+  text_box = new Guix_TextBox(0, 364, w(), h() - 364);
   add(text_box);
   resizable(text_box);
 

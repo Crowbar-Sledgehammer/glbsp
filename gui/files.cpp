@@ -56,11 +56,10 @@ static void file_in_browse_CB(Fl_Widget *w, void *data)
   guix_win->files->InFileChanged();
 }
 
-#if 0  // not needed (but might be)
 static void file_out_browse_CB(Fl_Widget *w, void *data)
 {
   const char *name = fl_file_chooser("Select an output file",
-      NULL, guix_win->files->out_file->value());
+      "*.wad", guix_win->files->out_file->value());
 
   if (! name)
     return;
@@ -69,7 +68,6 @@ static void file_out_browse_CB(Fl_Widget *w, void *data)
   guix_win->files->out_file->redraw();
   guix_win->files->WriteInfo();
 }
-#endif
 
 static void file_out_guess_CB(Fl_Widget *w, void *data)
 {
@@ -97,7 +95,7 @@ Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
   align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP);
 
   // create the file group -- serves as the resizable
-  int len = w - 62 - 100;
+  int len = w - 62 - 178;
 
   file_group = new Fl_Group(x+62, y, len, h);
   file_group->end();
@@ -140,10 +138,15 @@ Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
   in_browse->callback((Fl_Callback *) file_in_browse_CB, in_file);
   add(in_browse);
 
-  out_browse = new Fl_Button(x+70+len, y+18+30*1, 70, 26, "Guess");
+  out_browse = new Fl_Button(x+70+len, y+18+30*1, 80, 26, "Browse");
   out_browse->align(FL_ALIGN_INSIDE);
-  out_browse->callback((Fl_Callback *) file_out_guess_CB, out_file);
+  out_browse->callback((Fl_Callback *) file_out_browse_CB, out_file);
   add(out_browse);
+
+  out_guess = new Fl_Button(x+70+86+len, y+18+30*1, 70, 26, "Guess");
+  out_guess->align(FL_ALIGN_INSIDE);
+  out_guess->callback((Fl_Callback *) file_out_guess_CB, out_file);
+  add(out_guess);
 
   ReadInfo();
 }
@@ -196,12 +199,14 @@ void Guix_FileBox::GWA_Changed()
     out_file->hide();
     out_gwa_file->show();
     out_browse->deactivate();
+    out_guess->deactivate();
   }
   else
   {
     out_gwa_file->hide();
     out_file->show();
     out_browse->activate();
+    out_guess->activate();
   }
 }
 
@@ -235,7 +240,7 @@ Guix_FactorBox::Guix_FactorBox(int x, int y, int w, int h) :
   
   // create factor input box
 
-  factor = new Fl_Counter(x+60, y+7, 100, 26, "Factor");
+  factor = new Fl_Counter(x+60, y+8, 100, 24, "Factor");
   factor->align(FL_ALIGN_LEFT);
   factor->type(FL_SIMPLE_COUNTER);
   factor->range(1, 99);
@@ -525,6 +530,8 @@ static void BuildDoBuild(void)
   if (ret == GLBSP_E_OK)
     return;
 
+  guix_win->progress->ClearBars();
+    
   if (ret == GLBSP_E_Cancelled)
   {
     guix_win->text_box->AddMsg("\n*** Cancelled ***\n", FL_BLUE, TRUE);
@@ -578,7 +585,7 @@ static void BuildDoBuild(void)
   DialogShowAndGetChoice("glBSP Error", pldie_image, buffer);
 }
 
-static void build_button_CB(Fl_Widget *w, void *data)
+static void builder_build_CB(Fl_Widget *w, void *data)
 {
   // make sure info is up-to-date
   guix_win->WriteAllInfo();
@@ -633,6 +640,12 @@ static void build_button_CB(Fl_Widget *w, void *data)
   guix_comms.message = NULL;
 }
 
+static void builder_cancel_CB(Fl_Widget *w, void *data)
+{
+  guix_comms.cancelled = TRUE;
+}
+
+
 //
 // BuildButton Constructor
 //
@@ -645,11 +658,18 @@ Guix_BuildButton::Guix_BuildButton(int x, int y, int w, int h) :
 
   // create button sitting in a space of its own
 
-  button = new Fl_Button(x+60, y+5, 120, 30, "Build Nodes");
-  button->box(FL_ROUND_UP_BOX);
-  button->align(FL_ALIGN_INSIDE);
-  button->callback((Fl_Callback *) build_button_CB);
-  add(button);
+  build = new Fl_Button(x+10, y+10, 90, 30, "Build");
+  build->box(FL_ROUND_UP_BOX);
+  build->align(FL_ALIGN_INSIDE);
+  build->callback((Fl_Callback *) builder_build_CB);
+  add(build);
+
+  stopper = new Fl_Button(x+140, y+10, 90, 30, "Stop");
+  stopper->box(FL_ROUND_UP_BOX);
+  stopper->align(FL_ALIGN_INSIDE);
+  stopper->callback((Fl_Callback *) builder_cancel_CB);
+  stopper->shortcut(FL_Escape);
+  add(stopper);
 }
 
 //

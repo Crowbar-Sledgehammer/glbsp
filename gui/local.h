@@ -61,6 +61,7 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_Return_Button.H>
@@ -144,9 +145,9 @@ public:
   Guix_Book();
   virtual ~Guix_Book();
 
-  // override resize method, maybe reformat text
+  // override resize method, reformat text
   virtual FL_EXPORT void resize(int,int,int,int);
-  
+ 
   // child widgets
   Fl_Group *group;
     
@@ -216,6 +217,29 @@ extern const book_page_t book_pages[];
 extern Guix_Book * guix_book_win;
 
 
+class Guix_License : public Fl_Window
+{
+public:
+  Guix_License();
+  virtual ~Guix_License();
+
+  // child widgets
+  Fl_Group *group;
+  Fl_Button *quit;
+  Fl_Browser *browser;
+
+  boolean_g want_quit;
+
+protected:
+
+  // initial window position and size
+  int init_x, init_y;
+  int init_w, init_h;
+};
+
+extern Guix_License * guix_lic_win;
+
+
 //
 //  COOKIE
 //
@@ -268,13 +292,14 @@ public:
  
   Fl_Button *in_browse;
   Fl_Button *out_browse;
+  Fl_Button *out_guess;
 
   // filename to produce when in GWA mode.
   const char *gwa_filename;
   
   // group for file boxes, to handle resizing properly.
   Fl_Group *file_group;
-  
+ 
   // routine to set the input widgets based on the build-info.
   void ReadInfo();
 
@@ -314,7 +339,8 @@ public:
   virtual ~Guix_BuildButton();
 
   // child widget
-  Fl_Button *button;
+  Fl_Button *build;
+  Fl_Button *stopper;
 };
 
 
@@ -356,7 +382,7 @@ extern const char *license_text[];
 //
 
 #define MANUAL_WINDOW_MIN_W  500
-#define MANUAL_WINDOW_MIN_H  160
+#define MANUAL_WINDOW_MIN_H  200
 
 Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h);
 
@@ -372,11 +398,11 @@ public:
   virtual ~Guix_BuildMode();
 
   // child widgets: a set of radio buttons
-  Fl_Check_Button *gwa;
-  Fl_Check_Button *maybe_normal;
-  Fl_Check_Button *both;
-  Fl_Check_Button *gl_only;
-  Fl_Check_Button *normal_only;
+  Fl_Button *gwa;
+  Fl_Button *maybe_normal;
+  Fl_Button *both;
+  Fl_Button *gl_only;
+  Fl_Button *normal_only;
 
   // this routine sets one of the radio buttons on, based on the given
   // build-information.
@@ -397,10 +423,10 @@ public:
   virtual ~Guix_MiscOptions();
 
   // child widgets: a set of toggle buttons
-  Fl_Round_Button *warnings;
-  Fl_Round_Button *v1_vert;
-  Fl_Round_Button *no_reject;
-  Fl_Round_Button *pack_sides;
+  Fl_Button *warnings;
+  Fl_Button *v1_vert;
+  Fl_Button *no_reject;
+  Fl_Button *pack_sides;
   
   // routine to set the buttons based on the build-info.
   void ReadInfo();
@@ -431,8 +457,8 @@ public:
   // child widgets
   Fl_Group *groups[3];
 
-  Fl_Round_Button *overwrite;
-  Fl_Round_Button *same_file;
+  Fl_Button *overwrite;
+  Fl_Button *same_file;
 
   // color stuff ??
  
@@ -462,24 +488,24 @@ typedef struct guix_bar_s
   Fl_Slider *slide;
   Fl_Box *perc;
 
-  // current string for label
+  // current string for bar
   const char *lab_str;
 
   // string buffer for percentage
-  char perc_buf[20];
+  char perc_buf[16];
 }
 guix_bar_t;
 
-class Guix_Progress : public Fl_Window
+class Guix_ProgressBox : public Fl_Group
 {
 public:
-  Guix_Progress(int num_bars);
-  virtual ~Guix_Progress();
+  Guix_ProgressBox(int x, int y, int w, int h);
+  virtual ~Guix_ProgressBox();
 
   // child widgets
   guix_bar_t bars[2];
 
-  Fl_Button *cancel;
+  Fl_Group *group;
 
   // current number of bars
   int curr_bars;
@@ -487,10 +513,16 @@ public:
   // current message strings
   const char *title_str;
 
+  // clear the progress bars (e.g. when stopped by user)
+  void ClearBars(void);
+  
 protected:
 
   // initial window position
   int init_x, init_y;
+
+  void CreateOneBar(guix_bar_t& bar, int x, int y, int w, int h,
+      const char *label_short, Fl_Color col);
 };
 
 void GUI_Ticker(void);
@@ -507,7 +539,7 @@ void GUI_DisplayClose(void);
 //  TEXTBOX
 //
 
-class Guix_TextBox : public Fl_Browser
+class Guix_TextBox : public Fl_Multi_Browser
 {
 public:
   Guix_TextBox(int x, int y, int w, int h);
@@ -542,7 +574,7 @@ void GUI_PrintMsg(const char *str, ...);
 #define MAIN_BG_COLOR  fl_gray_ramp(FL_NUM_GRAY * 9 / 24)
 
 #define MAIN_WINDOW_MIN_W  540
-#define MAIN_WINDOW_MIN_H  440
+#define MAIN_WINDOW_MIN_H  450
 
 class Guix_MainWin : public Fl_Window
 {
@@ -556,14 +588,13 @@ public:
 
   Guix_BuildMode *build_mode;
   Guix_MiscOptions *misc_opts;
+  Guix_FactorBox *factor;
 
   Guix_FileBox *files;
-  
-  Guix_FactorBox *factor;
+  Guix_ProgressBox *progress;
   Guix_BuildButton *builder;
-  
   Guix_TextBox *text_box;
-
+ 
   // user closed the window
   boolean_g want_quit;
   

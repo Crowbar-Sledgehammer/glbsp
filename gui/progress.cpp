@@ -29,102 +29,95 @@
 
 
 #define BAR_ORANGEY  \
-      fl_color_cube(FL_NUM_RED-1, (FL_NUM_GREEN-1)*5/7, 0)
+      fl_color_cube(FL_NUM_RED-1, (FL_NUM_GREEN-1)*7/7, 0)
 
 #define BAR_CYANISH  \
-      fl_color_cube(0, (FL_NUM_GREEN-1)*4/7, FL_NUM_BLUE-1)
+      fl_color_cube(0, (FL_NUM_GREEN-1)*1/7, FL_NUM_BLUE-1)
 
 
-static Guix_Progress *progress_window = NULL;
-
-
-static void progress_cancel_CB(Fl_Widget *w, void *data)
+void Guix_ProgressBox::CreateOneBar(guix_bar_t& bar,
+    int x, int y, int w, int h,
+    const char *label_short, Fl_Color col)
 {
-   guix_comms.cancelled = TRUE;
+  bar.label = new Fl_Box(x+6, y+4, 50, 20, label_short);
+  bar.label->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+  add(bar.label);
+
+  bar.slide = new Fl_Slider(group->x(), y+6, group->w(), 16);
+  bar.slide->set_output();
+  bar.slide->slider(FL_FLAT_BOX);
+  bar.slide->type(FL_HOR_FILL_SLIDER);
+  bar.slide->selection_color(col);
+  group->add(bar.slide);
+
+  bar.perc = new Fl_Box(x + w - 50, y+4, 40, 20);
+  bar.perc->box(FL_FLAT_BOX);
+  bar.perc->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(bar.perc);
 }
 
 //
-// Progress Constructor
+// ProgressBox Constructor
 //
-// Note: no label passed to Fl_Window constructor.  The main code will
-// call GUI_DisplaySetTitle to do it.
-//
-Guix_Progress::Guix_Progress(int num_bars) :
-    Fl_Window(400, (num_bars >= 2) ? 190 : 70)
+Guix_ProgressBox::Guix_ProgressBox(int x, int y, int w, int h) :
+    Fl_Group(x, y, w, h, "Progress")
 {
   // cancel the automatic `begin' in Fl_Group constructor
   end();
  
-  // non-resizable window
-  size_range(w(), h(), w(), h());
+  box(FL_THIN_UP_BOX);
+  resizable(0);  // no resizing the kiddies, please
+  
+  labelfont(FL_HELVETICA | FL_BOLD);
+  labeltype(FL_NORMAL_LABEL);
+  align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
-  position(guix_prefs.progress_x, guix_prefs.progress_y);
-  
-  // allow manual closing of window
-  callback((Fl_Callback *) progress_cancel_CB);
-  
-  curr_bars = num_bars;
+  curr_bars = 0;
 
   bars[0].lab_str = bars[1].lab_str = NULL;
   title_str = NULL;
 
+  // create the resizable
+ 
+  int len = w - 60 - 50;
+
+  group = new Fl_Group(x+60, y, len, h);
+  group->end();
+
+  add(group);
+  resizable(group);
+      
   // create bars
 
-  Fl_Color bar_col = (num_bars == 2) ? BAR_ORANGEY : BAR_CYANISH;
- 
-  bars[0].label = new Fl_Box(8, 4, w() - 16, 24);
-  bars[0].label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
-  add(bars[0].label);
- 
-  bars[0].slide = new Fl_Slider(8, 30, w() - 16, 26);
-  bars[0].slide->type(FL_HOR_FILL_SLIDER);
-  bars[0].slide->selection_color(bar_col);
-  add(bars[0].slide);
-
-  if (curr_bars >= 2)
-  {
-    bars[1].label = new Fl_Box(8, 74, w() - 16, 24);
-    bars[1].label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
-    add(bars[1].label);
-  
-    bars[1].slide = new Fl_Slider(8, 100, w() - 16, 26);
-    bars[1].slide->type(FL_HOR_FILL_SLIDER);
-    bars[1].slide->selection_color(bar_col);
-    add(bars[1].slide);
-
-    // create cancel button
-
-    cancel = new Fl_Button(150, 150, 100, 30, "Cancel");
-    cancel->callback((Fl_Callback *) progress_cancel_CB);
-    cancel->shortcut(FL_Escape);
-    add(cancel);
-  }
-
-  // show the window
-  set_modal();
-  show();
-
-  // read initial pos (same logic as in Guix_MainWin)
-  WindowSmallDelay();
-  init_x = x(); init_y = y();
+  y += 16;
+  CreateOneBar(bars[0], x, y, w, h, "Map", BAR_ORANGEY);
+      
+  y += 24;
+  CreateOneBar(bars[1], x, y, w, h, "File", BAR_CYANISH);
 }
 
 
 //
-// Progress Destructor
+// ProgressBox Destructor
 //
-Guix_Progress::~Guix_Progress()
+Guix_ProgressBox::~Guix_ProgressBox()
 {
-  // update preferences if user moved the window
-  if (x() != init_x || y() != init_y)
-  {
-    guix_prefs.progress_x = x();
-    guix_prefs.progress_y = y();
-  }
-
   GlbspFree(bars[0].lab_str);
   GlbspFree(bars[1].lab_str);
   GlbspFree(title_str);
+}
+
+
+void Guix_ProgressBox::ClearBars(void)
+{
+  for (int i=0; i < 2; i++)
+  {
+    bars[i].slide->value(0);
+    bars[i].slide->redraw();
+
+    bars[i].perc->label(NULL);
+    bars[i].perc->redraw();
+  }
 }
 
 
@@ -150,19 +143,16 @@ boolean_g GUI_DisplayOpen(displaytype_e type)
   switch (type)
   {
     case DIS_BUILDPROGRESS:
-      progress_window = new Guix_Progress(2);
+      guix_win->progress->curr_bars = 2;
       break;
 
     case DIS_FILEPROGRESS:
-      progress_window = new Guix_Progress(1);
+      guix_win->progress->curr_bars = 1;
       break;
 
     default:
       return FALSE;  // unknown display type
   }
-
-  progress_window->set_modal();
-  progress_window->show();
 
   return TRUE;
 }
@@ -172,15 +162,15 @@ boolean_g GUI_DisplayOpen(displaytype_e type)
 //
 void GUI_DisplaySetTitle(const char *str)
 {
-  if (! progress_window)
+  if (guix_win->progress->curr_bars == 0)
     return;
 
   // copy the string
-  GlbspFree(progress_window->title_str);
-  progress_window->title_str = GlbspStrDup(str);
+  GlbspFree(guix_win->progress->title_str);
+  guix_win->progress->title_str = GlbspStrDup(str);
 
-  progress_window->label(progress_window->title_str);
-  progress_window->redraw();
+///  progress_window->label(progress_window->title_str);
+///  progress_window->redraw();
 }
 
 //
@@ -188,14 +178,14 @@ void GUI_DisplaySetTitle(const char *str)
 //
 void GUI_DisplaySetBarText(int barnum, const char *str)
 {
-  if (! progress_window)
+  if (guix_win->progress->curr_bars == 0)
     return;
  
   // select the correct bar
-  if (barnum < 1 || barnum > progress_window->curr_bars)
+  if (barnum < 1 || barnum > guix_win->progress->curr_bars)
     return;
  
-  guix_bar_t *bar = progress_window->bars + (barnum-1);
+  guix_bar_t *bar = guix_win->progress->bars + (barnum-1);
 
   // we must copy the string, as the label() method only stores the
   // pointer -- not good if we've been passed an on-stack buffer.
@@ -203,11 +193,11 @@ void GUI_DisplaySetBarText(int barnum, const char *str)
   GlbspFree(bar->lab_str);
   bar->lab_str = GlbspStrDup(str);
 
-  bar->label->label(bar->lab_str);
-  bar->label->redraw();
+///  bar->label->label(bar->lab_str);
+///  bar->label->redraw();
 
   // redraw window too 
-  progress_window->redraw();
+  guix_win->progress->redraw();
 }
 
 //
@@ -215,14 +205,14 @@ void GUI_DisplaySetBarText(int barnum, const char *str)
 //
 void GUI_DisplaySetBarLimit(int barnum, int limit)
 {
-  if (! progress_window)
+  if (guix_win->progress->curr_bars == 0)
     return;
  
   // select the correct bar
-  if (barnum < 1 || barnum > progress_window->curr_bars)
+  if (barnum < 1 || barnum > guix_win->progress->curr_bars)
     return;
  
-  guix_bar_t *bar = progress_window->bars + (barnum-1);
+  guix_bar_t *bar = guix_win->progress->bars + (barnum-1);
 
   bar->slide->range(0, limit);
 }
@@ -232,14 +222,14 @@ void GUI_DisplaySetBarLimit(int barnum, int limit)
 //
 void GUI_DisplaySetBar(int barnum, int count)
 {
-  if (! progress_window)
+  if (guix_win->progress->curr_bars == 0)
     return;
 
   // select the correct bar
-  if (barnum < 1 || barnum > progress_window->curr_bars)
+  if (barnum < 1 || barnum > guix_win->progress->curr_bars)
     return;
  
-  guix_bar_t *bar = progress_window->bars + (barnum-1);
+  guix_bar_t *bar = guix_win->progress->bars + (barnum-1);
 
   // work out percentage
   int perc = 0;
@@ -252,7 +242,8 @@ void GUI_DisplaySetBar(int barnum, int count)
 
   sprintf(bar->perc_buf, "%d%%", perc);
 
-//FIXME: DONT WORK:  bar->label(progress_window->percent_buf[barnum]);
+  bar->perc->label(bar->perc_buf);
+  bar->perc->redraw();
 
   bar->slide->value(count);
   bar->slide->redraw();
@@ -263,10 +254,6 @@ void GUI_DisplaySetBar(int barnum, int count)
 //
 void GUI_DisplayClose(void)
 {
-  if (! progress_window)
-    return;
-
-  delete progress_window;
-  progress_window = NULL;
+  guix_win->progress->curr_bars = 0;
 }
 

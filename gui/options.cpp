@@ -21,11 +21,13 @@
 // this includes everything we need
 #include "local.h"
 
-#include <unistd.h>
 
-// consistency check
-#ifndef GLBSP_GUI
-#error GLBSP_GUI should be defined when compiling this file
+#ifdef WIN32
+#define BM_BUTTONTYPE  FL_ROUND_DOWN_BOX
+#define BM_BUTTONSIZE  26
+#else
+#define BM_BUTTONTYPE  FL_DIAMOND_DOWN_BOX
+#define BM_BUTTONSIZE  28
 #endif
 
 
@@ -62,35 +64,41 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
 
   // create the children
 
-  gwa = new Fl_Check_Button(x+12, y+16+22*0, 30, 30, "GWA Mode");
+  gwa = new Fl_Check_Button(x+12, y+16+22*0, 
+      BM_BUTTONSIZE, BM_BUTTONSIZE, "GWA Mode");
+  gwa->down_box(BM_BUTTONTYPE);
   gwa->type(FL_RADIO_BUTTON);
   gwa->align(FL_ALIGN_RIGHT);
   gwa->callback((Fl_Callback *) build_mode_radio_CB);
   add(gwa);
 
-  maybe_normal = new Fl_Check_Button(x+12, y+16+22*1, 30, 30, 
-      "GL, Normal if missing");
+  maybe_normal = new Fl_Check_Button(x+12, y+16+22*1,
+      BM_BUTTONSIZE, BM_BUTTONSIZE, "GL, Normal if missing");
+  maybe_normal->down_box(BM_BUTTONTYPE);
   maybe_normal->type(FL_RADIO_BUTTON);
   maybe_normal->align(FL_ALIGN_RIGHT);
   maybe_normal->callback((Fl_Callback *) build_mode_radio_CB);
   add(maybe_normal);
 
-  both = new Fl_Check_Button(x+12, y+16+22*2, 30, 30, 
-      "GL and Normal nodes");
+  both = new Fl_Check_Button(x+12, y+16+22*2,
+      BM_BUTTONSIZE, BM_BUTTONSIZE, "GL and Normal nodes");
+  both->down_box(BM_BUTTONTYPE);
   both->type(FL_RADIO_BUTTON);
   both->align(FL_ALIGN_RIGHT);
   both->callback((Fl_Callback *) build_mode_radio_CB);
   add(both);
 
-  gl_only = new Fl_Check_Button(x+12, y+16+22*3, 30, 30, 
-      "GL nodes only");
+  gl_only = new Fl_Check_Button(x+12, y+16+22*3,
+      BM_BUTTONSIZE, BM_BUTTONSIZE, "GL nodes only");
+  gl_only->down_box(BM_BUTTONTYPE);
   gl_only->type(FL_RADIO_BUTTON);
   gl_only->align(FL_ALIGN_RIGHT);
   gl_only->callback((Fl_Callback *) build_mode_radio_CB);
   add(gl_only);
 
-  normal_only = new Fl_Check_Button(x+12, y+16+22*4, 30, 30, 
-      "Normal nodes only");
+  normal_only = new Fl_Check_Button(x+12, y+16+22*4,
+      BM_BUTTONSIZE, BM_BUTTONSIZE, "Normal nodes only");
+  normal_only->down_box(BM_BUTTONTYPE);
   normal_only->type(FL_RADIO_BUTTON);
   normal_only->align(FL_ALIGN_RIGHT);
   normal_only->callback((Fl_Callback *) build_mode_radio_CB);
@@ -190,26 +198,30 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
 
   // create children
 
-  warnings = new Fl_Round_Button(x+12, y+16+22*0, 26, 26,
+  warnings = new Fl_Check_Button(x+12, y+20+22*0, 22, 22,
       "Extra Warnings");
+  warnings->down_box(FL_DOWN_BOX);
   warnings->align(FL_ALIGN_RIGHT);
   warnings->callback((Fl_Callback *) misc_opts_check_CB);
   add(warnings);
 
-  v1_vert = new Fl_Round_Button(x+12, y+16+22*1, 26, 26,
+  v1_vert = new Fl_Check_Button(x+12, y+20+22*1, 22, 22,
       "V1 GL Nodes");
+  v1_vert->down_box(FL_DOWN_BOX);
   v1_vert->align(FL_ALIGN_RIGHT);
   v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
   add(v1_vert);
 
-  no_reject = new Fl_Round_Button(x+12, y+16+22*2, 26, 26,
+  no_reject = new Fl_Check_Button(x+12, y+20+22*2, 22, 22,
       "Don't clobber REJECT");
+  no_reject->down_box(FL_DOWN_BOX);
   no_reject->align(FL_ALIGN_RIGHT);
   no_reject->callback((Fl_Callback *) misc_opts_check_CB);
   add(no_reject);
 
-  pack_sides = new Fl_Round_Button(x+12, y+16+22*3, 26, 26,
+  pack_sides = new Fl_Check_Button(x+12, y+20+22*3, 22, 22,
       "Pack Sidedefs");
+  pack_sides->down_box(FL_DOWN_BOX);
   pack_sides->align(FL_ALIGN_RIGHT);
   pack_sides->callback((Fl_Callback *) misc_opts_check_CB);
   add(pack_sides);

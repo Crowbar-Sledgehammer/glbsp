@@ -32,14 +32,14 @@
 // TextBox Constructor
 //
 Guix_TextBox::Guix_TextBox(int x, int y, int w, int h) :
-    Fl_Browser(x, y, w, h)
+    Fl_Multi_Browser(x, y, w, h)
 {
   // cancel the automatic `begin' in Fl_Group constructor
   // (it's an ancestor of Fl_Browser).
   end();
  
   textfont(FL_COURIER);
-  textsize(16);
+  textsize(14);
 }
 
 

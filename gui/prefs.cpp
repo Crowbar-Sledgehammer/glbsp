@@ -72,14 +72,18 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   groups[0]->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP);
   add(groups[0]);
  
-  overwrite = new Fl_Round_Button(20, 22, 26, 26,
+  int ay = 24;
+    
+  overwrite = new Fl_Check_Button(20, ay+22*0, 22, 22,
       "Overwriting files");
+  overwrite->down_box(FL_DOWN_BOX);
   overwrite->align(FL_ALIGN_RIGHT);
   overwrite->value(guix_prefs.overwrite_warn ? 1 : 0);
   groups[0]->add(overwrite);
 
-  same_file = new Fl_Round_Button(20, 44, 26, 26,
+  same_file = new Fl_Check_Button(20, ay+22*1, 22, 22,
       "Output same file as Input");
+  same_file->down_box(FL_DOWN_BOX);
   same_file->align(FL_ALIGN_RIGHT);
   same_file->value(guix_prefs.same_file_warn ? 1 : 0);
   groups[0]->add(same_file);
@@ -87,6 +91,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   // create reset button
   
   groups[1] = new Fl_Group(0, 160, w(), 60);
+///---  groups[1]->color(MAIN_BG_COLOR, MAIN_BG_COLOR);
   groups[1]->box(FL_THIN_UP_BOX);
   groups[1]->resizable(0);
   add(groups[1]);
