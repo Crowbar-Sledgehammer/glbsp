@@ -29,6 +29,9 @@ static bool inited_FLTK = false;
 
 static int main_result = 0;
 
+wad_c *the_wad;
+wad_c *the_gwa;
+
 
 static void ShowTitle(void)
 {
@@ -128,11 +131,11 @@ int main(int argc, char **argv)
 				filename = arg_list[idx + 1];
 		}
 
-		if (ReadWadFile(filename) < 0)
-		{
+		the_wad = wad_c::Load(filename);
+		if (!the_wad)
 			FatalError("Unable to read file: %s\n", filename);
-		}
 
+		// FIXME: use first level if no argument
 		const char *level_name = "MAP01";
 		{
 			int params;
@@ -142,12 +145,7 @@ int main(int argc, char **argv)
 				level_name = arg_list[idx + 1];
 		}
 
-		if (! FindLevel(level_name))
-		{
-			FatalError("Unable to find level: %s\n", level_name);
-		}
-
-		LoadLevel();
+		LoadLevel(level_name);
 
 		guix_win = new Guix_MainWin(MY_TITLE);
 

@@ -331,7 +331,7 @@ EXTERN_LEVELARRAY(node_c,    lev_nodes)
 /* ----- function prototypes ----------------------- */
 
 // load all level data for the current level
-void LoadLevel(void);
+void LoadLevel(const char *name);
 
 // free all level data
 void FreeLevel(void);

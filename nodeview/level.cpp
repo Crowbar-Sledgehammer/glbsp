@@ -27,6 +27,8 @@
 
 bool lev_doing_hexen;
 
+extern wad_c *the_wad;  //!!!! FIXME
+
 
 #define LEVELARRAY(TYPE, BASEVAR, NAMESTR)  \
     container_tp<TYPE> BASEVAR(NAMESTR);
@@ -48,8 +50,8 @@ static const uint8_g *lev_v2_magic = (uint8_g *)"gNd2";
 static const uint8_g *lev_v3_magic = (uint8_g *)"gNd3";
 
 // forward decls
-void GetLinedefsHexen(void);
-void GetThingsHexen(void);
+void GetLinedefsHexen(wad_c *base);
+void GetThingsHexen(wad_c *base);
 
 vertex_c::vertex_c(int _idx, const raw_vertex_t *raw)
 {
@@ -74,13 +76,16 @@ vertex_c::~vertex_c()
 //
 // GetVertices
 //
-void GetVertices(void)
+void GetVertices(wad_c *base)
 {
-	lump_c *lump = FindLevelLump("VERTEXES");
+	lump_c *lump = base->FindLumpInLevel("VERTEXES");
 	int count = -1;
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_vertex_t);
+	}
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -119,9 +124,9 @@ void GetV2Verts(const uint8_g *data, int length)
 //
 // GetGLVerts
 //
-void GetGLVerts(void)
+void GetGLVerts(wad_c *base)
 {
-	lump_c *lump = FindLevelLump("GL_VERT");
+	lump_c *lump = base->FindLumpInLevel("GL_VERT");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -129,6 +134,8 @@ void GetGLVerts(void)
 
 	if (!lump)
 		FatalError("Couldn't find any GL Vertices");
+
+	base->CacheLump(lump);
 
 	if (lump->length >= 4 && memcmp(lump->data, lev_v2_magic, 4) == 0)
 	{
@@ -170,13 +177,16 @@ sector_c::~sector_c()
 //
 // GetSectors
 //
-void GetSectors(void)
+void GetSectors(wad_c *base)
 {
 	int count = -1;
-	lump_c *lump = FindLevelLump("SECTORS");
+	lump_c *lump = base->FindLumpInLevel("SECTORS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_sector_t);
+	}
 
 	if (!lump || count == 0)
 		FatalError("Couldn't find any Sectors");
@@ -224,19 +234,22 @@ thing_c::~thing_c()
 //
 // GetThings
 //
-void GetThings(void)
+void GetThings(wad_c *base)
 {
 	if (lev_doing_hexen)
 	{
-		GetThingsHexen();
+		GetThingsHexen(base);
 		return;
 	}
 	
 	int count = -1;
-	lump_c *lump = FindLevelLump("THINGS");
+	lump_c *lump = base->FindLumpInLevel("THINGS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_thing_t);
+	}
 
 	if (!lump || count == 0)
 	{
@@ -263,13 +276,16 @@ void GetThings(void)
 //
 // GetThingsHexen
 //
-void GetThingsHexen(void)
+void GetThingsHexen(wad_c *base)
 {
 	int count = -1;
-	lump_c *lump = FindLevelLump("THINGS");
+	lump_c *lump = base->FindLumpInLevel("THINGS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_hexen_thing_t);
+	}
 
 	if (!lump || count == 0)
 	{
@@ -315,13 +331,16 @@ sidedef_c::~sidedef_c()
 //
 // GetSidedefs
 //
-void GetSidedefs(void)
+void GetSidedefs(wad_c *base)
 {
 	int count = -1;
-	lump_c *lump = FindLevelLump("SIDEDEFS");
+	lump_c *lump = base->FindLumpInLevel("SIDEDEFS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_sidedef_t);
+	}
 
 	if (!lump || count == 0)
 		FatalError("Couldn't find any Sidedefs");
@@ -405,19 +424,22 @@ linedef_c::~linedef_c()
 //
 // GetLinedefs
 //
-void GetLinedefs(void)
+void GetLinedefs(wad_c *base)
 {
 	if (lev_doing_hexen)
 	{
-		GetLinedefsHexen();
+		GetLinedefsHexen(base);
 		return;
 	}
 	
 	int count = -1;
-	lump_c *lump = FindLevelLump("LINEDEFS");
+	lump_c *lump = base->FindLumpInLevel("LINEDEFS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_linedef_t);
+	}
 
 	if (!lump || count == 0)
 		FatalError("Couldn't find any Linedefs");
@@ -439,13 +461,16 @@ void GetLinedefs(void)
 //
 // GetLinedefsHexen
 //
-void GetLinedefsHexen(void)
+void GetLinedefsHexen(wad_c *base)
 {
 	int count = -1;
-	lump_c *lump = FindLevelLump("LINEDEFS");
+	lump_c *lump = base->FindLumpInLevel("LINEDEFS");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_hexen_linedef_t);
+	}
 
 	if (!lump || count == 0)
 		FatalError("Couldn't find any Linedefs");
@@ -583,9 +608,9 @@ void GetV3Segs(const uint8_g *data, int length)
 //
 // GetGLSegs
 //
-void GetGLSegs(void)
+void GetGLSegs(wad_c *base)
 {
-	lump_c *lump = FindLevelLump("GL_SEGS");
+	lump_c *lump = base->FindLumpInLevel("GL_SEGS");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -593,6 +618,8 @@ void GetGLSegs(void)
 
 	if (!lump)
 		FatalError("Couldn't find any GL Segs");
+
+	base->CacheLump(lump);
 
 	if (lump->length >= 4 && memcmp(lump->data, lev_v3_magic, 4) == 0)
 	{
@@ -699,9 +726,9 @@ void GetV3Subsecs(const uint8_g *data, int length)
 //
 // GetGLSubsecs
 //
-void GetGLSubsecs(void)
+void GetGLSubsecs(wad_c *base)
 {
-	lump_c *lump = FindLevelLump("GL_SSECT");
+	lump_c *lump = base->FindLumpInLevel("GL_SSECT");
 
 # if DEBUG_LOAD
 	PrintDebug("GetVertices: num = %d\n", count);
@@ -709,6 +736,8 @@ void GetGLSubsecs(void)
 
 	if (!lump)
 		FatalError("Couldn't find any GL Subsectors");
+
+	base->CacheLump(lump);
 
 	if (lump->length >= 4 && memcmp(lump->data, lev_v3_magic, 4) == 0)
 	{
@@ -772,13 +801,16 @@ node_c::~node_c()
 //
 // GetGLNodes
 //
-void GetGLNodes(void)
+void GetGLNodes(wad_c *base)
 {
 	int count = -1;
-	lump_c *lump = FindLevelLump("GL_NODES");
+	lump_c *lump = base->FindLumpInLevel("GL_NODES");
 
 	if (lump)
+	{
+		base->CacheLump(lump);
 		count = lump->length / sizeof(raw_node_t);
+	}
 
 	if (!lump || count < 5)
 		return;
@@ -804,21 +836,32 @@ void GetGLNodes(void)
 //
 // LoadLevel
 //
-void LoadLevel(void)
+void LoadLevel(const char *level_name)
 {
+	if (! the_wad->FindLevel(level_name))
+		FatalError("Unable to find level: %s\n", level_name);
+
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
-	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
+	lev_doing_hexen = (the_wad->FindLumpInLevel("BEHAVIOR") != NULL);
 
-	GetVertices();
-	GetSectors();
-	GetSidedefs();
-	GetLinedefs();
-	GetThings();
+	GetVertices(the_wad);
+	GetSectors(the_wad);
+	GetSidedefs(the_wad);
+	GetLinedefs(the_wad);
+	GetThings(the_wad);
 
-	GetGLVerts();
-	GetGLSegs();
-	GetGLSubsecs();
-	GetGLNodes();
+	char gl_name[16];
+	
+	sprintf(gl_name, "GL_%s", level_name);
+
+	// !!!! FIXME check gwa file if exists
+	if (! the_wad->FindLevel(gl_name))
+		FatalError("Unable to find GL level: %s\n", gl_name);
+
+	GetGLVerts(the_wad);
+	GetGLSegs(the_wad);
+	GetGLSubsecs(the_wad);
+	GetGLNodes(the_wad);
 
 ///	PrintMsg("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
 ///			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
