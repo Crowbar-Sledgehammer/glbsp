@@ -545,9 +545,9 @@ wad_c *wad_c::Load(const char *filename)
 	if (! wad->ReadHeader())
 		return NULL;
 
-	PrintMsg("Opened %cWAD file : %s\n", (wad->kind == IWAD) ? 'I' : 'P', 
+	PrintDebug("Opened %cWAD file : %s\n", (wad->kind == IWAD) ? 'I' : 'P', 
 			filename); 
-	PrintMsg("Reading %d dir entries at 0x%X\n", wad->num_entries, 
+	PrintDebug("Reading %d dir entries at 0x%X\n", wad->num_entries, 
 			wad->dir_start);
 
 	// read directory
