@@ -16,6 +16,7 @@ LDFLAGS=-L/usr/X11R6/lib
 LIBS=-lm $(FLTK_LIBS)
 
 OBJS=./main.o     \
+     ./asserts.o  \
      ./dialog.o   \
      ./grid.o     \
      ./level.o    \

@@ -32,7 +32,6 @@
 
 #include <math.h>
 #include <limits.h>
-#include <assert.h>
 
 #ifdef WIN32
 #include <FL/x.H>
@@ -78,6 +77,7 @@
 //  LOCAL INCLUDES
 //
 #include "system.h"
+#include "asserts.h"
 #include "structs.h"
 #include "util.h"
 #include "wad.h"
