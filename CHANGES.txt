@@ -5,9 +5,9 @@ CHANGELOG
 Changes in V2.10  (Unreleased)
 ------------------------------
 
- - allow sidedef numbers to use full 16-bit range.
-
  - choose first seg in a subsector better, avoid self-referenced lines.
+
+ - allow levels to contain more than 32767 sidedefs.
 
  - removed -fresh option (now the default), and added a -fast option.
 
