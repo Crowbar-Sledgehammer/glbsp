@@ -27,29 +27,20 @@ struct superblock_s;
 
 typedef struct vertex_s
 {
-  // coordinates
-  double x, y;
+	// coordinates
+	double x, y;
 
-  // vertex index.  Always valid after loading and pruning of unused
-  // vertices has occurred.  For GL vertices, bit 30 will be set.
-  int index;
+	// vertex index.  Always valid after loading and pruning of unused
+	// vertices has occurred.  For GL vertices, bit 30 will be set.
+	int index;
 
-  // reference count.  When building normal node info, unused vertices
-  // will be pruned.
-  int ref_count;
+	// reference count.  When building normal node info, unused vertices
+	// will be pruned.
+	int ref_count;
 
-  // usually NULL, unless this vertex occupies the same location as a
-  // previous vertex.  Only used during the pruning phase.
-  struct vertex_s *equiv;
-
-///---  // set of wall_tips
-///---  wall_tip_t *tip_set;
-
-///---  // contains a duplicate vertex, needed when both normal and V2 GL
-///---  // nodes are being built at the same time (this is the vertex used
-///---  // for the normal segs).  Normally NULL.  Note: the wall tips on
-///---  // this vertex are not created.
-///---  struct vertex_s *normal_dup;
+	// usually NULL, unless this vertex occupies the same location as a
+	// previous vertex.  Only used during the pruning phase.
+	struct vertex_s *equiv;
 }
 vertex_t;
 
@@ -58,267 +49,257 @@ vertex_t;
 
 typedef struct sector_s
 {
-  // sector index.  Always valid after loading & pruning.
-  int index;
+	// sector index.  Always valid after loading & pruning.
+	int index;
 
-  // allow segs from other sectors to coexist in a subsector.
-  char coalesce;
+	// allow segs from other sectors to coexist in a subsector.
+	char coalesce;
 
-  // -JL- non-zero if this sector contains a polyobj.
-  int has_polyobj;
+	// -JL- non-zero if this sector contains a polyobj.
+	int has_polyobj;
 
-  // reference count.  When building normal nodes, unused sectors will
-  // be pruned.
-  int ref_count;
+	// reference count.  When building normal nodes, unused sectors will
+	// be pruned.
+	int ref_count;
 
-  // heights
-  int floor_h, ceil_h;
+	// heights
+	int floor_h, ceil_h;
 
-  // textures
-  char floor_tex[8];
-  char ceil_tex[8];
+	// textures
+	char floor_tex[8];
+	char ceil_tex[8];
 
-  // attributes
-  int light;
-  int special;
-  int tag;
-
-  // used when building REJECT table.  Each set of sectors that are
-  // isolated from other sectors will have a different group number.
-  // Thus: on every 2-sided linedef, the sectors on both sides will be
-  // in the same group.  The rej_next, rej_prev fields are a link in a
-  // RING, containing all sectors of the same group.
-  int rej_group;
-
-  struct sector_s *rej_next;
-  struct sector_s *rej_prev;
+	// attributes
+	int light;
+	int special;
+	int tag;
 }
 sector_t;
 
 
 typedef struct sidedef_s
 {
-  // adjacent sector.  Can be NULL (invalid sidedef)
-  sector_t *sector;
+	// adjacent sector.  Can be NULL (invalid sidedef)
+	sector_t *sector;
 
-  // offset values
-  int x_offset, y_offset;
+	// offset values
+	int x_offset, y_offset;
 
-  // texture names
-  char upper_tex[8];
-  char lower_tex[8];
-  char mid_tex[8];
-  
-  // sidedef index.  Always valid after loading & pruning.
-  int index;
+	// texture names
+	char upper_tex[8];
+	char lower_tex[8];
+	char mid_tex[8];
 
-  // reference count.  When building normal nodes, unused sidedefs will
-  // be pruned.
-  int ref_count;
+	// sidedef index.  Always valid after loading & pruning.
+	int index;
 
-  // usually NULL, unless this sidedef is exactly the same as a
-  // previous one.  Only used during the pruning phase.
-  struct sidedef_s *equiv;
+	// reference count.  When building normal nodes, unused sidedefs will
+	// be pruned.
+	int ref_count;
 
-  // this is true if the sidedef is on a special line.  We don't merge
-  // these sidedefs together, as they might scroll, or change texture
-  // when a switch is pressed.
-  int on_special;
+	// usually NULL, unless this sidedef is exactly the same as a
+	// previous one.  Only used during the pruning phase.
+	struct sidedef_s *equiv;
+
+	// this is true if the sidedef is on a special line.  We don't merge
+	// these sidedefs together, as they might scroll, or change texture
+	// when a switch is pressed.
+	int on_special;
 }
 sidedef_t;
 
 
 typedef struct linedef_s
 {
-  // link for list
-  struct linedef_s *next;
+	// link for list
+	struct linedef_s *next;
 
-  vertex_t *start;    // from this vertex...
-  vertex_t *end;      // ... to this vertex
+	vertex_t *start;    // from this vertex...
+	vertex_t *end;      // ... to this vertex
 
-  sidedef_t *right;   // right sidedef
-  sidedef_t *left;    // left sidede, or NULL if none
+	sidedef_t *right;   // right sidedef
+	sidedef_t *left;    // left sidede, or NULL if none
 
-  // line is marked two-sided
-  char two_sided;
+	// line is marked two-sided
+	char two_sided;
 
-  // prefer not to split
-  char is_precious;
+	// prefer not to split
+	char is_precious;
 
-  // zero length (line should be totally ignored)
-  char zero_len;
+	// zero length (line should be totally ignored)
+	char zero_len;
 
-  int flags;
-  int type;
-  int tag;
+	int flags;
+	int type;
+	int tag;
 
-  // Hexen support
-  int specials[5];
-  
-  // normally NULL, except when this linedef directly overlaps an earlier
-  // one (a rarely-used trick to create higher mid-masked textures).
-  // No segs should be created for these overlapping linedefs.
-  struct linedef_s *overlap;
+	// Hexen support
+	int specials[5];
 
-  // linedef index.  Always valid after loading & pruning of zero
-  // length lines has occurred.
-  int index;
+	// normally NULL, except when this linedef directly overlaps an earlier
+	// one (a rarely-used trick to create higher mid-masked textures).
+	// No segs should be created for these overlapping linedefs.
+	struct linedef_s *overlap;
+
+	// linedef index.  Always valid after loading & pruning of zero
+	// length lines has occurred.
+	int index;
 }
 linedef_t;
 
 
 typedef struct thing_s
 {
-  int x, y;
-  int type;
-  int options;
+	int x, y;
+	int type;
+	int options;
 
-  // other info (angle, and hexen stuff) omitted.  We don't need to
-  // write the THING lump, only read it.
+	// other info (angle, and hexen stuff) omitted.  We don't need to
+	// write the THING lump, only read it.
 
-  // Always valid (thing indices never change).
-  int index;
+	// Always valid (thing indices never change).
+	int index;
 }
 thing_t;
 
 
 typedef struct seg_s
 {
-  // link for list
-  struct seg_s *next;
+	// link for list
+	struct seg_s *next;
 
-  vertex_t *start;   // from this vertex...
-  vertex_t *end;     // ... to this vertex
+	vertex_t *start;   // from this vertex...
+	vertex_t *end;     // ... to this vertex
 
-  // linedef that this seg goes along, or NULL if miniseg
-  linedef_t *linedef;
+	// linedef that this seg goes along, or NULL if miniseg
+	linedef_t *linedef;
 
-  // adjacent sector, or NULL if invalid sidedef or miniseg
-  sector_t *sector;
+	// adjacent sector, or NULL if invalid sidedef or miniseg
+	sector_t *sector;
 
-  // 0 for right, 1 for left
-  int side;
+	// 0 for right, 1 for left
+	int side;
 
-  // seg on other side, or NULL if one-sided.  This relationship is
-  // always one-to-one -- if one of the segs is split, the partner seg
-  // must also be split.
-  struct seg_s *partner;
+	// seg on other side, or NULL if one-sided.  This relationship is
+	// always one-to-one -- if one of the segs is split, the partner seg
+	// must also be split.
+	struct seg_s *partner;
 
-  // seg index.  Only valid once the seg has been added to a
-  // subsector.  A negative value means it is invalid -- there
-  // shouldn't be any of these once the BSP tree has been built.
-  int index;
+	// seg index.  Only valid once the seg has been added to a
+	// subsector.  A negative value means it is invalid -- there
+	// shouldn't be any of these once the BSP tree has been built.
+	int index;
 
-  // when 1, this seg has become zero length (integer rounding of the
-  // start and end vertices produces the same location).  It should be
-  // ignored when writing the SEGS or V1 GL_SEGS lumps.  [Note: there
-  // won't be any of these when writing the V2 GL_SEGS lump].
-  int degenerate;
- 
-  // the superblock that contains this seg, or NULL if the seg is no
-  // longer in any superblock (e.g. now in a subsector).
-  struct superblock_s *block;
+	// when 1, this seg has become zero length (integer rounding of the
+	// start and end vertices produces the same location).  It should be
+	// ignored when writing the SEGS or V1 GL_SEGS lumps.  [Note: there
+	// won't be any of these when writing the V2 GL_SEGS lump].
+	int degenerate;
 
-  // precomputed data for fast calculations
-  double psx, psy;
-  double pex, pey;
-  double pdx, pdy;
+	// the superblock that contains this seg, or NULL if the seg is no
+	// longer in any superblock (e.g. now in a subsector).
+	struct superblock_s *block;
 
-  double p_length;
-  double p_angle;
-  double p_para;
-  double p_perp;
+	// precomputed data for fast calculations
+	double psx, psy;
+	double pex, pey;
+	double pdx, pdy;
 
-  // linedef that this seg initially comes from.  For "real" segs,
-  // this is just the same as the `linedef' field above.  For
-  // "minisegs", this is the linedef of the partition line.
-  linedef_t *source_line;
+	double p_length;
+	double p_angle;
+	double p_para;
+	double p_perp;
+
+	// linedef that this seg initially comes from.  For "real" segs,
+	// this is just the same as the `linedef' field above.  For
+	// "minisegs", this is the linedef of the partition line.
+	linedef_t *source_line;
 }
 seg_t;
 
 
 typedef struct subsec_s
 {
-  // list of segs
-  seg_t *seg_list;
+	// list of segs
+	seg_t *seg_list;
 
-  // count of segs
-  int seg_count;
+	// count of segs
+	int seg_count;
 
-  // subsector index.  Always valid, set when the subsector is
-  // initially created.
-  int index;
+	// subsector index.  Always valid, set when the subsector is
+	// initially created.
+	int index;
 
-  // approximate middle point
-  double mid_x;
-  double mid_y;
+	// approximate middle point
+	double mid_x;
+	double mid_y;
 }
 subsec_t;
 
 
 typedef struct bbox_s
 {
-  int minx, miny;
-  int maxx, maxy;
+	int minx, miny;
+	int maxx, maxy;
 }
 bbox_t;
 
 
 typedef struct child_s
 {
-  // child node or subsector (one must be NULL)
-  struct node_s *node;
-  subsec_t *subsec;
+	// child node or subsector (one must be NULL)
+	struct node_s *node;
+	subsec_t *subsec;
 
-  // child bounding box
-  bbox_t bounds;
+	// child bounding box
+	bbox_t bounds;
 }
 child_t;
 
 
 typedef struct node_s
 {
-  int x, y;     // starting point
-  int dx, dy;   // offset to ending point
+	int x, y;     // starting point
+	int dx, dy;   // offset to ending point
 
-  // right & left children
-  child_t r;
-  child_t l;
+	// right & left children
+	child_t r;
+	child_t l;
 
-  // node index.  Only valid once the NODES or GL_NODES lump has been
-  // created.
-  int index;
+	// node index.  Only valid once the NODES or GL_NODES lump has been
+	// created.
+	int index;
 
-  // the node is too long, and the (dx,dy) values should be halved
-  // when writing into the NODES lump.
-  int too_long;
+	// the node is too long, and the (dx,dy) values should be halved
+	// when writing into the NODES lump.
+	int too_long;
 }
 node_t;
 
 
 typedef struct superblock_s
 {
-  // parent of this block, or NULL for a top-level block
-  struct superblock_s *parent;
+	// parent of this block, or NULL for a top-level block
+	struct superblock_s *parent;
 
-  // coordinates on map for this block, from lower-left corner to
-  // upper-right corner.  Pseudo-inclusive, i.e (x,y) is inside block
-  // if and only if x1 <= x < x2 and y1 <= y < y2.
-  int x1, y1;
-  int x2, y2;
+	// coordinates on map for this block, from lower-left corner to
+	// upper-right corner.  Pseudo-inclusive, i.e (x,y) is inside block
+	// if and only if x1 <= x < x2 and y1 <= y < y2.
+	int x1, y1;
+	int x2, y2;
 
-  // sub-blocks.  NULL when empty.  [0] has the lower coordinates, and
-  // [1] has the higher coordinates.  Division of a square always
-  // occurs horizontally (e.g. 512x512 -> 256x512 -> 256x256).
-  struct superblock_s *subs[2];
+	// sub-blocks.  NULL when empty.  [0] has the lower coordinates, and
+	// [1] has the higher coordinates.  Division of a square always
+	// occurs horizontally (e.g. 512x512 -> 256x512 -> 256x256).
+	struct superblock_s *subs[2];
 
-  // number of real segs and minisegs contained by this block
-  // (including all sub-blocks below it).
-  int real_num;
-  int mini_num;
+	// number of real segs and minisegs contained by this block
+	// (including all sub-blocks below it).
+	int real_num;
+	int mini_num;
 
-  // list of segs completely contained by this block.
-  seg_t *segs;
+	// list of segs completely contained by this block.
+	seg_t *segs;
 }
 superblock_t;
 

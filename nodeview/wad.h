@@ -29,25 +29,25 @@ typedef enum { IWAD, PWAD } wad_kind_e;
 
 typedef struct wad_s
 {
-  // kind of wad file
-  int kind;
+	// kind of wad file
+	int kind;
 
-  // number of entries in directory
-  int num_entries;
+	// number of entries in directory
+	int num_entries;
 
-  // offset to start of directory
-  int dir_start;
+	// offset to start of directory
+	int dir_start;
 
-  // current directory entries
-  struct lump_s *dir_head;
-  struct lump_s *dir_tail;
+	// current directory entries
+	struct lump_s *dir_head;
+	struct lump_s *dir_tail;
 
-  // current level
-  struct lump_s *current_level;
+	// current level
+	struct lump_s *current_level;
 
-  // array of level names found
-  const char ** level_names;
-  int num_level_names;
+	// array of level names found
+	const char ** level_names;
+	int num_level_names;
 }
 wad_t;
 
@@ -56,19 +56,19 @@ wad_t;
 
 typedef struct level_s
 {
-  // various flags
-  int flags;
+	// various flags
+	int flags;
 
-  // the child lump list
-  struct lump_s *children;
+	// the child lump list
+	struct lump_s *children;
 
-  // for normal levels, this is the associated GL level lump
-  struct lump_s *buddy;
+	// for normal levels, this is the associated GL level lump
+	struct lump_s *buddy;
 
-  // information on overflow
-  int soft_limit;
-  int hard_limit;
-  int v3_switch;
+	// information on overflow
+	int soft_limit;
+	int hard_limit;
+	int v3_switch;
 }
 level_t;
 
@@ -99,29 +99,29 @@ level_t;
 
 typedef struct lump_s
 {
-  // link in list
-  struct lump_s *next;
-  struct lump_s *prev;
+	// link in list
+	struct lump_s *next;
+	struct lump_s *prev;
 
-  // name of lump
-  char *name;
+	// name of lump
+	char *name;
 
-  // offset to start of lump
-  int start;
-  int new_start;
+	// offset to start of lump
+	int start;
+	int new_start;
 
-  // length of lump
-  int length;
-  int space;
+	// length of lump
+	int length;
+	int space;
 
-  // various flags
-  int flags;
- 
-  // data of lump
-  void *data;
+	// various flags
+	int flags;
 
-  // level information, usually NULL
-  level_t *lev_info;
+	// data of lump
+	void *data;
+
+	// level information, usually NULL
+	level_t *lev_info;
 }
 lump_t;
 
@@ -202,17 +202,8 @@ lump_t *CreateGLLump(const char *name);
 //
 void AppendLevelLump(lump_t *lump, void *data, int length);
 
-// mark the fact that this level failed to build.
-void MarkSoftFailure(int soft);
-void MarkHardFailure(int hard);
-void MarkV3Switch(int v3);
-
-// alert the user if any levels failed to build properly.
-void ReportFailedLevels(void);
-
 
 /* ----- conversion macros ----------------------- */
-
 
 #define UINT8(x)   ((uint8_g) (x))
 #define SINT8(x)   ((sint8_g) (x))

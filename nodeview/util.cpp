@@ -20,17 +20,6 @@
 #include "defs.h"
 
 
-///---#include <stdio.h>
-///---#include <stdlib.h>
-///---#include <string.h>
-///---#include <stdarg.h>
-///---#include <ctype.h>
-///---#include <math.h>
-///---#include <limits.h>
-///---#include <assert.h>
-///---#include "util.h"
-
-
 //
 // UtilCalloc
 //
@@ -38,12 +27,12 @@
 //
 void *UtilCalloc(int size)
 {
-  void *ret = calloc(1, size);
-  
-  if (!ret)
-    FatalError("Out of memory (cannot allocate %d bytes)", size);
+	void *ret = calloc(1, size);
 
-  return ret;
+	if (!ret)
+		FatalError("Out of memory (cannot allocate %d bytes)", size);
+
+	return ret;
 }
 
 //
@@ -53,12 +42,12 @@ void *UtilCalloc(int size)
 //
 void *UtilRealloc(void *old, int size)
 {
-  void *ret = realloc(old, size);
+	void *ret = realloc(old, size);
 
-  if (!ret)
-    FatalError("Out of memory (cannot reallocate %d bytes)", size);
+	if (!ret)
+		FatalError("Out of memory (cannot reallocate %d bytes)", size);
 
-  return ret;
+	return ret;
 }
 
 //
@@ -68,10 +57,10 @@ void *UtilRealloc(void *old, int size)
 //
 void UtilFree(void *data)
 {
-  if (data == NULL)
-    InternalError("Trying to free a NULL pointer");
-  
-  free(data);
+	if (data == NULL)
+		InternalError("Trying to free a NULL pointer");
+
+	free(data);
 }
 
 //
@@ -81,17 +70,17 @@ void UtilFree(void *data)
 //
 char *UtilStrDup(const char *str)
 {
-  char *result;
-  int len = (int)strlen(str);
+	char *result;
+	int len = (int)strlen(str);
 
-  result = (char *)UtilCalloc(len+1);
+	result = (char *)UtilCalloc(len+1);
 
-  if (len > 0)
-    memcpy(result, str, len);
-  
-  result[len] = 0;
+	if (len > 0)
+		memcpy(result, str, len);
 
-  return result;
+	result[len] = 0;
+
+	return result;
 }
 
 //
@@ -101,33 +90,33 @@ char *UtilStrDup(const char *str)
 //
 char *UtilStrNDup(const char *str, int size)
 {
-  char *result;
-  int len;
+	char *result;
+	int len;
 
-  for (len=0; len < size && str[len]; len++)
-  { }
+	for (len=0; len < size && str[len]; len++)
+	{ }
 
-  result = (char *)UtilCalloc(len+1);
+	result = (char *)UtilCalloc(len+1);
 
-  if (len > 0)
-    memcpy(result, str, len);
-  
-  result[len] = 0;
+	if (len > 0)
+		memcpy(result, str, len);
 
-  return result;
+	result[len] = 0;
+
+	return result;
 }
 
 int UtilStrCaseCmp(const char *A, const char *B)
 {
-  for (; *A || *B; A++, B++)
-  {
-    // this test also catches end-of-string conditions
-    if (toupper(*A) != toupper(*B))
-      return (toupper(*A) - toupper(*B));
-  }
+	for (; *A || *B; A++, B++)
+	{
+		// this test also catches end-of-string conditions
+		if (toupper(*A) != toupper(*B))
+			return (toupper(*A) - toupper(*B));
+	}
 
-  // strings are equal
-  return 0;
+	// strings are equal
+	return 0;
 }
 
 
@@ -138,17 +127,17 @@ int UtilStrCaseCmp(const char *A, const char *B)
 //
 int UtilRoundPOW2(int x)
 {
-  int tmp;
+	int tmp;
 
-  if (x <= 2)
-    return x;
+	if (x <= 2)
+		return x;
 
-  x--;
-  
-  for (tmp=x / 2; tmp; tmp /= 2)
-    x |= tmp;
-  
-  return (x + 1);
+	x--;
+
+	for (tmp=x / 2; tmp; tmp /= 2)
+		x |= tmp;
+
+	return (x + 1);
 }
 
 
@@ -159,17 +148,17 @@ int UtilRoundPOW2(int x)
 //
 angle_g UtilComputeAngle(double dx, double dy)
 {
-  double angle;
+	double angle;
 
-  if (dx == 0)
-    return (dy > 0) ? 90.0 : 270.0;
+	if (dx == 0)
+		return (dy > 0) ? 90.0 : 270.0;
 
-  angle = atan2((double) dy, (double) dx) * 180.0 / M_PI;
+	angle = atan2((double) dy, (double) dx) * 180.0 / M_PI;
 
-  if (angle < 0) 
-    angle += 360.0;
+	if (angle < 0) 
+		angle += 360.0;
 
-  return angle;
+	return angle;
 }
 
 
@@ -178,15 +167,15 @@ angle_g UtilComputeAngle(double dx, double dy)
 //
 bool UtilFileExists(const char *filename)
 {
-  FILE *fp = fopen(filename, "rb");
+	FILE *fp = fopen(filename, "rb");
 
-  if (fp)
-  {
-    fclose(fp);
-    return true;
-  }
+	if (fp)
+	{
+		fclose(fp);
+		return true;
+	}
 
-  return false;
+	return false;
 }
 
 //
@@ -197,14 +186,14 @@ bool UtilFileExists(const char *filename)
 unsigned int UtilGetMillis()
 {
 #ifdef WIN32
-  unsigned long ticks = GetTickCount();
+	unsigned long ticks = GetTickCount();
 
-  return (unsigned int) ticks;
+	return (unsigned int) ticks;
 #else
-  struct timeval tm;
+	struct timeval tm;
 
-  gettimeofday(&tm, NULL);
+	gettimeofday(&tm, NULL);
 
-  return (unsigned int) ((tm.tv_sec * 1000) + (tm.tv_usec / 1000));
+	return (unsigned int) ((tm.tv_sec * 1000) + (tm.tv_usec / 1000));
 #endif
 }

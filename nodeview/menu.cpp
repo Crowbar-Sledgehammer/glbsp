@@ -25,14 +25,14 @@ static bool menu_want_to_quit;
 
 static void menu_quit_CB(Fl_Widget *w, void *data)
 {
-  menu_want_to_quit = true;
+	menu_want_to_quit = true;
 }
 
 
 #ifndef MACOSX
 static void menu_do_exit(Fl_Widget *w, void * data)
 {
-  guix_win->want_quit = true;
+	guix_win->want_quit = true;
 }
 #endif
 
@@ -47,22 +47,22 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-  "By Andrew Apted (C) 2000-2004\n"
-  "\n"
-  "Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
-  "\n"
-  "Additional credits to...\n"
-  "    Andy Baker & Marc Pullen, for invaluable help\n"
-  "    Janis Legzdinsh, for fixing up Hexen support\n"
-  "    Matt Fell, for the Doom Specs\n"
-  "    Raphael Quinet, for DEU and the original idea\n"
-  "    ... and everyone else who deserves it !\n"
-  "\n"
-  "This program is free software, under the terms of\n"
-  "the GNU General Public License, and comes with\n"
-  "ABSOLUTELY NO WARRANTY.\n"
-  "\n"
-  "Website:  http://glbsp.sourceforge.net";
+	"By Andrew Apted (C) 2000-2004\n"
+	"\n"
+	"Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
+	"\n"
+	"Additional credits to...\n"
+	"    Andy Baker & Marc Pullen, for invaluable help\n"
+	"    Janis Legzdinsh, for fixing up Hexen support\n"
+	"    Matt Fell, for the Doom Specs\n"
+	"    Raphael Quinet, for DEU and the original idea\n"
+	"    ... and everyone else who deserves it !\n"
+	"\n"
+	"This program is free software, under the terms of\n"
+	"the GNU General Public License, and comes with\n"
+	"ABSOLUTELY NO WARRANTY.\n"
+	"\n"
+	"Website:  http://glbsp.sourceforge.net";
 
 
 static void menu_do_about(Fl_Widget *w, void * data)
@@ -159,21 +159,21 @@ static void menu_do_save_log(Fl_Widget *w, void * data)
 
 static Fl_Menu_Item menu_items[] = 
 {
-  { "&File", 0, 0, 0, FL_SUBMENU },
-    { "&Preferences...",    0, FCAL menu_do_prefs },
-    { "&Save Log...",       0, FCAL menu_do_save_log },
+    { "&File", 0, 0, 0, FL_SUBMENU },
+        { "&Preferences...",    0, FCAL menu_do_prefs },
+        { "&Save Log...",       0, FCAL menu_do_save_log },
 #ifndef MACOSX
-    { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },
+        { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },
 #endif
-    { 0 },
+        { 0 },
 
-  { "&Help", 0, 0, 0, FL_SUBMENU },
-    { "&About...",         0,  FCAL menu_do_about },
-    { "&License...",       0,  FCAL menu_do_license },
-    { "&Manual...",   FL_F+1,  FCAL menu_do_manual },
-    { 0 },
+    { "&Help", 0, 0, 0, FL_SUBMENU },
+        { "&About...",         0,  FCAL menu_do_about },
+        { "&License...",       0,  FCAL menu_do_license },
+        { "&Manual...",   FL_F+1,  FCAL menu_do_manual },
+        { 0 },
 
-  { 0 }
+    { 0 }
 };
 
 
@@ -183,16 +183,16 @@ static Fl_Menu_Item menu_items[] =
 #ifdef MACOSX
 Fl_Sys_Menu_Bar * MenuCreate(int x, int y, int w, int h)
 {
-  Fl_Sys_Menu_Bar *bar = new Fl_Sys_Menu_Bar(x, y, w, h);
-  bar->menu(menu_items);
-  return bar;
+	Fl_Sys_Menu_Bar *bar = new Fl_Sys_Menu_Bar(x, y, w, h);
+	bar->menu(menu_items);
+	return bar;
 }
 #else
 Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h)
 {
-  Fl_Menu_Bar *bar = new Fl_Menu_Bar(x, y, w, h);
-  bar->menu(menu_items);
-  return bar;
+	Fl_Menu_Bar *bar = new Fl_Menu_Bar(x, y, w, h);
+	bar->menu(menu_items);
+	return bar;
 }
 #endif
 

@@ -100,7 +100,7 @@ int DialogQueryFilename(const char *message,
 
 void GUI_FatalError(const char *str, ...);
 
-#define ALERT_TXT  "glBSP Alert"
+#define ALERT_TXT  "GL-Node Viewer Alert"
 #define MISSING_COMMS  "(Not Specified)"
 
 
@@ -110,54 +110,54 @@ void GUI_FatalError(const char *str, ...);
 
 class W_Grid : public Fl_Widget
 {
-  public:
-    W_Grid(int X, int Y, int W, int H, const char *label = 0);
-    ~W_Grid();
+public:
+	W_Grid(int X, int Y, int W, int H, const char *label = 0);
+	~W_Grid();
 
-    void SetZoom(int new_zoom);
-    // changes the current zoom factor.
+	void SetZoom(int new_zoom);
+	// changes the current zoom factor.
 
-    void SetPos(double new_x, double new_y);
-    // changes the current position.
+	void SetPos(double new_x, double new_y);
+	// changes the current position.
 
-    void MapToWin(double mx, double my, int *X, int *Y) const;
-    // convert a map coordinate into a window coordinate, using
-    // current grid position and zoom factor.
- 
-    void WinToMap(int X, int Y, double *mx, double *my) const;
-    // convert a map coordinate into a window coordinate, using
-    // current grid position and zoom factor.
- 
-  public:
-    int handle(int event);
-    // FLTK virtual method for handling input events.
+	void MapToWin(double mx, double my, int *X, int *Y) const;
+	// convert a map coordinate into a window coordinate, using
+	// current grid position and zoom factor.
 
-    void resize(int X, int Y, int W, int H);
-    // FLTK virtual method for resizing.
+	void WinToMap(int X, int Y, double *mx, double *my) const;
+	// convert a map coordinate into a window coordinate, using
+	// current grid position and zoom factor.
 
-  private:
-    void draw();
-    // FLTK virtual method for drawing.
-   
-    void draw_grid(int spacing);
+public:
+	int handle(int event);
+	// FLTK virtual method for handling input events.
 
-  public:
-    int handle_key(int key);
+	void resize(int X, int Y, int W, int H);
+	// FLTK virtual method for resizing.
 
-  private:
+private:
+	void draw();
+	// FLTK virtual method for drawing.
+
+	void draw_grid(int spacing);
+
+public:
+	int handle_key(int key);
+
+private:
 
 #define MIN_GRID_ZOOM  4
 #define DEF_GRID_ZOOM  18
-#define MAX_GRID_ZOOM  28
+#define MAX_GRID_ZOOM  30
 
-    int zoom;
-    // zoom factor: (2 ^ (zoom/2)) pixels per 512 units on the map
+	int zoom;
+	// zoom factor: (2 ^ (zoom/2)) pixels per 512 units on the map
 
-    double zoom_mul;
-    // derived from 'zoom'.
+	double zoom_mul;
+	// derived from 'zoom'.
 
-    double mid_x;
-    double mid_y;
+	double mid_x;
+	double mid_y;
 };
 
 #define GRID_FIND(x,y)  int(((x) < 0) ? fmod((x),(y)) + (y) : fmod((x),(y)))
@@ -192,57 +192,48 @@ void GUI_PrintMsg(const char *str, ...);
 class Guix_MainWin : public Fl_Window
 {
 public:
-  Guix_MainWin(const char *title);
-  virtual ~Guix_MainWin();
+	Guix_MainWin(const char *title);
+	virtual ~Guix_MainWin();
 
   // main child widgets
   
 #ifdef MACOSX
-  Fl_Sys_Menu_Bar *menu_bar;
+	Fl_Sys_Menu_Bar *menu_bar;
 #else
-  Fl_Menu_Bar *menu_bar;
+	Fl_Menu_Bar *menu_bar;
 #endif
 
-  W_Grid *grid;
+	W_Grid *grid;
 
-///---  Guix_BuildMode *build_mode;
-///---  Guix_MiscOptions *misc_opts;
-///---  Guix_FactorBox *factor;
-///---
-///---  Guix_FileBox *files;
-///---  Guix_ProgressBox *progress;
-///---  Guix_BuildButton *builder;
-///---  Guix_TextBox *text_box;
- 
-  // user closed the window
-  bool want_quit;
-  
-  // routine to capture the current main window state into the
-  // guix_preferences_t structure.
-  // 
-  void WritePrefs();
+	// user closed the window
+	bool want_quit;
 
-  // this routine is useful if the nodebuildinfo has changed.  It
-  // causes all the widgets to update themselves using the new
-  // parameters.
-  // 
-  void ReadAllInfo();
-  
-  // routine to capture all of the nodebuildinfo state from the
-  // various widgets.  Note: don't need to call this before
-  // destructing everything -- the widget destructors will do it
-  // automatically.
-  // 
-  void WriteAllInfo();
+	// routine to capture the current main window state into the
+	// guix_preferences_t structure.
+	// 
+	void WritePrefs();
+
+	// this routine is useful if the nodebuildinfo has changed.  It
+	// causes all the widgets to update themselves using the new
+	// parameters.
+	// 
+	void ReadAllInfo();
+
+	// routine to capture all of the nodebuildinfo state from the
+	// various widgets.  Note: don't need to call this before
+	// destructing everything -- the widget destructors will do it
+	// automatically.
+	// 
+	void WriteAllInfo();
 
 protected:
   
-  // initial window size, read after the window manager has had a
-  // chance to move the window somewhere else.  If the window is still
-  // there when CaptureState() is called, we don't need to update the
-  // coords in the cookie file.
-  // 
-  int init_x, init_y, init_w, init_h;
+	// initial window size, read after the window manager has had a
+	// chance to move the window somewhere else.  If the window is still
+	// there when CaptureState() is called, we don't need to update the
+	// coords in the cookie file.
+	// 
+	int init_x, init_y, init_w, init_h;
 };
 
 extern Guix_MainWin * guix_win;
