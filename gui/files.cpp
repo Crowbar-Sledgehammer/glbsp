@@ -21,8 +21,6 @@
 // this includes everything we need
 #include "local.h"
 
-/// #include <unistd.h>
-
 
 #define MY_GWA_COLOR  \
     fl_color_cube((FL_NUM_RED-1)*3/4, 0, 0)
