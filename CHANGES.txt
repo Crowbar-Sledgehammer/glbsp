@@ -2,8 +2,8 @@
 CHANGELOG
 =========
 
-Changes in V2.05  (Unreleased)
-------------------------------
+Changes in V2.05  (28th December 2003)
+--------------------------------------
 
  - ported glBSP and glBSPX to MacOS X.
 
