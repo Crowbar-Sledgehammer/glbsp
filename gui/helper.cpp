@@ -39,6 +39,24 @@ int HelperCaseCmp(const char *A, const char *B)
 
 
 //
+// HelperCaseCmpLen
+//
+// Like the above routine, but compares no more than `len' characters
+// at the start of each string.
+//
+int HelperCaseCmpLen(const char *A, const char *B, int len)
+{
+  for (; (*A || *B) && (len > 0); A++, B++, len--)
+  {
+    if (toupper(*A) != toupper(*B))
+      return (toupper(*A) - toupper(*B));
+  }
+
+  return 0;
+}
+
+
+//
 // HelperFilenameValid
 //
 boolean_g HelperFilenameValid(const char *filename)

@@ -171,3 +171,17 @@ void Guix_MainWin::WriteAllInfo()
   factor->WriteInfo();
 }
 
+
+void Guix_MainWin::LockOut(boolean_g lock_it)
+{
+  build_mode->LockOut(lock_it);
+  misc_opts->LockOut(lock_it);
+  files->LockOut(lock_it);
+  factor->LockOut(lock_it);
+  builder->LockOut(lock_it);
+  text_box->LockOut(lock_it);
+
+  // change the mouse cursor
+  cursor(lock_it ? FL_CURSOR_WAIT : FL_CURSOR_DEFAULT);
+}
+

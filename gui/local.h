@@ -314,6 +314,9 @@ public:
   // widget.
   //
   void InFileChanged();
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 class Guix_FactorBox : public Fl_Group
@@ -330,6 +333,9 @@ public:
 
   // routine to change the build-info to match the input.
   void WriteInfo();
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 class Guix_BuildButton : public Fl_Group
@@ -341,6 +347,9 @@ public:
   // child widget
   Fl_Button *build;
   Fl_Button *stopper;
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 
@@ -349,6 +358,7 @@ public:
 //
 
 int HelperCaseCmp(const char *A, const char *B);
+int HelperCaseCmpLen(const char *A, const char *B, int len);
 
 boolean_g HelperFilenameValid(const char *filename);
 boolean_g HelperHasExt(const char *filename);
@@ -414,6 +424,9 @@ public:
   // is currently active.
   //
   void WriteInfo();
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 class Guix_MiscOptions : public Fl_Group
@@ -436,6 +449,9 @@ public:
   
   // routine to call when GWA mode changes state.
   void GWA_Changed();
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 
@@ -507,22 +523,30 @@ public:
 
   Fl_Group *group;
 
-  // current number of bars
-  int curr_bars;
-
   // current message strings
   const char *title_str;
 
+  // current number of bars (READ ONLY from outside)
+  int curr_bars;
+
+  // sets the number of active bars.  Must be 1 or 2.
+  void SetBars(int num);
+  
   // clear the progress bars (e.g. when stopped by user)
   void ClearBars(void);
   
+  // set the short name of the bar
+  void SetBarName(int which, const char *label_short);
+   
 protected:
 
   // initial window position
   int init_x, init_y;
 
-  void CreateOneBar(guix_bar_t& bar, int x, int y, int w, int h,
-      const char *label_short, Fl_Color col);
+  void CreateOneBar(guix_bar_t& bar, int x, int y, int w, int h);
+
+  void SetupOneBar(guix_bar_t& bar, int y, const char *label_short, 
+      Fl_Color col);
 };
 
 void GUI_Ticker(void);
@@ -562,6 +586,9 @@ public:
   // FALSE if an error occurred.
   //
   boolean_g SaveLog(const char *filename);
+
+  // locking routine (see Guix_MainWin)
+  void LockOut(boolean_g lock_it);
 };
 
 void GUI_PrintMsg(const char *str, ...);
@@ -616,6 +643,12 @@ public:
   // 
   void WriteAllInfo();
 
+  // this routine will update the user interface to prevent the user
+  // from modifying most of the widgets (used during building).  When
+  // `lock_it' is FALSE, we are actually unlocking a previous lock.
+  // 
+  void LockOut(boolean_g lock_it);
+   
 protected:
   
   // initial window size, read after the window manager has had a

@@ -223,6 +223,31 @@ void Guix_FileBox::InFileChanged(void)
 }
 
 
+void Guix_FileBox::LockOut(boolean_g lock_it)
+{
+  if (lock_it)
+  {
+    in_file->set_output();
+    out_file->set_output();
+    out_gwa_file->set_output();
+
+    in_browse->set_output();
+    out_browse->set_output();
+    out_guess->set_output();
+  }
+  else
+  {
+    in_file->clear_output();
+    out_file->clear_output();
+    out_gwa_file->clear_output();
+
+    in_browse->clear_output();
+    out_browse->clear_output();
+    out_guess->clear_output();
+  }
+}
+
+
 //------------------------------------------------------------------------
 
 
@@ -268,6 +293,15 @@ void Guix_FactorBox::ReadInfo()
 void Guix_FactorBox::WriteInfo()
 {
   guix_info.factor = (int) factor->value();
+}
+
+
+void Guix_FactorBox::LockOut(boolean_g lock_it)
+{
+  if (lock_it)
+    factor->set_output();
+  else
+    factor->clear_output();
 }
 
 
@@ -531,7 +565,7 @@ static void BuildDoBuild(void)
     return;
 
   guix_win->progress->ClearBars();
-    
+   
   if (ret == GLBSP_E_Cancelled)
   {
     guix_win->text_box->AddMsg("\n*** Cancelled ***\n", FL_BLUE, TRUE);
@@ -587,6 +621,10 @@ static void BuildDoBuild(void)
 
 static void builder_build_CB(Fl_Widget *w, void *data)
 {
+  // disable most of the interface, especially the BUILD button itself
+  // (this routine is NOT reentrant !).
+  guix_win->LockOut(TRUE);
+
   // make sure info is up-to-date
   guix_win->WriteAllInfo();
 
@@ -618,7 +656,6 @@ static void builder_build_CB(Fl_Widget *w, void *data)
     if (BuildCheckInfo())
     {
       BuildDoBuild();
-
       guix_win->text_box->AddHorizBar();
     }
   }
@@ -638,6 +675,10 @@ static void builder_build_CB(Fl_Widget *w, void *data)
 
   GlbspFree(guix_comms.message);
   guix_comms.message = NULL;
+
+  // restore user interface to normal
+  guix_win->LockOut(FALSE);
+  guix_win->progress->ClearBars();
 }
 
 static void builder_cancel_CB(Fl_Widget *w, void *data)
@@ -678,5 +719,14 @@ Guix_BuildButton::Guix_BuildButton(int x, int y, int w, int h) :
 Guix_BuildButton::~Guix_BuildButton()
 {
   // nothing to do
+}
+
+
+void Guix_BuildButton::LockOut(boolean_g lock_it)
+{
+  if (lock_it)
+    build->set_output();
+  else
+    build->clear_output();
 }
 

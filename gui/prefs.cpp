@@ -82,7 +82,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   groups[0]->add(overwrite);
 
   same_file = new Fl_Check_Button(20, ay+22*1, 22, 22,
-      "Output same file as Input");
+      "Output and Input files are the same");
   same_file->down_box(FL_DOWN_BOX);
   same_file->align(FL_ALIGN_RIGHT);
   same_file->value(guix_prefs.same_file_warn ? 1 : 0);
@@ -91,7 +91,6 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   // create reset button
   
   groups[1] = new Fl_Group(0, 160, w(), 60);
-///---  groups[1]->color(MAIN_BG_COLOR, MAIN_BG_COLOR);
   groups[1]->box(FL_THIN_UP_BOX);
   groups[1]->resizable(0);
   add(groups[1]);

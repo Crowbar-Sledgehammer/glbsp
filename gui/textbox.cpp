@@ -127,6 +127,14 @@ boolean_g Guix_TextBox::SaveLog(const char *filename)
 }
 
 
+void Guix_TextBox::LockOut(boolean_g lock_it)
+{
+  // Don't need to lock the text box.  This routine is for
+  // completeness, e.g. in case some aspect of the text box should
+  // actually be locked.
+}
+
+
 //------------------------------------------------------------------------
 
 //

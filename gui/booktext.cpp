@@ -59,7 +59,7 @@ static const char *contents_text[] =
   "@-",
   "",
   "@r by Andrew Apted   ",
-  "@r Updated: 18th July 2001   ",
+  "@r Updated: 24th September 2001   ",
   "",
   "@c@m Table of Contents",
   "",
@@ -273,6 +273,7 @@ static const char *dialog_text[] =
   "",
   "@-",
   "",
+  "(Sorry, this section has not been written yet)",
   NULL
 };
 

@@ -28,33 +28,15 @@
 #endif
 
 
+#define BAR_YELLOWY  \
+      fl_color_cube(FL_NUM_RED-1, FL_NUM_GREEN-1, 0)
+
 #define BAR_ORANGEY  \
-      fl_color_cube(FL_NUM_RED-1, (FL_NUM_GREEN-1)*7/7, 0)
+      fl_color_cube(FL_NUM_RED-1, (FL_NUM_GREEN-1)*4/7, 0)
 
 #define BAR_CYANISH  \
-      fl_color_cube(0, (FL_NUM_GREEN-1)*1/7, FL_NUM_BLUE-1)
+      fl_color_cube(0, (FL_NUM_GREEN-1)*2/7, FL_NUM_BLUE-1)
 
-
-void Guix_ProgressBox::CreateOneBar(guix_bar_t& bar,
-    int x, int y, int w, int h,
-    const char *label_short, Fl_Color col)
-{
-  bar.label = new Fl_Box(x+6, y+4, 50, 20, label_short);
-  bar.label->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-  add(bar.label);
-
-  bar.slide = new Fl_Slider(group->x(), y+6, group->w(), 16);
-  bar.slide->set_output();
-  bar.slide->slider(FL_FLAT_BOX);
-  bar.slide->type(FL_HOR_FILL_SLIDER);
-  bar.slide->selection_color(col);
-  group->add(bar.slide);
-
-  bar.perc = new Fl_Box(x + w - 50, y+4, 40, 20);
-  bar.perc->box(FL_FLAT_BOX);
-  bar.perc->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  add(bar.perc);
-}
 
 //
 // ProgressBox Constructor
@@ -89,11 +71,8 @@ Guix_ProgressBox::Guix_ProgressBox(int x, int y, int w, int h) :
       
   // create bars
 
-  y += 16;
-  CreateOneBar(bars[0], x, y, w, h, "Map", BAR_ORANGEY);
-      
-  y += 24;
-  CreateOneBar(bars[1], x, y, w, h, "File", BAR_CYANISH);
+  CreateOneBar(bars[0], x, y, w, h);
+  CreateOneBar(bars[1], x, y, w, h);
 }
 
 
@@ -108,16 +87,92 @@ Guix_ProgressBox::~Guix_ProgressBox()
 }
 
 
+void Guix_ProgressBox::CreateOneBar(guix_bar_t& bar,
+    int x, int y, int w, int h)
+{
+  bar.label = new Fl_Box(x+6, y+4, 50, 20);
+  bar.label->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+  bar.label->hide();
+  add(bar.label);
+
+  bar.slide = new Fl_Slider(group->x(), y+6, group->w(), 16);
+  bar.slide->set_output();
+  bar.slide->slider(FL_FLAT_BOX);
+  bar.slide->type(FL_HOR_FILL_SLIDER);
+  bar.slide->hide();
+  group->add(bar.slide);
+
+  bar.perc = new Fl_Box(x + w - 50, y+4, 40, 20);
+  bar.perc->box(FL_FLAT_BOX);
+  bar.perc->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  bar.perc->hide();
+  add(bar.perc);
+}
+
+
+void Guix_ProgressBox::SetupOneBar(guix_bar_t& bar, int y,
+    const char *label_short, Fl_Color col)
+{
+  bar.label->label(label_short);
+  bar.label->position(bar.label->x(), y+4);
+  bar.label->show();
+
+  bar.slide->selection_color(col);
+  bar.slide->position(bar.slide->x(), y+6);
+  bar.slide->value(0);
+  bar.slide->show();
+
+  bar.perc->position(bar.perc->x(), y+4);
+  bar.perc->show();
+}
+
+
+void Guix_ProgressBox::SetBars(int num)
+{
+  assert(num == 1 || num == 2);
+
+  if (curr_bars != 0)
+    ClearBars();
+
+  curr_bars = num;
+
+  if (curr_bars == 1)
+  {
+    // FILE loading/saving
+    
+    SetupOneBar(bars[0], y() + 28, "File", BAR_ORANGEY);
+  }
+  else
+  {
+    // MAP building
+    
+    SetupOneBar(bars[0], y() + 16, "Map",  BAR_YELLOWY);
+    SetupOneBar(bars[1], y() + 40, "File", BAR_CYANISH);
+  }
+}
+
+
 void Guix_ProgressBox::ClearBars(void)
 {
+  if (guix_win->progress->curr_bars == 0)
+    return;
+
   for (int i=0; i < 2; i++)
   {
-    bars[i].slide->value(0);
-    bars[i].slide->redraw();
-
-    bars[i].perc->label(NULL);
-    bars[i].perc->redraw();
+    bars[i].label->hide();
+    bars[i].slide->hide();
+    bars[i].perc->hide();
   }
+}
+
+
+void Guix_ProgressBox::SetBarName(int which, const char *label_short)
+{
+  assert(0 <= which && which < 2);
+
+  bars[which].label->label(label_short);
+
+  redraw();
 }
 
 
@@ -143,11 +198,11 @@ boolean_g GUI_DisplayOpen(displaytype_e type)
   switch (type)
   {
     case DIS_BUILDPROGRESS:
-      guix_win->progress->curr_bars = 2;
+      guix_win->progress->SetBars(2);
       break;
 
     case DIS_FILEPROGRESS:
-      guix_win->progress->curr_bars = 1;
+      guix_win->progress->SetBars(1);
       break;
 
     default:
@@ -193,9 +248,16 @@ void GUI_DisplaySetBarText(int barnum, const char *str)
   GlbspFree(bar->lab_str);
   bar->lab_str = GlbspStrDup(str);
 
-///  bar->label->label(bar->lab_str);
-///  bar->label->redraw();
+  // for loading/saving, update short name
+  if (guix_win->progress->curr_bars == 1)
+  {
+    if (HelperCaseCmpLen(str, "Read", 4) == 0)
+      guix_win->progress->SetBarName(0, "Load");
 
+    if (HelperCaseCmpLen(str, "Writ", 4) == 0)
+      guix_win->progress->SetBarName(0, "Save");
+  }
+ 
   // redraw window too 
   guix_win->progress->redraw();
 }
@@ -254,6 +316,6 @@ void GUI_DisplaySetBar(int barnum, int count)
 //
 void GUI_DisplayClose(void)
 {
-  guix_win->progress->curr_bars = 0;
+  guix_win->progress->ClearBars();
 }
 

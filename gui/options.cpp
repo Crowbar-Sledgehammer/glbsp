@@ -171,6 +171,27 @@ void Guix_BuildMode::WriteInfo()
 }
 
 
+void Guix_BuildMode::LockOut(boolean_g lock_it)
+{
+  if (lock_it)
+  {
+    gwa->set_output();
+    maybe_normal->set_output();
+    both->set_output();
+    gl_only->set_output();
+    normal_only->set_output();
+  }
+  else
+  {
+    gwa->clear_output();
+    maybe_normal->clear_output();
+    both->clear_output();
+    gl_only->clear_output();
+    normal_only->clear_output();
+  }
+}
+
+
 //------------------------------------------------------------------------
 
 
@@ -270,13 +291,31 @@ void Guix_MiscOptions::GWA_Changed()
 {
   if (guix_info.gwa_mode)
   {
-    no_reject->hide();   /// deactivate
+    no_reject->hide();
     pack_sides->hide();
   }
   else
   {
-    no_reject->show();   /// activate
+    no_reject->show();
     pack_sides->show();
   }
 }
 
+
+void Guix_MiscOptions::LockOut(boolean_g lock_it)
+{
+  if (lock_it)
+  {
+    v1_vert->set_output();
+    warnings->set_output();
+    no_reject->set_output();
+    pack_sides->set_output();
+  }
+  else
+  {
+    v1_vert->clear_output();
+    warnings->clear_output();
+    no_reject->clear_output();
+    pack_sides->clear_output();
+  }
+} 
