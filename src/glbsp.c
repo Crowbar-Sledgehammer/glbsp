@@ -2,7 +2,7 @@
 // MAIN : Main program for glBSP
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -70,7 +70,10 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // keep_sect
   FALSE,   // no_prune
 
-  DEFAULT_BLOCK_LIMIT   // block_limit
+  DEFAULT_BLOCK_LIMIT,   // block_limit
+
+  FALSE,   // missing_output
+  FALSE    // same_filenames
 };
 
 const nodebuildcomms_t default_buildcomms =
@@ -199,7 +202,7 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
 
   if (!info->input_file)
   {
-    comms->message = "INTERNAL ERROR: Missing input filename !";
+    comms->message = "Missing input filename !";
     return GLBSP_E_BadArgs;
   }
 
@@ -207,16 +210,19 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
   {
     info->output_file = ReplaceExtension(info->input_file, "gwa");
     info->gwa_mode = 1;
+    info->missing_output = TRUE;
 
-    //!!! PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
+    PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
   }
   else if (CheckExtension(info->output_file, "gwa"))
+  {
     info->gwa_mode = 1;
+  }
 
   if (strcmp(info->input_file, info->output_file) == 0)
   {
-    //!!! PrintMsg("* Output file is same as input file. Using -loadall\n\n");
     info->load_all = 1;
+    info->same_filenames = TRUE;
   }
 
   if (info->no_prune && info->pack_sides)
@@ -343,18 +349,24 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     comms->message = "-nonormal and -nogl specified: nothing to do !";
     return GLBSP_E_BadArgs;
   }
-  
+
   InitDebug();
   
+  if (info->missing_output)
+    PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
+  
+  if (info->same_filenames)
+    PrintMsg("* Output file is same as input file. Using -loadall\n\n");
+
   // opens and reads directory from the input wad
   ReadWadFile(cur_info->input_file);
 
   if (CountLevels() <= 0)
   {
-    //!!!! Error("No levels found in wad")
     CloseWads();
     TermDebug();
 
+    comms->message = "No levels found in wad!";
     return GLBSP_E_Unknown;
   }
    

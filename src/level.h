@@ -2,7 +2,7 @@
 // LEVEL : Level structures & read/write functions.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -105,6 +105,16 @@ typedef struct sector_s
   int light;
   int special;
   int tag;
+
+  // used when building REJECT table.  Each set of sectors that are
+  // isolated from other sectors will have a different group number.
+  // Thus: on every 2-sided linedef, the sectors on both sides will be
+  // in the same group.  The rej_next, rej_prev fields are a link in a
+  // RING, containing all sectors of the same group.
+  int rej_group;
+
+  struct sector_s *rej_next;
+  struct sector_s *rej_prev;
 }
 sector_t;
 

@@ -2,7 +2,7 @@
 // LEVEL : Level structure read/write functions.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -32,6 +32,7 @@
 #include "blockmap.h"
 #include "level.h"
 #include "node.h"
+#include "reject.h"
 #include "seg.h"
 #include "structs.h"
 #include "util.h"
@@ -290,6 +291,8 @@ void GetSectors(void)
 
     // sector indices never change
     sector->index = i;
+
+    // Note: rej_* fields are handled completely in reject.c
   }
 }
 
@@ -384,6 +387,7 @@ void GetLinedefs(void)
     line->type = UINT16(raw->type);
     line->tag  = SINT16(raw->tag);
 
+    line->two_sided = (line->flags & LINEFLAG_TWO_SIDED) ? TRUE : FALSE;
     line->is_precious = (line->tag >= 900) ? TRUE : FALSE;
 
     line->right = (SINT16(raw->sidedef1) < 0) ? NULL :

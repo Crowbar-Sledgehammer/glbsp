@@ -2,7 +2,7 @@
 // GLBSP.H : Interface to Node Builder
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -22,7 +22,7 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "1.93"
+#define GLBSP_VER  "1.94"
 
 
 // certain GCC attributes can be useful
@@ -81,6 +81,12 @@ typedef struct nodebuildinfo_s
   boolean_g no_prune;
 
   int block_limit;
+
+  // private stuff -- values computed in GlbspParseArgs or
+  // GlbspCheckInfo that need to be passed to GlbspBuildNodes.
+
+  boolean_g missing_output;
+  boolean_g same_filenames;
 }
 nodebuildinfo_t;
 
@@ -142,7 +148,7 @@ typedef enum
   // an unknown error occurred (this is the catch-all value)
   GLBSP_E_Unknown,
 
-  // the arguments were bad/inconsistent.   !!!!
+  // the arguments were bad/inconsistent.
   GLBSP_E_BadArgs,
 
   // file errors
@@ -158,7 +164,8 @@ glbsp_ret_e;
 // Returns GLBSP_E_OK if all went well, otherwise another error code.
 // Upon error, comms->message may be set to an string describing the
 // error.  Typical errors are unrecognised options and invalid option
-// values.  Calling this routine is not compulsory.
+// values.  Calling this routine is not compulsory.  Note that the set
+// of arguments does not include the program's name.
 //
 glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     volatile nodebuildcomms_t *comms,

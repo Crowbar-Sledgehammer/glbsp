@@ -2,7 +2,7 @@
 // SEG : Choose the best Seg to use for a node line.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -58,9 +58,9 @@
 #define PRECIOUS_MULTIPLY  64
 
 
-#define DEBUG_PICKNODE  0
-#define DEBUG_SPLIT     0
-#define DEBUG_CUTLIST   0
+#define DEBUG_PICKNODE  1
+#define DEBUG_SPLIT     1
+#define DEBUG_CUTLIST   1
 
 
 typedef struct eval_info_s

@@ -2,7 +2,7 @@
 // NODE : Recursively create nodes and return the pointers.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -53,9 +53,9 @@
 #include "wad.h"
 
 
-#define DEBUG_BUILDER  0
-#define DEBUG_SORTER   0
-#define DEBUG_SUBSEC   0
+#define DEBUG_BUILDER  1
+#define DEBUG_SORTER   1
+#define DEBUG_SUBSEC   1
 
 
 static superblock_t *quick_alloc_supers = NULL;
@@ -562,7 +562,7 @@ static void ClockwiseOrder(subsec_t *sub)
     angle_g angle = ComputeAngle(cur->start->x - sub->mid_x,
         cur->start->y - sub->mid_y);
     
-    PrintDebug("  Seg %p: Angle %1.1f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
+    PrintDebug("  Seg %p: Angle %1.9f  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
       cur, angle, cur->start->x, cur->start->y, cur->end->x, cur->end->y);
   }
   #endif
@@ -591,6 +591,14 @@ static void SanityCheckClosed(subsec_t *sub)
     PrintMiniWarn("Subsector #%d near (%1.1f,%1.1f) is not closed "
         "(%d gaps, %d segs)\n", sub->index, 
         sub->mid_x, sub->mid_y, gaps, total);
+
+    #if DEBUG_SUBSEC
+    for (cur=sub->seg_list; cur; cur=cur->next)
+    {
+      PrintDebug("  SEG %p  (%1.1f,%1.1f) --> (%1.1f,%1.1f)\n", cur,
+          cur->start->x, cur->start->y, cur->end->x, cur->end->y);
+    }
+    #endif
   }
 }
 
