@@ -380,6 +380,8 @@ void CookieSetPath(const char *argv0)
 
   char buffer[1024];
 
+  buffer[0] = 0;
+
 #if defined(WIN32)
 
   if (HelperFilenameValid(argv0))
@@ -387,16 +389,36 @@ void CookieSetPath(const char *argv0)
     strcpy(buffer, HelperReplaceExt(argv0, "ini"));
   }
   else
-    strcpy(buffer, "glbspX.ini");
+    strcpy(buffer, "glBSPX.ini");
+
+#elif defined(MACOSX)
+
+  if (getenv("HOME"))
+  {
+    strcpy(buffer, getenv("HOME"));
+    strcat(buffer, "/Library/Preferences/");
+  }
+
+  strcat(buffer, "glBSPX.rc");
 
 #else  // LINUX
 
   if (getenv("HOME"))
+  {
     strcpy(buffer, getenv("HOME"));
-  else
-    strcpy(buffer, ".");
+    strcat(buffer, "/");
+  }
 
-  strcat(buffer, "/.glbspX_rc");
+  // backwards compatibility (glbspX != glBSPX)
+
+  strcat(buffer, ".glbspX_rc");
+
+  if (! HelperFileExists(buffer))
+  {
+    char *bsp = strrchr(buffer, 'b');
+
+    if (bsp) strncpy(bsp, "BSP", 3);
+  }
 #endif
  
   cookie_filename = GlbspStrDup(buffer);

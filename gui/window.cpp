@@ -119,7 +119,7 @@ Guix_MainWin::Guix_MainWin(const char *title) :
 
   // show window (pass some dummy arguments)
   int argc = 1;
-  char *argv[] = { "glbspX", NULL };
+  char *argv[] = { "glBSPX", NULL };
   
   show(argc, argv);
 
