@@ -2,19 +2,15 @@
 NodeView TODO list
 ==================
 
-- GUI option to select MAP.
-
 - support GWA files.
 
 - start: center screen on map (or player#1), select zoom to fit map.
-
-- debugging: make it run-time selectable.
 
 - class-ify the wad structures.  [partially done]
 
 - fix drawing bugs at high zoom levels.
 
-DONE: command-line options to select WAD.
+DONE: debugging: make it run-time selectable.
 
 TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
 
