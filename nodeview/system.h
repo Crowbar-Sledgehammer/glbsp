@@ -63,4 +63,16 @@ void TermDebug(void);
 void PrintDebug(const char *str, ...);
 
 
+/* ----- conversion macros ----------------------- */
+
+#define UINT8(x)   ((uint8_g) (x))
+#define SINT8(x)   ((sint8_g) (x))
+
+#define UINT16(x)  Endian_U16(x)
+#define UINT32(x)  Endian_U32(x)
+
+#define SINT16(x)  ((sint16_g) Endian_U16((uint16_g) (x)))
+#define SINT32(x)  ((sint32_g) Endian_U32((uint32_g) (x)))
+
+
 #endif /* __NODEVIEW_SYSTEM_H__ */
