@@ -1,0 +1,6 @@
+
+GL-NodeView TODO list
+=====================
+
+- move class definitions from defs.h into own header files.
+

@@ -1,0 +1,43 @@
+#
+# NodeView Makefile for Unix/FLTK
+#
+
+PROGNAME=nodeview
+SRC_DIR=nodeview
+
+FLTK_CFLAGS=-I/usr/local/lib
+FLTK_LIBS=-lfltk_images -lfltk -lX11 -lXext -lpng -ljpeg
+
+CC=gcc
+CXX=g++
+CFLAGS=-O -g -Wall -DUNIX $(FLTK_CFLAGS)
+CXXFLAGS=$(CFLAGS)
+LDFLAGS=-L/usr/X11R6/lib
+LIBS=-lm $(FLTK_LIBS)
+
+OBJS=./main.o     \
+     ./dialog.o   \
+     ./grid.o     \
+     ./level.o    \
+     ./menu.o     \
+     ./system.o   \
+     ./util.o     \
+     ./wad.o      \
+     ./window.o
+
+
+# ----- TARGETS ------------------------------------------------------
+
+all:    $(PROGNAME)
+
+clean:
+	rm -f $(PROGNAME) *.o core core.* ERRS
+
+$(PROGNAME): $(OBJS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $(PROGNAME) $(LDFLAGS) $(LIBS)
+
+bin: all
+	strip --strip-unneeded $(PROGNAME)
+
+.PHONY: all clean bin install
+
