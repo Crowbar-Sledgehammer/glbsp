@@ -2,5 +2,13 @@
 GL-NodeView TODO list
 =====================
 
+- class-ify the wad structures.
+
+- allow multiple wad files (at least: wad + gwa).
+
 - move class definitions from defs.h into own header files.
+
+TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
+
+DONE: class-ify the level structures.
 
