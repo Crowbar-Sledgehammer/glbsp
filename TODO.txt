@@ -2,9 +2,9 @@
 TODO
 ====
 
-+  Put Changelog on GLBSP page.
-
 **  WIN32 + FLTK: have a proper makefile.
+
++  MacOSX: de-FINK-itise glBSPX.
 
 TEST: cookie under linux (use .glbspX_rc if exists, otherwise .glBSPX_rc).
 
@@ -12,6 +12,8 @@ TOO COMPLEX: -modify option: directly modifies the input wad.
 
 LATER
 -----
+
++  Put Changelog on GLBSP page.
 
 -  Project builder setup for MacOS X.
 
