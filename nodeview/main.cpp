@@ -40,23 +40,7 @@ static void ShowTitle(void)
 static void ShowInfo(void)
 {
 	GUI_PrintMsg(
-		"This GL node builder was originally based on BSP 2.3, which was\n"
-		"created from the basic theory stated in DEU5 (OBJECTS.C)\n"
-		"\n"
-		"Credits should go to :-\n"
-		"  Andy Baker & Marc Pullen   for their invaluable help\n"
-		"  Janis Legzdinsh            for fixing up Hexen support\n"
-		"  Colin Reed & Lee Killough  for creating the original BSP\n"
-		"  Matt Fell                  for the Doom Specs\n"
-		"  Raphael Quinet             for DEU and the original idea\n"
-		"  ... and everyone who helped with the original BSP.\n"
-		"\n"
-		"This program is free software, under the terms of the GNU General\n"
-		"Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
-		"accompanying documentation for more details.\n"
-		"\n"
-		"Note: glBSPX is the GUI (graphical user interface) version.\n"
-		"Try plain \"glbsp\" if you want the command-line version.\n"
+		"Info...\n\n"
 	);
 }
 
