@@ -158,7 +158,7 @@ static INLINE_G void AddLevelName(const char *name)
 {
   if ((wad.num_level_names % LEVNAME_BUNCH) == 0)
   {
-    wad.level_names = (const char **) UtilRealloc(wad.level_names,
+    wad.level_names = (const char **) UtilRealloc((void *)wad.level_names,
         (wad.num_level_names + LEVNAME_BUNCH) * sizeof(const char *));
   }
 
@@ -383,7 +383,7 @@ static void ProcessDirEntry(lump_t *lump)
 
   if (CheckLevelName(lump->name))
   {
-    // NOTE !  Level marks can have data (in Hexen anyway).
+    /* NOTE !  Level marks can have data (in Hexen anyway) */
     if (cur_info->load_all)
       lump->flags |= LUMP_READ_ME;
     else
@@ -1293,7 +1293,8 @@ glbsp_ret_e WriteWadFile(const char *filename)
   int check1, check2;
   char strbuf[1024];
 
-  PrintMsg("\nSaving WAD as %s\n", filename);
+  PrintMsg("\n");
+  PrintMsg("Saving WAD as %s\n", filename);
 
   RecomputeDirectory();
 
@@ -1358,7 +1359,7 @@ void CloseWads(void)
     out_file = NULL;
   }
   
-  // free directory entries
+  /* free directory entries */
   while (wad.dir_head)
   {
     lump_t *head = wad.dir_head;
@@ -1367,14 +1368,69 @@ void CloseWads(void)
     FreeLump(head);
   }
 
-  // free level names
+  /* free the level names */
   if (wad.level_names)
   {
     for (i=0; i < wad.num_level_names; i++)
       UtilFree((char *) wad.level_names[i]);
 
-    UtilFree(wad.level_names);
+    UtilFree((void *)wad.level_names);
     wad.level_names = NULL;
   }
+}
+
+
+//
+// MarkLevelFailed
+//
+void MarkLevelFailed(void)
+{
+  wad.current_level->flags |= LUMP_FAILED_LEVEL;
+}
+
+
+//
+// ReportFailedLevels
+//
+int ReportFailedLevels(void)
+{
+  lump_t *cur;
+  int lev_count = 0;
+  int failures = 0;
+  
+  for (cur=wad.dir_head; cur; cur=cur->next)
+  {
+    if (! (cur->flags & LUMP_IS_LEVEL))
+      continue;
+
+    lev_count++;
+
+    if (cur->flags & LUMP_FAILED_LEVEL)
+      failures++;
+  }
+
+  if (failures == 0)
+    return failures;
+
+  PrintMsg("\n");
+
+  if (failures == lev_count)
+  {
+    PrintMsg("ATTENTION: ALL LEVELS FAILED TO BUILD !!\n");
+    return failures;
+  }
+
+  PrintMsg("ATTENTION: The following levels FAILED to build:\n");
+
+  for (cur=wad.dir_head; cur; cur=cur->next)
+  {
+    if (! (cur->flags & LUMP_IS_LEVEL))
+      continue;
+
+    if (cur->flags & LUMP_FAILED_LEVEL)
+      PrintMsg("  %s\n", cur->name);
+  }
+   
+  return failures;
 }
 

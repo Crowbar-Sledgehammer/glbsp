@@ -351,6 +351,7 @@ static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
   {
     PrintWarn("Bad sidedef on linedef #%d (Z_CheckHeap error)\n",
         line->index);
+    MarkLevelFailed();
   }
  
   seg->start   = start;
@@ -652,6 +653,23 @@ static void SanityCheckSameSector(subsec_t *sub)
 }
 
 //
+// SanityCheckHasRealSeg
+//
+static void SanityCheckHasRealSeg(subsec_t *sub)
+{
+  seg_t *cur;
+
+  for (cur=sub->seg_list; cur; cur=cur->next)
+  {
+    if (cur->linedef)
+      return;
+  }
+
+  InternalError("Subsector #%d near (%1.1f,%1.1f) has no real seg !\n",
+      sub->index, sub->mid_x, sub->mid_y);
+}
+
+//
 // RenumberSubsecSegs
 //
 static void RenumberSubsecSegs(subsec_t *sub)
@@ -786,7 +804,7 @@ static void DebugShowSegs(superblock_t *seg_list)
 // BuildNodes
 //
 glbsp_ret_e BuildNodes(superblock_t *seg_list, 
-    node_t ** N, subsec_t ** S, int depth)
+    node_t ** N, subsec_t ** S, int depth, node_t *stale_nd)
 {
   node_t *node;
   seg_t *best;
@@ -795,6 +813,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   superblock_t *lefts;
 
   intersection_t *cut_list;
+  int stale_opposite = 0;
 
   glbsp_ret_e ret;
 
@@ -809,8 +828,8 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   DebugShowSegs(seg_list);
 # endif
 
-  // pick best node to use.  None indicates convexicity.
-  best = PickNode(seg_list, depth);
+  /* pick best node to use.  None indicates convexicity */
+  best = PickNode(seg_list, depth, &stale_nd, &stale_opposite);
 
   if (best == NULL)
   {
@@ -830,7 +849,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
       best, best->start->x, best->start->y, best->end->x, best->end->y);
 # endif
 
-  // create left and right super blocks
+  /* create left and right super blocks */
   lefts  = (superblock_t *) NewSuperBlock();
   rights = (superblock_t *) NewSuperBlock();
 
@@ -839,12 +858,12 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   lefts->x2 = rights->x2 = seg_list->x2;
   lefts->y2 = rights->y2 = seg_list->y2;
 
-  // divide the segs into two lists: left & right
+  /* divide the segs into two lists: left & right */
   cut_list = NULL;
 
   SeparateSegs(seg_list, best, lefts, rights, &cut_list);
 
-  // sanity checks...
+  /* sanity checks... */
   if (rights->real_num + rights->mini_num == 0)
     InternalError("Separated seg-list has no RIGHT side");
 
@@ -862,7 +881,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   node->dx = (int)best->pdx;
   node->dy = (int)best->pdy;
 
-  // check for really long partition (overflows dx,dy in NODES)
+  /* check for really long partition (overflows dx,dy in NODES) */
   if (best->p_length >= 30000)
   {
     if (node->dx && node->dy && ((node->dx & 1) || (node->dy & 1)))
@@ -875,7 +894,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
     node->too_long = 1;
   }
 
-  // find limits of vertices
+  /* find limits of vertices */
   FindLimits(lefts,  &node->l.bounds);
   FindLimits(rights, &node->r.bounds);
 
@@ -883,7 +902,9 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   PrintDebug("Build: Going LEFT\n");
 # endif
 
-  ret = BuildNodes(lefts,  &node->l.node, &node->l.subsec, depth+1);
+  ret = BuildNodes(lefts,  &node->l.node, &node->l.subsec, depth+1,
+      stale_nd ? (stale_opposite ? stale_nd->r.node : stale_nd->l.node) 
+      : NULL);
   FreeSuper(lefts);
 
   if (ret != GLBSP_E_OK)
@@ -896,7 +917,9 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   PrintDebug("Build: Going RIGHT\n");
 # endif
 
-  ret = BuildNodes(rights, &node->r.node, &node->r.subsec, depth+1);
+  ret = BuildNodes(rights, &node->r.node, &node->r.subsec, depth+1,
+      stale_nd ? (stale_opposite ? stale_nd->l.node : stale_nd->r.node) 
+      : NULL);
   FreeSuper(rights);
 
 # if DEBUG_BUILDER
@@ -927,6 +950,7 @@ void ClockwiseBspTree(node_t *root)
     // do some sanity checks
     SanityCheckClosed(sub);
     SanityCheckSameSector(sub);
+    SanityCheckHasRealSeg(sub);
   }
 }
 

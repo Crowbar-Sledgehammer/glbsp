@@ -89,18 +89,21 @@ typedef struct lump_s
 }
 lump_t;
 
-// this lump is a level marker
-#define LUMP_IS_LEVEL     0x0001
-#define LUMP_IS_GL_LEVEL  0x0002
+/* this lump is a level marker */
+#define LUMP_IS_LEVEL      0x0001
+#define LUMP_IS_GL_LEVEL   0x0002
 
-// this lump should be copied from the input wad
-#define LUMP_COPY_ME      0x0004
+/* this lump should be copied from the input wad */
+#define LUMP_COPY_ME       0x0004
 
-// this lump shouldn't be written to the output wad
-#define LUMP_IGNORE_ME    0x0008
+/* this lump shouldn't be written to the output wad */
+#define LUMP_IGNORE_ME     0x0008
 
-// this lump needs to be loaded
-#define LUMP_READ_ME      0x0100
+/* this lump needs to be loaded */
+#define LUMP_READ_ME       0x0100
+
+/* this level failed to build properly */
+#define LUMP_FAILED_LEVEL  0x4000
 
 
 /* ----- function prototypes --------------------- */
@@ -171,6 +174,14 @@ lump_t *CreateGLLump(const char *name);
 // with the above function).
 //
 void AppendLevelLump(lump_t *lump, void *data, int length);
+
+// mark the fact that this level failed to build.
+void MarkLevelFailed(void);
+
+// alert the user if any levels failed to build properly.  Returns the
+// number of failed levels (usually none).
+//
+int ReportFailedLevels(void);
 
 
 /* ----- conversion macros ----------------------- */
