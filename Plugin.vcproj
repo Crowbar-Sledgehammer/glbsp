@@ -31,7 +31,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/plugin.lib"/>
+				OutputFile="$(OutDir)/libglbsp.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -68,7 +68,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/plugin.lib"/>
+				OutputFile="libglbsp.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
