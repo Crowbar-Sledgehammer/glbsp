@@ -448,11 +448,12 @@ public:
   virtual ~Guix_MiscOptions();
 
   // child widgets: a set of toggle buttons
+  Fl_Button *choose_fresh;
   Fl_Button *warnings;
   Fl_Button *v1_vert;
   Fl_Button *no_reject;
   Fl_Button *pack_sides;
-  
+ 
   // routine to set the buttons based on the build-info.
   void ReadInfo();
 

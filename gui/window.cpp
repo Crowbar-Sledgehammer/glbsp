@@ -89,25 +89,25 @@ Guix_MainWin::Guix_MainWin(const char *title) :
   menu_bar = MenuCreate(0, 0, w(), 28);
   add(menu_bar);
 
-  build_mode = new Guix_BuildMode(8, 32, hw, 160);
+  build_mode = new Guix_BuildMode(8, 32, hw, 176);
   add(build_mode);
 
-  misc_opts  = new Guix_MiscOptions(8+hw+4, 32, hw, 120);
+  misc_opts  = new Guix_MiscOptions(8+hw+4, 32, hw, 136);
   add(misc_opts);
    
-  factor = new Guix_FactorBox(8+hw+4, 152, hw, 40);
+  factor = new Guix_FactorBox(8+hw+4, 168, hw, 40);
   add(factor);
 
-  files = new Guix_FileBox(8, 196, w()-8*2, 86);
+  files = new Guix_FileBox(8, 212, w()-8*2, 86);
   add(files);
 
-  builder = new Guix_BuildButton(8, 286+10, hw, 60);
+  builder = new Guix_BuildButton(8, 302+10, hw, 60);
   add(builder);
 
-  progress = new Guix_ProgressBox(8+hw+4, 286, hw, 74);
+  progress = new Guix_ProgressBox(8+hw+4, 302, hw, 74);
   add(progress);
 
-  text_box = new Guix_TextBox(0, 364, w(), h() - 364);
+  text_box = new Guix_TextBox(0, 380, w(), h() - 380);
   add(text_box);
   resizable(text_box);
 

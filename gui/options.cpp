@@ -36,8 +36,9 @@ static void build_mode_radio_CB(Fl_Widget *w, void *data)
   if (old_gwa != guix_info.gwa_mode)
   {
     guix_win->files->GWA_Changed();
-    guix_win->misc_opts->GWA_Changed();
   }
+
+  guix_win->misc_opts->GWA_Changed();
 }
 
 
@@ -236,7 +237,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   warnings->callback((Fl_Callback *) misc_opts_check_CB);
   add(warnings);
 
-  CY += 22;
+  CY += 21;
 
   v1_vert = new Fl_Check_Button(CX, CY, 22, 22, "V1 GL Nodes");
   v1_vert->down_box(FL_DOWN_BOX);
@@ -244,7 +245,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
   add(v1_vert);
 
-  CY += 22;
+  CY += 21;
 
   no_reject = new Fl_Check_Button(CX, CY, 22, 22, "Don't clobber REJECT");
   no_reject->down_box(FL_DOWN_BOX);
@@ -252,7 +253,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   no_reject->callback((Fl_Callback *) misc_opts_check_CB);
   add(no_reject);
 
-  CY += 22;
+  CY += 21;
 
   pack_sides = new Fl_Check_Button(CX, CY, 22, 22, "Pack Sidedefs");
   pack_sides->down_box(FL_DOWN_BOX);
@@ -260,7 +261,15 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   pack_sides->callback((Fl_Callback *) misc_opts_check_CB);
   add(pack_sides);
 
-  CY += 22;
+  CY += 21;
+
+  choose_fresh = new Fl_Check_Button(CX, CY, 22, 22, "Fresh Partitions Lines");
+  choose_fresh->down_box(FL_DOWN_BOX);
+  choose_fresh->align(FL_ALIGN_RIGHT);
+  choose_fresh->callback((Fl_Callback *) misc_opts_check_CB);
+  add(choose_fresh);
+
+  CY += 21;
 
   ReadInfo();
 }
@@ -277,6 +286,9 @@ Guix_MiscOptions::~Guix_MiscOptions()
 
 void Guix_MiscOptions::ReadInfo()
 {
+  choose_fresh->value(guix_info.choose_fresh ? 1 : 0);
+  choose_fresh->redraw();
+
   v1_vert->value(guix_info.v1_vert ? 1 : 0);
   v1_vert->redraw();
 
@@ -295,6 +307,7 @@ void Guix_MiscOptions::ReadInfo()
 
 void Guix_MiscOptions::WriteInfo()
 {
+  guix_info.choose_fresh = choose_fresh->value() ? TRUE : FALSE;
   guix_info.v1_vert = v1_vert->value() ? TRUE : FALSE;
   guix_info.no_reject = no_reject->value() ? TRUE : FALSE;
   guix_info.mini_warnings = warnings->value() ? TRUE : FALSE;
@@ -314,6 +327,11 @@ void Guix_MiscOptions::GWA_Changed()
     no_reject->show();
     pack_sides->show();
   }
+
+  if (guix_info.force_normal)
+    choose_fresh->hide();
+  else
+    choose_fresh->show();
 }
 
 
@@ -321,6 +339,7 @@ void Guix_MiscOptions::LockOut(boolean_g lock_it)
 {
   if (lock_it)
   {
+    choose_fresh->set_output();
     v1_vert->set_output();
     warnings->set_output();
     no_reject->set_output();
@@ -328,6 +347,7 @@ void Guix_MiscOptions::LockOut(boolean_g lock_it)
   }
   else
   {
+    choose_fresh->clear_output();
     v1_vert->clear_output();
     warnings->clear_output();
     no_reject->clear_output();

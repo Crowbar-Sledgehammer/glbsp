@@ -198,15 +198,18 @@ void GUI_PrintMsg(const char *str, ...)
   va_end(args);
 
   // handle pre-windowing text (ShowOptions and friends)
-  if (guix_win)
-  {
-    guix_win->text_box->AddMsg(buffer,
-        (strncmp(buffer, "Warning", 7) == 0) ? FL_RED : FL_BLACK);
-  }
-  else
+  if (! guix_win)
   {
     printf("%s", buffer);
     fflush(stdout);
+    return;
   }
+
+  if (strncmp(buffer, "ATTENTION", 9) == 0)
+    guix_win->text_box->AddMsg(buffer, FL_RED, TRUE);
+  else if (strncmp(buffer, "Warning", 7) == 0)
+    guix_win->text_box->AddMsg(buffer, FL_RED);
+  else
+    guix_win->text_box->AddMsg(buffer);
 }
 

@@ -124,6 +124,9 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
   if (strcasecmp(name, "v1_vert") == 0)
     return SetBooleanVar(guix_info.v1_vert, value);
 
+  if (strcasecmp(name, "choose_fresh") == 0)
+    return SetBooleanVar(guix_info.choose_fresh, value);
+
 
   // block limit
   if (strcasecmp(name, "block_limit") == 0)
@@ -477,6 +480,7 @@ static void CookieWriteBuildInfo(FILE *fp)
   fprintf(fp, "mini_warnings = %d\n", guix_info.mini_warnings ? 1 : 0); 
   fprintf(fp, "pack_sides = %d\n", guix_info.pack_sides ? 1 : 0); 
   fprintf(fp, "v1_vert = %d\n", guix_info.v1_vert ? 1 : 0); 
+  fprintf(fp, "choose_fresh = %d\n", guix_info.choose_fresh ? 1 : 0); 
 
   // block limit
   fprintf(fp, "block_limit = %d\n", guix_info.block_limit); 
