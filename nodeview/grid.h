@@ -81,9 +81,10 @@ private:
 	double mid_x;
 	double mid_y;
 
-	bool grid_MODE;
+	int grid_MODE;
 	int partition_MODE;
 	int miniseg_MODE;
+	int shade_MODE;
 
 	static const int MAX_ROUTE = 2000;
 

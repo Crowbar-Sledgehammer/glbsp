@@ -34,7 +34,7 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
         Fl_Widget(X, Y, W, H, label),
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
         mid_x(0), mid_y(0),
-		grid_MODE(true), partition_MODE(1), miniseg_MODE(2),
+		grid_MODE(1), partition_MODE(1), miniseg_MODE(2), shade_MODE(1),
 		route_len(0)
 {
 	visit_route = new char[MAX_ROUTE];
@@ -171,7 +171,7 @@ void W_Grid::draw()
 
 void W_Grid::draw_grid(int spacing)
 {
-	if (! grid_MODE)
+	if (grid_MODE == 0)
 		return;
 
 	double mlx = mid_x - w() * 0.5 / zoom_mul;
@@ -349,6 +349,12 @@ void W_Grid::draw_child(const child_t *ch, int pos, bool shade)
 
 bool W_Grid::set_seg_color(seg_c *seg, bool on)
 {
+	if (shade_MODE == 0 && !on)
+		return false;
+	
+	if (shade_MODE == 2)
+		on = true;
+
 	if (! seg->linedef)  // miniseg
 	{
 		if (miniseg_MODE < 2)
@@ -576,7 +582,7 @@ int W_Grid::handle_key(int key)
 			return 1;
 
 		case 'g': case 'G':
-			grid_MODE = ! grid_MODE;
+			grid_MODE = (grid_MODE + 1) % 2;
 			redraw();
 			return 1;
 
@@ -587,6 +593,11 @@ int W_Grid::handle_key(int key)
 
 		case 'm': case 'M':
 			miniseg_MODE = (miniseg_MODE + 2) % 3;
+			redraw();
+			return 1;
+
+		case 's': case 'S':
+			shade_MODE = (shade_MODE + 1) % 3;
 			redraw();
 			return 1;
 
