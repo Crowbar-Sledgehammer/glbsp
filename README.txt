@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted.  8th June 2001.
+by Andrew Apted.  28th June 2001.
 
 
 Introduction
@@ -22,7 +22,7 @@ and Vavoom.  See the links below.
 Status
 ------
 
-The current version of glBSP is 1.94.  It has been tested and known to
+The current version of glBSP is 1.95.  It has been tested and known to
 work on numerous large wads, including DOOM I shareware, DOOM II,
 TeamTNT's Eternal III, Fanatic's QDOOM, and many others.
 
@@ -49,8 +49,9 @@ License
 
 Thanks to Lee Killough and André Majorel (the previous and current
 maintainers of BSP, respectively), glBSP is now under the GNU General
-Public License (GPL).  See the file `COPYING' in the source package
-(or go to http://www.gnu.org) for the full text, but to summarise:
+Public License (GPL).  See the file `GLBSP.lic' in the binary package
+or `COPYING.txt' in the source package (or go to http://www.gnu.org)
+for the full text, but to summarise:
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -94,7 +95,7 @@ Look here for PrBOOM:
    http://prboom.sourceforge.net/
 
 The Vavoom site is here:
-   http://www.raven-games.com/vavoom
+   http://www.raven-games.com/hosted/vavoom
 
 
 Acknowledgements
@@ -107,8 +108,13 @@ Marc A. Pullen, for testing and helping with the documentation.
 Lee Killough and André Majorel, for giving their permission to put
 glBSP under the GNU GPL.
 
+Janis Legzdinsh for fixing many problems with Hexen wads.
+
 Jaakko Keränen, who gave some useful feedback on the "GL Friendly
 Nodes" specification.
+
+The authors of FLTK (Fast Light Tool Kit), for a nice LGPL C++ GUI
+toolkit that even I can get working on both Linux and Win32.
 
 Marc Rousseau (author of ZenNode 1.0), Robert Fenske Jr (author of
 Warm 1.6), L.M. Witek (author of Reject 1.1), and others, for
