@@ -2,7 +2,7 @@
 // SEG : Choose the best Seg to use for a node line.
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -57,7 +57,7 @@
 
 #define PRECIOUS_MULTIPLY  100
 
-#define SEG_REUSE_THRESHHOLD  64
+#define SEG_REUSE_THRESHHOLD  200
 
 
 #define DEBUG_PICKNODE  0
@@ -707,8 +707,6 @@ static boolean_g PickNodeWorker(superblock_t *part_list,
       DisplaySetBar(2, cur_file_pos + cur_build_pos / 100);
     }
 
-    DisplayTicker();
-
     /* ignore minisegs as partition candidates */
     if (! part->linedef)
       continue;
@@ -725,6 +723,8 @@ static boolean_g PickNodeWorker(superblock_t *part_list,
     /* remember which Seg */
     (*best) = part;
   }
+
+  DisplayTicker();
 
   /* recursively handle sub-blocks */
 
@@ -947,8 +947,6 @@ void SeparateSegs(superblock_t *seg_list, seg_t *part,
     intersection_t ** cut_list)
 {
   int num;
-
-  DisplayTicker();
 
   while (seg_list->segs)
   {
