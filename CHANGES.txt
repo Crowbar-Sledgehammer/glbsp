@@ -2,10 +2,10 @@
 CHANGELOG
 =========
 
-Changes in V2.05  (28th December 2003)
+Changes in V2.05  (31st December 2003)
 --------------------------------------
 
- - ported glBSP and glBSPX to MacOS X.
+ - ported glbsp and glBSPX to MacOS X.
 
  - fixed blockmap bug when building on big-endian CPUs.
 
@@ -18,7 +18,7 @@ Changes in V2.05  (28th December 2003)
 
  - added some 'near miss' names for certain command-line options.
 
- - glBSP now handles multiple input files (GWA mode).
+ - glbsp now handles multiple input files (GWA mode).
 
  - lumps are now aligned on 4-byte boundaries within the output WAD.
 
@@ -35,7 +35,7 @@ Changes in V2.05  (28th December 2003)
  - reduced the amount of global symbols, and renamed some things for
    more consistency (e.g. UtilStrCaseCmp).
 
- - glBSPX: the manual/license windows have a nicer interface.
+ - glBSPX: gave the manual/license windows a nicer interface.
 
 
 Changes in V2.00  (25th September 2002)
