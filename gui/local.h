@@ -2,7 +2,7 @@
 // LOCAL : Unix/FLTK local definitions
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -68,6 +68,9 @@
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Scrollbar.H>
 #include <FL/Fl_Slider.H>
+#ifdef MACOSX
+#include <FL/Fl_Sys_Menu_Bar.H>
+#endif
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Window.H>
@@ -126,8 +129,8 @@ void MainSetDefaults(void);
 extern const unsigned char about_image_pal[256 * 3];
 extern const unsigned char about_image_data[];
 
-#define ABOUT_IMG_W  220
-#define ABOUT_IMG_H  192
+#define ABOUT_IMG_W  190
+#define ABOUT_IMG_H  190
 
 
 //
@@ -372,6 +375,8 @@ public:
 int HelperCaseCmp(const char *A, const char *B);
 int HelperCaseCmpLen(const char *A, const char *B, int len);
 
+unsigned int HelperGetMillis();
+
 boolean_g HelperFilenameValid(const char *filename);
 boolean_g HelperHasExt(const char *filename);
 boolean_g HelperCheckExt(const char *filename, const char *ext);
@@ -406,7 +411,12 @@ extern const char *license_text[];
 #define MANUAL_WINDOW_MIN_W  500
 #define MANUAL_WINDOW_MIN_H  200
 
-Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h);
+#ifdef MACOSX
+Fl_Sys_Menu_Bar
+#else
+Fl_Menu_Bar
+#endif
+* MenuCreate(int x, int y, int w, int h);
 
 
 //
@@ -523,6 +533,9 @@ typedef struct guix_bar_s
 
   // string buffer for percentage
   char perc_buf[16];
+
+  int perc_shown;
+  // current percentage shown (avoid updating widget)
 }
 guix_bar_t;
 
@@ -625,7 +638,11 @@ public:
 
   // main child widgets
   
+#ifdef MACOSX
+  Fl_Sys_Menu_Bar *menu_bar;
+#else
   Fl_Menu_Bar *menu_bar;
+#endif
 
   Guix_BuildMode *build_mode;
   Guix_MiscOptions *misc_opts;

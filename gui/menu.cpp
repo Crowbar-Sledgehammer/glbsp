@@ -2,7 +2,7 @@
 // MENU : Unix/FLTK Menu handling
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -35,10 +35,12 @@ static void menu_do_clear_log(Fl_Widget *w, void * data)
   guix_win->text_box->ClearLog();
 }
 
+#ifndef MACOSX
 static void menu_do_exit(Fl_Widget *w, void * data)
 {
   guix_win->want_quit = TRUE;
 }
+#endif
 
 
 //------------------------------------------------------------------------
@@ -58,7 +60,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-  "By Andrew Apted (C) 2000-2002\n"
+  "By Andrew Apted (C) 2000-2003\n"
   "\n"
   "Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
   "\n"
@@ -94,8 +96,8 @@ static void menu_do_about(Fl_Widget *w, void * data)
   group->color(FL_BLACK, FL_BLACK);
   ab_win->add(group);
   
-  Fl_Box *box = new Fl_Box(0, 60, ABOUT_IMG_W+2, ABOUT_IMG_H+2);
-  about_image->label(box);
+  Fl_Box *box = new Fl_Box(20, 90, ABOUT_IMG_W+2, ABOUT_IMG_H+2);
+  box->image(about_image);
   group->add(box); 
 
 
@@ -297,8 +299,12 @@ static Fl_Menu_Item menu_items[] =
   { "&File", 0, 0, 0, FL_SUBMENU },
     { "&Preferences...",    0, FCAL menu_do_prefs },
     { "&Save Log...",       0, FCAL menu_do_save_log },
+#ifdef MACOSX
+    { "&Clear Log",         0, FCAL menu_do_clear_log },
+#else
     { "&Clear Log",         0, FCAL menu_do_clear_log, 0, FL_MENU_DIVIDER },
     { "E&xit",   FL_ALT + 'q', FCAL menu_do_exit },
+#endif
     { 0 },
 
   { "&Help", 0, 0, 0, FL_SUBMENU },
@@ -314,12 +320,19 @@ static Fl_Menu_Item menu_items[] =
 //
 // MenuCreate
 //
+#ifdef MACOSX
+Fl_Sys_Menu_Bar * MenuCreate(int x, int y, int w, int h)
+{
+  Fl_Sys_Menu_Bar *bar = new Fl_Sys_Menu_Bar(x, y, w, h);
+  bar->menu(menu_items);
+  return bar;
+}
+#else
 Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h)
 {
   Fl_Menu_Bar *bar = new Fl_Menu_Bar(x, y, w, h);
-
   bar->menu(menu_items);
- 
   return bar;
 }
+#endif
 
