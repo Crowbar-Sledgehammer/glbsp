@@ -2,6 +2,8 @@
 TODO
 ====
 
+-  rework memory allocation, to cope with buggy DJGPP malloc().
+
 -  make loading/saving progress into percentage.
 
 -  un-recursivify AddSegToSuper() and co.

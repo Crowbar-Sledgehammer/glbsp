@@ -2,7 +2,7 @@
 Using glBSP
 ===========
 
-by Andrew Apted.  23rd August 2000.
+by Andrew Apted.  8th September 2000.
 
 
 There are two main ways of using glBSP:
@@ -108,6 +108,23 @@ in a WAD without destroying non-map data.
     (The GL node entries will be rearranged, causing problems).
 
 
+Problems under DOS ?
+--------------------
+
+If you find that glBSP consistently runs out of memory and/or crashes
+at a certain point within a particular WAD, it could well be your DPMI
+settings.  This happened to me just recently, after much checking of
+the code the problem seemed inexplicable.  It turned out that CWSDPMI
+was the culprit.  The solution was to increase CWSDPMI's "internal
+heap" size using the companion CWSPARAM program, bumping it up from
+128 to 1024 (see the CWSPARAM.DOC file for the details).  If you have
+a different one (e.g. QDPMI), then check its documentation.
+
+I'll be implementing a work-around for this problem in the next
+release of glBSP (rather reluctantly I have to say, since it is not a
+bug in *my* code).
+
+
 Option Descriptions
 -------------------
 
@@ -170,7 +187,7 @@ provided to allow complete control or for special circumstances:
 
   -nonormal    Forces glBSP to not create the normal node information
                when it detects that it is absent.
-  
+ 
   -forcenormal
                glBSP will normally detect if the normal node info (i.e. 
                the non-GL variety) is present, and leave it untouched
