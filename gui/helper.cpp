@@ -2,7 +2,7 @@
 // HELPER : Unix/FLTK Little Helpers...
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -18,8 +18,13 @@
 //
 //------------------------------------------------------------------------
 
-// this includes everything we need
 #include "local.h"
+
+#ifdef WIN32
+#include <FL/x.H>
+#else
+#include <sys/time.h>
+#endif
 
 
 //
@@ -55,6 +60,27 @@ int HelperCaseCmpLen(const char *A, const char *B, int len)
     return 0;
 
   return (*A) ? 1 : (*B) ? -1 : 0;
+}
+
+
+//
+// HelperGetMillis
+//
+// Be sure to handle the result overflowing (it WILL happen !).
+//
+unsigned int HelperGetMillis()
+{
+#ifdef WIN32
+  unsigned long ticks = GetTickCount();
+
+  return (unsigned int) ticks;
+#else
+  struct timeval tm;
+
+  gettimeofday(&tm, NULL);
+
+  return (unsigned int) ((tm.tv_sec * 1000) + (tm.tv_usec / 1000));
+#endif
 }
 
 
