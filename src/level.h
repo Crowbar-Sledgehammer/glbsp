@@ -284,6 +284,10 @@ typedef struct node_s
   // node index.  Only valid once the NODES or GL_NODES lump has been
   // created.
   int index;
+
+  // the node is too long, and the (dx,dy) values should be halved
+  // when writing into the NODES lump.
+  int too_long;
 }
 node_t;
 

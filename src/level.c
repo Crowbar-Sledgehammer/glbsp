@@ -1153,6 +1153,10 @@ void PutVertices(char *name, int do_gl)
     count++;
   }
 
+  if (count >= 32768)
+    PrintWarn("Number of %svertices (%d) has OVERFLOWED the "
+        "normal limit!\n", do_gl ? "GL " : "", count);
+
   if (count != (do_gl ? num_gl_vert : num_normal_vert))
     InternalError("PutVertices miscounted (%d != %d)", count,
       do_gl ? num_gl_vert : num_normal_vert);
@@ -1187,6 +1191,10 @@ void PutV2Vertices(void)
     count++;
   }
 
+  if (count >= 32768)
+    PrintWarn("Number of GL vertices (%d) has OVERFLOWED the "
+        "normal limit!\n", count);
+
   if (count != num_gl_vert)
     InternalError("PutV2Vertices miscounted (%d != %d)", count,
       num_gl_vert);
@@ -1216,6 +1224,10 @@ void PutSectors(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
+
+  if (num_sectors >= 32768)
+    PrintWarn("Number of sectors (%d) has OVERFLOWED the "
+        "normal limit!\n", num_sectors);
 }
 
 void PutSidedefs(void)
@@ -1242,6 +1254,10 @@ void PutSidedefs(void)
  
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
+
+  if (num_sidedefs >= 32768)
+    PrintWarn("Number of sidedefs (%d) has OVERFLOWED the "
+        "normal limit!\n", num_sidedefs);
 }
 
 void PutLinedefs(void)
@@ -1268,6 +1284,10 @@ void PutLinedefs(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
+
+  if (num_linedefs >= 32768)
+    PrintWarn("Number of linedefs (%d) has OVERFLOWED the "
+        "normal limit!\n", num_linedefs);
 }
 
 void PutLinedefsHexen(void)
@@ -1297,6 +1317,10 @@ void PutLinedefsHexen(void)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
+
+  if (num_linedefs >= 32768)
+    PrintWarn("Number of linedefs (%d) has OVERFLOWED the "
+        "normal limit!\n", num_linedefs);
 }
 
 void PutSegs(void)
@@ -1337,6 +1361,10 @@ void PutSegs(void)
         seg->start->x, seg->start->y, seg->end->x, seg->end->y);
     #endif
   }
+
+  if (count >= 32768)
+    PrintWarn("Number of segs (%d) has OVERFLOWED the "
+        "normal limit!\n", count);
 
   if (count != num_complete_seg)
     InternalError("PutSegs miscounted (%d != %d)", count,
@@ -1388,6 +1416,10 @@ void PutGLSegs(void)
     #endif
   }
 
+  if (count >= 32768)
+    PrintWarn("Number of GL segs (%d) has OVERFLOWED the "
+        "normal limit!\n", count);
+
   if (count != num_complete_seg)
     InternalError("PutGLSegs miscounted (%d != %d)", count,
       num_complete_seg);
@@ -1420,6 +1452,10 @@ void PutSubsecs(char *name, int do_gl)
       sub->index, UINT16(raw.first), UINT16(raw.num));
     #endif
   }
+
+  if (num_subsecs >= 32768)
+    PrintWarn("Number of %ssubsectors (%d) has OVERFLOWED the "
+        "normal limit!\n", do_gl ? "GL " : "", num_subsecs);
 }
 
 static int node_cur_index;
@@ -1438,8 +1474,8 @@ static void PutOneNode(node_t *node, lump_t *lump)
 
   raw.x  = SINT16(node->x);
   raw.y  = SINT16(node->y);
-  raw.dx = SINT16(node->dx);
-  raw.dy = SINT16(node->dy);
+  raw.dx = SINT16(node->dx / (node->too_long ? 2 : 1));
+  raw.dy = SINT16(node->dy / (node->too_long ? 2 : 1));
 
   raw.b1.minx = SINT16(node->r.bounds.minx);
   raw.b1.miny = SINT16(node->r.bounds.miny);
@@ -1491,6 +1527,10 @@ void PutNodes(char *name, int do_gl, node_t *root)
   if (root)
     PutOneNode(root, lump);
   
+  if (node_cur_index >= 32768)
+    PrintWarn("Number of %snodes (%d) has OVERFLOWED the "
+        "normal limit!\n", do_gl ? "GL " : "", node_cur_index);
+
   if (node_cur_index != num_nodes)
     InternalError("PutNodes miscounted (%d != %d)",
       node_cur_index, num_nodes);

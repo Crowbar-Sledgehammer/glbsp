@@ -24,6 +24,8 @@
 #include "structs.h"
 #include "level.h"
 
+#define DEFAULT_BLOCK_LIMIT  44000
+
 extern int block_x, block_y;
 extern int block_w, block_h;
 

@@ -32,8 +32,18 @@
 
 #define DEBUG_ENABLED   0
 
+#define DEBUGGING_FILE  "gb_debug.txt"
+
+
+int total_big_warn;
+int total_small_warn;
+
 
 static char message_buf[1024];
+
+#if DEBUG_ENABLED
+static FILE *debug_fp = NULL;
+#endif
 
 
 //
@@ -90,6 +100,8 @@ void PrintWarn(const char *str, ...)
   va_end(args);
 
   (* cur_funcs->print_msg)("Warning: %s", message_buf);
+
+  total_big_warn++;
 }
 
 //
@@ -107,6 +119,8 @@ void PrintMiniWarn(const char *str, ...)
 
     (* cur_funcs->print_msg)("Warning: %s", message_buf);
   }
+
+  total_small_warn++;
 }
 
 
@@ -118,7 +132,12 @@ void PrintMiniWarn(const char *str, ...)
 void InitDebug(void)
 {
 #if DEBUG_ENABLED
-  //!!!!
+  debug_fp = fopen(DEBUGGING_FILE, "w");
+
+  if (! debug_fp)
+    PrintWarn("Unable to open DEBUG FILE: %s\n", DEBUGGING_FILE);
+
+  PrintDebug("=== START OF DEBUG FILE ===\n");
 #endif
 }
 
@@ -128,7 +147,13 @@ void InitDebug(void)
 void TermDebug(void)
 {
 #if DEBUG_ENABLED
-  //!!!!
+  if (debug_fp)
+  {
+    PrintDebug("=== END OF DEBUG FILE ===\n");
+
+    fclose(debug_fp);
+    debug_fp = NULL;
+  }
 #endif
 }
 
@@ -138,15 +163,16 @@ void TermDebug(void)
 void PrintDebug(const char *str, ...)
 {
 #if DEBUG_ENABLED
-  //!!! FIXME TO WRITE INTO FILE
+  if (debug_fp)
+  {
+    va_list args;
 
-  va_list args;
+    va_start(args, str);
+    vfprintf(debug_fp, str, args);
+    va_end(args);
 
-  fprintf(stderr, "Debug: ");
-
-  va_start(args, str);
-  vfprintf(stderr, str, args);
-  va_end(args);
+    fflush(debug_fp);
+  }
 #else
   (void) str;
 #endif

@@ -98,6 +98,7 @@ static void ShowHelp(void)
     "  -forcegwa        Forces the output file to be GWA style\n"
     "  -keepsect        Don't prune unused sectors\n"
     "  -noprune         Don't prune anything that is unused\n"
+    "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"
   );
 }
 

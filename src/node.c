@@ -403,13 +403,25 @@ superblock_t *CreateSegs(void)
     if (line->polyobj)
       continue;
 
+    // check for Humungously long lines
+    if (ABS(line->start->x - line->end->x) >= 10000 ||
+        ABS(line->start->y - line->end->y) >= 10000)
+    {
+      if (ComputeDist(line->start->x - line->end->x,
+          line->start->y - line->end->y) >= 30000)
+      {
+        PrintWarn("Linedef #%d is VERY long, it may cause problems\n",
+            line->index);
+      }
+    }
+    
     if (line->right)
     {
       right = CreateOneSeg(line, line->start, line->end, line->right, 0);
       AddSegToSuper(block, right);
     }
     else
-      PrintWarn("Linedef #%d has no right sidedef\n", line->index);
+      PrintWarn("Linedef #%d has no right sidedef!\n", line->index);
 
     if (line->left)
     {
@@ -739,6 +751,28 @@ int ComputeHeight(node_t *node)
 }
 
 
+#ifdef DEBUG_BUILDER
+
+static void DebugShowSegs(superblock_t *seg_list)
+{
+  seg_t *cur;
+  int num;
+
+  for (cur=seg_list->segs; cur; cur=cur->next)
+  {
+    PrintDebug("Build:   %sSEG %p  sector=%d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
+        cur->linedef ? "" : "MINI", cur, cur->sector->index,
+        cur->start->x, cur->start->y, cur->end->x, cur->end->y);
+  }
+
+  for (num=0; num < 2; num++)
+  {
+    if (seg_list->subs[num])
+      DebugShowSegs(seg_list->subs[num]);
+  }
+}
+#endif
+
 //
 // BuildNodes
 //
@@ -763,12 +797,7 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
 
   #if DEBUG_BUILDER
   PrintDebug("Build: BEGUN @ %d\n", depth);
-  for (cur=seg_list; cur; cur=cur->next)
-  {
-    PrintDebug("Build:   %sSEG %p  sector=%d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
-        cur->linedef ? "" : "MINI", cur, cur->sector->index,
-        cur->start->x, cur->start->y, cur->end->x, cur->end->y);
-  }
+  DebugShowSegs(seg_list);
   #endif
 
   // pick best node to use.  None indicates convexicity.
@@ -788,8 +817,8 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   }
 
   #if DEBUG_BUILDER
-  PrintDebug("Build: PARTITION (%1.0f,%1.0f) -> (%1.0f,%1.0f)\n",
-      best->start->x, best->start->y, best->end->x, best->end->y);
+  PrintDebug("Build: PARTITION %p (%1.0f,%1.0f) -> (%1.0f,%1.0f)\n",
+      best, best->start->x, best->start->y, best->end->x, best->end->y);
   #endif
 
   // create left and right super blocks
@@ -823,6 +852,19 @@ glbsp_ret_e BuildNodes(superblock_t *seg_list,
   node->y  = (int)best->psy;
   node->dx = (int)best->pdx;
   node->dy = (int)best->pdy;
+
+  // check for really long partition (overflows dx,dy in NODES)
+  if (best->p_length >= 30000)
+  {
+    if (node->dx && node->dy && ((node->dx & 1) || (node->dy & 1)))
+    {
+      PrintMiniWarn("Loss of accuracy on VERY long node: "
+          "(%d,%d) -> (%d,%d)\n", node->x, node->y, 
+          node->x + node->dx, node->y + node->dy);
+    }
+
+    node->too_long = 1;
+  }
 
   // find limits of vertices
   FindLimits(lefts,  &node->l.bounds);

@@ -22,7 +22,7 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "1.92"
+#define GLBSP_VER  "1.93"
 
 
 // certain GCC attributes can be useful
@@ -79,6 +79,8 @@ typedef struct nodebuildinfo_s
   boolean_g gwa_mode;  
   boolean_g keep_sect;
   boolean_g no_prune;
+
+  int block_limit;
 }
 nodebuildinfo_t;
 

@@ -55,8 +55,6 @@
 #include "wad.h"
 
 
-///---  int factor = 7;
-
 #define PRECIOUS_MULTIPLY  64
 
 

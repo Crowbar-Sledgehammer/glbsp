@@ -68,7 +68,9 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // force_normal
   FALSE,   // gwa_mode
   FALSE,   // keep_sect
-  FALSE    // no_prune
+  FALSE,   // no_prune
+
+  DEFAULT_BLOCK_LIMIT   // block_limit
 };
 
 const nodebuildcomms_t default_buildcomms =
@@ -146,6 +148,20 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       }
 
       info->factor = (int) strtol(argv[1], NULL, 10);
+
+      argv += 2; argc -= 2;
+      continue;
+    }
+
+    if (StrCaseCmp(opt_str, "maxblock") == 0)
+    {
+      if (argc < 2)
+      {
+        comms->message = "Missing maxblock value";
+        return GLBSP_E_BadArgs;
+      }
+
+      info->block_limit = (int) strtol(argv[1], NULL, 10);
 
       argv += 2; argc -= 2;
       continue;
@@ -238,6 +254,13 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     retval = GLBSP_E_BadArgs;
   }
 
+  if (info->block_limit < 1000 || info->block_limit > 64000)
+  {
+    info->block_limit = DEFAULT_BLOCK_LIMIT;
+    comms->message = "Bad blocklimit value !";
+    retval = GLBSP_E_BadArgs;
+  }
+
   return retval;
 }
 
@@ -306,6 +329,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   cur_funcs = funcs;
   cur_comms = comms;
 
+  total_big_warn = total_small_warn = 0;
+
   // sanity check
   if (!cur_info->input_file || !cur_info->output_file)
   {
@@ -366,6 +391,9 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
 
   // close wads and free memory
   CloseWads();
+
+  PrintMsg("\nTotal serious warnings: %d\n", total_big_warn);
+  PrintMsg("Total minor warnings: %d\n", total_small_warn);
 
   TermDebug();
 

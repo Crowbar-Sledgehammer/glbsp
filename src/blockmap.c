@@ -370,10 +370,11 @@ static void CompressBlockmap(void)
   }
 
   if (cur_offset > 65535)
-    PrintWarn("Blockmap is VERY LARGE, it may cause problems\n");
+    PrintWarn("Blockmap has OVERFLOWED!  May cause problems "
+        "or even crash\n");
 
   #if DEBUG_BLOCKMAP
-  PrintMsg("Blockmap: Last ptr = %d  duplicates = %d\n", 
+  PrintDebug("Blockmap: Last ptr = %d  duplicates = %d\n", 
       cur_offset, dup_count);
   #endif
 
@@ -491,6 +492,30 @@ static void FindBlockmapLimits(bbox_t *bbox)
 }
 
 //
+// TruncateBlockmap
+//
+static void TruncateBlockmap(void)
+{
+  int orig_w = block_w;
+  int orig_h = block_h;
+
+  while (block_w * block_h > cur_info->block_limit)
+  {
+    block_w -= block_w / 8;
+    block_h -= block_h / 8;
+  }
+
+  block_count = block_w * block_h;
+
+  PrintWarn("Blockmap too large!  Truncated to %dx%d blocks\n",
+      block_w, block_h);
+
+  // center the truncated blockmap
+  block_x += (block_w - orig_w) * 128 / 2;
+  block_y += (block_h - orig_h) * 128 / 2;
+}
+
+//
 // InitBlockmap
 //
 void InitBlockmap(void)
@@ -510,36 +535,6 @@ void InitBlockmap(void)
   block_h = ((map_bbox.maxy - block_y) / 128) + 1;
   block_count = block_w * block_h;
 
-  // truncate blockmap if too large.  I really doubt that this will
-  // occur in practice, but just in case...
- 
-  if (block_count > 65535)
-  {
-    int orig_w = block_w;
-    int orig_h = block_h;
-
-    if (block_w > 256 && block_h > 256)
-    {
-      block_w = block_h = 256;
-    }
-    else
-    {
-      while (block_w * block_h > 65535)
-      {
-        block_w -= block_w / 8;
-        block_h -= block_h / 8;
-      }
-    }
-
-    block_count = block_w * block_h;
-
-    PrintWarn("Blockmap too large: truncated to %dx%d blocks\n",
-        block_w, block_h);
-
-    // center the truncated blockmap
-    block_x += (block_w - orig_w) * 128 / 2;
-    block_y += (block_h - orig_h) * 128 / 2;
-  }
 }
 
 //
@@ -547,6 +542,13 @@ void InitBlockmap(void)
 //
 void PutBlockmap(void)
 {
+  // truncate blockmap if too large.  We're limiting the number of
+  // blocks to around 44000 (user changeable), this leaves about 20K
+  // of shorts for the actual line lists.
+ 
+  if (block_count > cur_info->block_limit)
+    TruncateBlockmap();
+
   // initial phase: create internal blockmap containing the index of
   // all lines in each block.
   

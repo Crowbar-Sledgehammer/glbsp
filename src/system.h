@@ -45,6 +45,9 @@ extern volatile nodebuildcomms_t *cur_comms;
 extern int cur_build_pos;
 extern int cur_file_pos;
 
+extern int total_big_warn;
+extern int total_small_warn;
+
 
 /* ----- function prototypes ---------------------------- */
 
