@@ -881,7 +881,7 @@ char *ReplaceExtension(const char *filename, const char *ext)
   
   strcat(buffer, ext);
 
-  return strdup(buffer);
+  return SysStrdup(buffer);
 }
 
 
