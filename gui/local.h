@@ -1,0 +1,526 @@
+//------------------------------------------------------------------------
+// LOCAL : Unix/FLTK local definitions
+//------------------------------------------------------------------------
+//
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//
+//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 2
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//------------------------------------------------------------------------
+
+#ifndef __GLBSP_LOCAL_H__
+#define __GLBSP_LOCAL_H__
+
+
+// consistency check
+#ifndef GLBSP_GUI
+#error GLBSP_GUI should be defined when compiling this file
+#endif
+
+
+//
+//  INCLUDES
+//
+
+#include "../glbsp.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <math.h>
+#include <limits.h>
+#include <assert.h>
+
+#include <FL/Fl.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Counter.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Hold_Browser.H>
+#include <FL/Fl_Image.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Pack.H>
+#include <FL/Fl_Pixmap.H>
+#include <FL/Fl_Return_Button.H>
+#include <FL/Fl_Round_Button.H>
+#include <FL/Fl_Scrollbar.H>
+#include <FL/Fl_Slider.H>
+#include <FL/Fl_Value_Input.H>
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Window.H>
+
+#include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
+#include <FL/fl_file_chooser.H>
+
+
+//
+//  MAIN
+//
+
+typedef struct guix_preferences_s
+{
+  // main window position & size
+  int win_x, win_y;
+  int win_w, win_h;
+  
+  // positions & sizes of other windows
+  int progress_x, progress_y;
+
+  int dialog_x, dialog_y;
+
+  int manual_x, manual_y;
+  int manual_w, manual_h;
+  
+  // warn about overwriting files
+  boolean_g overwrite_warn;
+
+  // warn about input file == output file
+  boolean_g same_file_warn;
+}
+guix_preferences_t;
+
+extern guix_preferences_t guix_prefs;
+
+extern nodebuildinfo_t guix_info;
+extern volatile nodebuildcomms_t guix_comms;
+extern const nodebuildfuncs_t guix_funcs;
+
+
+//
+//  ABOUT
+//
+
+extern const unsigned char about_image_pal[256 * 3];
+extern const unsigned char about_image_data[];
+
+#define ABOUT_IMG_W  220
+#define ABOUT_IMG_H  192
+
+
+//
+//  BOOK
+//
+
+typedef struct book_page_s
+{
+  // array of lines, ends with NULL.
+  // Link lines start with `#L' and two decimal digits.
+  const char ** text;
+}
+book_page_t;
+
+class Guix_Book : public Fl_Window
+{
+public:
+  Guix_Book();
+  virtual ~Guix_Book();
+
+  // override resize method, maybe reformat text
+  virtual FL_EXPORT void resize(int,int,int,int);
+  
+  // child widgets
+  Fl_Group *group;
+    
+  Fl_Button *quit;
+  Fl_Button *contents;
+  Fl_Button *next;
+  Fl_Button *prev;
+  
+  Fl_Hold_Browser *browser;
+
+  int cur_page;
+
+  boolean_g want_quit;
+
+  // total number of pages ?
+  int PageCount();
+
+  // load a new page into the browser.  Updates `page_num'.  This
+  // routine should be called shortly after construction, to display
+  // the initial page.  Zero will get the contents page.  Invalid
+  // page numbers will be safely ignored.
+  //
+  void LoadPage(int new_num);
+
+  // handle various internal "to do" items.  (Because modifying
+  // widgets directly from within their callbacks seems like risky
+  // business to me).  Should be called in the Fl::wait() loop.
+  //
+  void UpdateState();
+    
+  // take the appropriate action for the given line number.
+  void FollowLink(int line);
+
+protected:
+
+  // page to change to, otherwise -2
+  int want_page;
+
+  boolean_g want_reformat;
+
+  // initial window position and size
+  int init_x, init_y;
+  int init_w, init_h;
+};
+
+extern const book_page_t book_pages[];
+extern Guix_Book * guix_book_win;
+
+
+//
+//  COOKIE
+//
+
+typedef enum
+{
+  COOKIE_E_OK = 0,
+  COOKIE_E_NO_FILE = 1,
+  COOKIE_E_PARSE_ERRORS = 2,
+  COOKIE_E_CHECK_ERRORS = 3
+}
+cookie_status_t;
+
+cookie_status_t CookieReadAll(void);
+cookie_status_t CookieWriteAll(void);
+
+
+//
+//  DIALOG
+//
+
+void DialogLoadImages(void);
+void DialogFreeImages(void);
+
+int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic, 
+    const char *message, const char *right = "OK", 
+    const char *middle = NULL, const char *left = NULL);
+
+void GUI_FatalError(const char *str, ...);
+
+
+//
+//  FILES
+//
+
+class Guix_FileBox : public Fl_Group
+{
+public:
+  Guix_FileBox(int x, int y, int w, int h);
+  virtual ~Guix_FileBox();
+
+  // child widgets in File area
+  Fl_Box *in_label;
+  Fl_Box *out_label;
+
+  Fl_Input *in_file;
+  Fl_Input *out_file;
+  Fl_Output *out_gwa_file;
+ 
+  Fl_Button *in_browse;
+  Fl_Button *out_browse;
+
+  // filename to produce when in GWA mode.
+  const char *gwa_filename;
+  
+  // group for file boxes, to handle resizing properly.
+  Fl_Group *file_group;
+  
+  // routine to set the input widgets based on the build-info.
+  void ReadInfo();
+
+  // routine to change the build-info to match the widgets.
+  void WriteInfo();
+
+  // routine to call when GWA mode changes state.
+  void GWA_Changed();
+
+  // routine to call when the in_file changes.  It should compute
+  // a new value for `gwa_filename', and update the out_gwa_file
+  // widget.
+  //
+  void InFileChanged();
+};
+
+class Guix_FactorBox : public Fl_Group
+{
+public:
+  Guix_FactorBox(int x, int y, int w, int h);
+  virtual ~Guix_FactorBox();
+
+  // child widget
+  Fl_Counter *factor;
+
+  // routine to set the input widget based on the build-info.
+  void ReadInfo();
+
+  // routine to change the build-info to match the input.
+  void WriteInfo();
+};
+
+class Guix_BuildButton : public Fl_Group
+{
+public:
+  Guix_BuildButton(int x, int y, int w, int h);
+  virtual ~Guix_BuildButton();
+
+  // child widget
+  Fl_Button *button;
+};
+
+
+//
+//  HELPER
+//
+
+int HelperCaseCmp(const char *A, const char *B);
+
+boolean_g HelperHasExt(const char *filename);
+boolean_g HelperCheckExt(const char *filename, const char *ext);
+char *HelperReplaceExt(const char *filename, const char *ext);
+char *HelperGuessOutput(const char *filename);
+boolean_g HelperFileExists(const char *filename);
+
+
+//
+//  IMAGES
+//
+
+extern const char * pldie_image_data[];
+extern const char * skull_image_data[];
+
+extern Fl_Image * about_image;
+extern Fl_Pixmap * pldie_image;
+extern Fl_Pixmap * skull_image;
+
+
+//
+//  LICENSE
+//
+
+extern const char *license_text[];
+
+
+//
+//  MENU
+//
+
+#define MANUAL_WINDOW_MIN_W  500
+#define MANUAL_WINDOW_MIN_H  160
+
+Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h);
+
+
+//
+//  OPTIONS
+//
+
+class Guix_BuildMode : public Fl_Group
+{
+public:
+  Guix_BuildMode(int x, int y, int w, int h);
+  virtual ~Guix_BuildMode();
+
+  // child widgets: a set of radio buttons
+  Fl_Check_Button *gwa;
+  Fl_Check_Button *maybe_normal;
+  Fl_Check_Button *both;
+  Fl_Check_Button *gl_only;
+  Fl_Check_Button *normal_only;
+
+  // this routine sets one of the radio buttons on, based on the given
+  // build-information.
+  //
+  void ReadInfo();
+
+  // this routine does the reverse, setting the `gwa_mode', `no_gl',
+  // `no_normal' and `force_normal' fields based on which radio button
+  // is currently active.
+  //
+  void WriteInfo();
+};
+
+class Guix_MiscOptions : public Fl_Group
+{
+public:
+  Guix_MiscOptions(int x, int y, int w, int h);
+  virtual ~Guix_MiscOptions();
+
+  // child widgets: a set of toggle buttons
+  Fl_Round_Button *v1_vert;
+  Fl_Round_Button *no_reject;
+  Fl_Round_Button *warnings;
+  Fl_Round_Button *pack_sides;
+  
+  // routine to set the buttons based on the build-info.
+  void ReadInfo();
+
+  // routine to change the build-info to match the buttons.
+  void WriteInfo();
+};
+
+
+//
+//  PROGRESS
+//
+
+typedef struct guix_bar_s
+{
+  // widgets
+  Fl_Box *label;
+  Fl_Slider *slide;
+  Fl_Box *perc;
+
+  // current string for label
+  const char *lab_str;
+
+  // string buffer for percentage
+  char perc_buf[20];
+}
+guix_bar_t;
+
+class Guix_Progress : public Fl_Window
+{
+public:
+  Guix_Progress(int num_bars);
+  virtual ~Guix_Progress();
+
+  // child widgets
+  guix_bar_t bars[2];
+
+  Fl_Button *cancel;
+
+  // current number of bars
+  int curr_bars;
+
+  // current message strings
+  const char *title_str;
+
+protected:
+
+  // initial window position
+  int init_x, init_y;
+};
+
+void GUI_Ticker(void);
+
+boolean_g GUI_DisplayOpen(displaytype_e type);
+void GUI_DisplaySetTitle(const char *str);
+void GUI_DisplaySetBar(int barnum, int count);
+void GUI_DisplaySetBarLimit(int barnum, int limit);
+void GUI_DisplaySetBarText(int barnum, const char *str);
+void GUI_DisplayClose(void);
+
+
+//
+//  TEXTBOX
+//
+
+class Guix_TextBox : public Fl_Browser
+{
+public:
+  Guix_TextBox(int x, int y, int w, int h);
+  virtual ~Guix_TextBox();
+
+  // adds the message to the text box.  The message may contain
+  // newlines ('\n').
+  //
+  void AddMsg(const char *msg, Fl_Color col = FL_BLACK, 
+      boolean_g bold = FALSE);
+ 
+  // add a horizontal dividing bar
+  void AddHorizBar();
+  
+  // routine to clear the text box
+  void ClearLog();
+
+  // routine to save the log to a file.  Returns TRUE if successful or
+  // FALSE if an error occurred.
+  //
+  boolean_g SaveLog(const char *filename);
+};
+
+void GUI_PrintMsg(const char *str, ...);
+
+
+//
+//  WINDOW
+//
+
+#define MAIN_WINDOW_MIN_W  540
+#define MAIN_WINDOW_MIN_H  440
+
+class Guix_MainWin : public Fl_Window
+{
+public:
+  Guix_MainWin(const char *title);
+  virtual ~Guix_MainWin();
+
+  // main child widgets
+  
+  Fl_Menu_Bar *menu_bar;
+
+  Guix_BuildMode *build_mode;
+  Guix_MiscOptions *misc_opts;
+
+  Guix_FileBox *files;
+  
+  Guix_FactorBox *factor;
+  Guix_BuildButton *builder;
+  
+  Guix_TextBox *text_box;
+
+  // user closed the window
+  boolean_g want_quit;
+  
+  // routine to capture the current main window state into the
+  // guix_preferences_t structure.
+  // 
+  void WritePrefs();
+
+  // this routine is useful if the nodebuildinfo has changed.  It
+  // causes all the widgets to update themselves using the new
+  // parameters.
+  // 
+  void ReadAllInfo();
+  
+  // routine to capture all of the nodebuildinfo state from the
+  // various widgets.  Note: don't need to call this before
+  // destructing everything -- the widget destructors will do it
+  // automatically.
+  // 
+  void WriteAllInfo();
+
+protected:
+  
+  // initial window size, read after the window manager has had a
+  // chance to move the window somewhere else.  If the window is still
+  // there when CaptureState() is called, we don't need to update the
+  // coords in the cookie file.
+  // 
+  int init_x, init_y, init_w, init_h;
+};
+
+extern Guix_MainWin * guix_win;
+
+void WindowSmallDelay(void);
+
+
+#endif /* __GLBSP_LOCAL_H__ */
