@@ -21,13 +21,6 @@
 // this includes everything we need
 #include "local.h"
 
-// (well almost)
-#ifdef WIN32
-#include <winbase.h>
-#else
-#include <unistd.h>
-#endif
-
 
 //
 // HelperCaseCmp

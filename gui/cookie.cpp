@@ -367,7 +367,7 @@ void CookieSetPath(const char *argv0)
 
   if (HelperFilenameValid(argv0))
   {
-    strcpy(buffer, HelperReplaceExt(argv[0], "ini");
+    strcpy(buffer, HelperReplaceExt(argv0, "ini"));
   }
   else
     strcpy(buffer, "glbspX.ini");
