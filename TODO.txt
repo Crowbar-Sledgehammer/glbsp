@@ -2,29 +2,19 @@
 TODO
 ====
 
-**  WIN32 + FLTK: have a proper makefile.
-
 -  Rework INSTALL.txt
 
-DONE: tidy up global namespace, IN PARTICULAR: 'nodes', 'sectors'
-
-DONE:  MacOSX: de-FINK-itise glBSPX.
-
-DONE:  Split level.c into two files.
-
-TOO COMPLEX: -modify option: directly modifies the input wad.
++  Retest installation on MacOS X and Win32.
 
 
 LATER / IDEAS
 =============
 
--  Detect overlapping linedefs (used to make higher mid-maskers).
-
 +  Put Changelog on GLBSP page.
 
--  MacOSX: Project builder setup for glBSPX.
+-  Detect and handle overlapping linedefs (used to make higher mid-maskers).
 
-?  -shrink option: finds duplicated LUMPS and merges them (for GFX).
+-  MacOSX: Project builder setup for glBSPX.
 
 ?  .GOR files (Glbsp ORganisation).  Applies parameters to WAD file
    with the same base name.
