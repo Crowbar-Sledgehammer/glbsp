@@ -1288,10 +1288,16 @@ glbsp_ret_e WriteWadFile(const char *filename)
 void CloseWads(void)
 {
   if (in_file)
+  {
     fclose(in_file);
+    in_file = NULL;
+  }
   
   if (out_file)
+  {
     fclose(out_file);
+    out_file = NULL;
+  }
   
   // free directory entries
   while (wad.dir_head)

@@ -418,7 +418,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     CloseWads();
     TermDebug();
 
-    SetMessage("No levels found in wad!");
+    SetMessage("No levels found in wad !");
     return GLBSP_E_Unknown;
   }
    
