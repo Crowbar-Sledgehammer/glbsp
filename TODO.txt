@@ -2,7 +2,9 @@
 TODO
 ====
 
-*  Implement a Unix/GTK+ version.
++  write plugin/makefile.bcc and plugin/makefile.dj.
+
+*  implement a Unix/GTK+ version.
 
 +  write debugging code in system.c.
 
