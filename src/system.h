@@ -2,7 +2,7 @@
 // SYSTEM : Bridging code
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -57,8 +57,12 @@ void InternalError(const char *str, ...);
 
 // display normal messages & warnings to the screen
 void PrintMsg(const char *str, ...);
+void PrintVerbose(const char *str, ...);
 void PrintWarn(const char *str, ...);
 void PrintMiniWarn(const char *str, ...);
+
+// set message for certain errors
+void SetErrorMsg(const char *str);
 
 // endian handling
 void InitEndian(void);

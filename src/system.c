@@ -2,7 +2,7 @@
 // SYSTEM : System specific code
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -98,6 +98,27 @@ void PrintMsg(const char *str, ...)
 }
 
 //
+// PrintVerbose
+//
+void PrintVerbose(const char *str, ...)
+{
+  va_list args;
+
+  if (! cur_info->quiet)
+  {
+    va_start(args, str);
+    vsprintf(message_buf, str, args);
+    va_end(args);
+
+    (* cur_funcs->print_msg)("%s", message_buf);
+  }
+
+#if DEBUG_ENABLED
+  PrintDebug(">>> %s", message_buf);
+#endif
+}
+
+//
 // PrintWarn
 //
 void PrintWarn(const char *str, ...)
@@ -142,6 +163,16 @@ void PrintMiniWarn(const char *str, ...)
 
   PrintDebug("MiniWarn: %s", message_buf);
 #endif
+}
+
+//
+// SetErrorMsg
+//
+void SetErrorMsg(const char *str)
+{
+  GlbspFree(cur_comms->message);
+
+  cur_comms->message = GlbspStrDup(str);
 }
 
 
