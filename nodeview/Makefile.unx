@@ -12,7 +12,7 @@ FLTK_LIBS=-lfltk_images -lfltk -lX11 -lXext -lpng -ljpeg
 
 CC=gcc
 CXX=g++
-CFLAGS=-O -g -Wall -DUNIX $(FLTK_CFLAGS)
+CFLAGS=-O -g3 -Wall -DUNIX $(FLTK_CFLAGS)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS=-L/usr/X11R6/lib
 LIBS=-lm $(FLTK_LIBS)
