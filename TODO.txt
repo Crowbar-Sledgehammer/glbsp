@@ -2,12 +2,10 @@
 TODO
 ====
 
-+  finish off FLTK version:
++  glBSPX: Create common dialog code for (a) invalid filename, 
+           (b) no ext, (c) file already exists, ETC ETC.
 
-   +  Fix modal windows not having close buttons in Win32.
++  glBSPX: Fix modal windows not having close buttons in Win32.
 
-   N  Finish Manual.
-   N  Implement SaveLog menu.
-   N  Copy/paste from output box.
-   N  Implement better file chooser.
- 
++  Put CHANGES.txt on website.
+
