@@ -2,8 +2,6 @@
 TODO
 ====
 
-+  pull makefiles / project files into top-level directory.
-
 
 LATER / IDEAS
 =============
