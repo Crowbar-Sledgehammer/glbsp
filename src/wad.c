@@ -1389,10 +1389,10 @@ void MarkV3Switch(int v3)
 //
 void ReportOneOverflow(const lump_t *lump, int limit, boolean_g hard)
 {
-  PrintMsg("%-6s : ", lump->name);
-
   const char *msg = hard ? "overflowed the absolute limit" :
     "overflowed the original limit";
+
+  PrintMsg("%-6s : ", lump->name);
 
   switch (limit)
   {
@@ -1423,6 +1423,8 @@ void ReportOneOverflow(const lump_t *lump, int limit, boolean_g hard)
 //
 void ReportOverflows(boolean_g hard)
 {
+  lump_t *cur;
+
   if (hard)
   {
     PrintMsg(
@@ -1437,8 +1439,6 @@ void ReportOverflows(boolean_g hard)
       "modern Doom port, but may fail (or even crash) in older ports.\n\n"
     );
   }
-
-  lump_t *cur;
 
   for (cur=wad.dir_head; cur; cur=cur->next)
   {
@@ -1467,12 +1467,12 @@ void ReportOverflows(boolean_g hard)
 //
 void ReportV3Switches(void)
 {
+  lump_t *cur;
+
   PrintMsg(
     "V3 FORMAT UPGRADES.  The following levels require a Doom port\n"
     "which supports V3 GL-Nodes, otherwise they will fail (or crash).\n\n"
   );
-
-  lump_t *cur;
 
   for (cur=wad.dir_head; cur; cur=cur->next)
   {
@@ -1484,14 +1484,12 @@ void ReportV3Switches(void)
     if (lev->v3_switch == 0)
       continue;
 
-    int v3 = lev->v3_switch;
-
-    if (v3 & LIMIT_VERTEXES)
+    if (lev->v3_switch & LIMIT_VERTEXES)
     {
       PrintMsg("%-6s : Number of vertices overflowed the limit.\n", cur->name);
     }
 
-    if (v3 & LIMIT_GL_SSECT)
+    if (lev->v3_switch & LIMIT_GL_SSECT)
     {
       PrintMsg("%-6s : Number of GL segs overflowed the limit.\n", cur->name);
     }

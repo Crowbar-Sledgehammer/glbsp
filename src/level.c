@@ -1032,11 +1032,11 @@ void PutV3Segs(void)
     raw_v3_seg_t raw;
     seg_t *seg = segs[i];
 
+    int flags = (seg->side == 1) ? V3SEG_F_LEFT : 0;
+
     // ignore degenerate segs
     if (seg->degenerate)
       continue;
-
-    int flags = (seg->side == 1) ? V3SEG_F_LEFT : 0;
 
     raw.start = UINT32(seg->start->index);
     raw.end   = UINT32(seg->end->index);

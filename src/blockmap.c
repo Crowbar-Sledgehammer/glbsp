@@ -479,11 +479,11 @@ static void FindBlockmapLimits(bbox_t *bbox)
 {
   int i;
 
-  bbox->minx = bbox->miny = SHRT_MAX;
-  bbox->maxx = bbox->maxy = SHRT_MIN;
-
   int mid_x = 0;
   int mid_y = 0;
+
+  bbox->minx = bbox->miny = SHRT_MAX;
+  bbox->maxx = bbox->maxy = SHRT_MIN;
 
   for (i=0; i < num_linedefs; i++)
   {
