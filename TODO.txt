@@ -2,17 +2,23 @@
 TODO
 ====
 
+*  BUG: crash with jHexen 1.7.14/15, MAP10. 
+
+   --> Remove the dummy detection and ignore code.
+
+-  Remove/modify the 'Based on BSP' messages.
+
 *  Unix/Linux: have 'make install' targets.
 
 +  Put Changelog on GLBSP page.
-
--  Remove/modify the 'Based on BSP' messages.
 
 -  MacOSX: Project builder setup for glBSPX.
 
 
 LATER / IDEAS
 =============
+
+-  Convert docs to a man page.
 
 -  Autoconf / Automake.
 
