@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted.  17th April 2004.
+by Andrew Apted.  4th July 2004.
 
 
 Introduction
@@ -30,9 +30,9 @@ Fanatic's QDOOM, and many others.
 Copyright
 ---------
 
-glBSP is Copyright (C) 2000-2004 Andrew Apted.  It is based on
-"BSP 2.3" (C) Colin Reed and Lee Killough, which was created from
-the basic theory stated in DEU5 (OBJECTS.C) by Raphael Quinet.
+glBSP is Copyright (C) 2000-2004 Andrew Apted.  It was originally
+based on "BSP 2.3" (C) Colin Reed and Lee Killough, which was created
+from the basic theory stated in DEU5 (OBJECTS.C) by Raphael Quinet.
 
 The GUI version (glBSPX) is based in part on the work of the FLTK
 project, see http://www.fltk.org.
@@ -109,7 +109,7 @@ releasing the source code to their WAD utilities, and giving me lots
 of ideas to "borrow" :), like blockmap packing.
 
 Colin Reed and Lee Killough (and others), who wrote the original BSP
-2.3 which glBSP is based on.
+2.3 which glBSP was based on.
 
 Matt Fell, for the Doom Specs v1.666.
 
