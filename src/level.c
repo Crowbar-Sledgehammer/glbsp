@@ -55,7 +55,7 @@ static int doing_gl;
 
 
 #define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
-    TYPE ** BASEVAR = NULL;  \
+    static TYPE ** BASEVAR = NULL;  \
     int NUMVAR = 0;
 
 
