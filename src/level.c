@@ -445,6 +445,17 @@ void GetSidedefs(void)
   }
 }
 
+static sidedef_t *SafeLookupSidedef(uint16_g num)
+{
+  if (num == 0xFFFF)
+    return NULL;
+
+  if ((int)num >= num_sidedefs && (sint16_g)(num) < 0)
+    return NULL;
+
+  return LookupSidedef(num);
+}
+
 //
 // GetLinedefs
 //
@@ -495,11 +506,8 @@ void GetLinedefs(void)
     line->is_precious = (line->tag >= 900 && line->tag < 1000) ? 
         TRUE : FALSE;
 
-    line->right = (SINT16(raw->sidedef1) < 0) ? NULL :
-        LookupSidedef(SINT16(raw->sidedef1));
-
-    line->left  = (SINT16(raw->sidedef2) < 0) ? NULL :
-        LookupSidedef(SINT16(raw->sidedef2));
+    line->right = SafeLookupSidedef(UINT16(raw->sidedef1));
+    line->left  = SafeLookupSidedef(UINT16(raw->sidedef2));
 
     if (line->right)
     {
@@ -570,11 +578,8 @@ void GetLinedefsHexen(void)
     // -JL- Added missing twosided flag handling that caused a broken reject
     line->two_sided = (line->flags & LINEFLAG_TWO_SIDED) ? TRUE : FALSE;
 
-    line->right = (SINT16(raw->sidedef1) < 0) ? NULL :
-        LookupSidedef(SINT16(raw->sidedef1));
-
-    line->left  = (SINT16(raw->sidedef2) < 0) ? NULL :
-        LookupSidedef(SINT16(raw->sidedef2));
+    line->right = SafeLookupSidedef(UINT16(raw->sidedef1));
+    line->left  = SafeLookupSidedef(UINT16(raw->sidedef2));
 
     // -JL- Added missing sidedef handling that caused all sidedefs to be
     //      pruned.
@@ -1224,9 +1229,6 @@ void LoadLevel(void)
     // -JL- Find sectors containing polyobjs
     DetectPolyobjSectors();
   }
-
-  if (!cur_info->keep_dummy && num_sectors > 10)
-    DetectDummySectors();
 
   DetectOverlappingLines();
 }
