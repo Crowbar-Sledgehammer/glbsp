@@ -56,8 +56,8 @@ private:
 	void draw_grid(int spacing);
 	void draw_partition(const node_c *nd, int ity);
 	void draw_all_partitions();
-	void draw_node(const node_c *nd, int pos, bool shade);
-	void draw_child(const child_t *ch, int pos, bool shade);
+	void draw_node(const node_c *nd, int pos, bool on_route);
+	void draw_child(const child_t *ch, int pos, bool on_route);
 
 	bool set_seg_color(seg_c *seg, bool on);
 	void draw_line(double x1, double y1, double x2, double y2);
@@ -97,7 +97,7 @@ private:
 	bool descend_by_mouse(int wx, int wy);  // true if OK
 	bool descend_tree(char side);  // true if OK
 
-	node_c *W_Grid::lowest_node();
+	void lowest_node(node_c **nd, subsec_c **sub);
 
 	static inline int GRID_FIND(double x, double y)
 	{
