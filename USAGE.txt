@@ -2,7 +2,7 @@
 Using glBSP
 ===========
 
-by Andrew Apted.  8th September 2000.
+by Andrew Apted.  28th April 2001.
 
 
 There are two main ways of using glBSP:
@@ -206,6 +206,27 @@ provided to allow complete control or for special circumstances:
                when normal nodes are being built (i.e. it is
                automatically disabled when in GWA mode).
  
+  -maxblock <num> 
+               Sets the limit of the number of blocks the BLOCKMAP may
+               contain before we truncate it.  Default is 44000.  When
+               the level is too large to fit, glBSP will truncate the
+               blockmap, so it covers less area on the level.  This
+               means that in the parts it doesn't cover (at the outer
+               edges) there is no collision detection: you can walk
+               through walls and other objects and bullets/missiles
+               don't hit anything.  On very large but sparse levels,
+               using a larger value (e.g. 60000) may help.
+
+               A more serious problem is when the blockmap overflows
+               (glBSP will show a message about this).  The blockmap
+               created is invalid, and could crash the DOOM engine
+               when used.  Setting a lower limit (e.g. 20000 or less)
+               may help prevent crashes -- at the expense of the
+               no-collision problem popping up.  Some DOOM engines
+               (e.g. BOOM and MBF) have a "-blockmap" option that
+               generates their own blockmap internally, fixing these
+               problems.
+
 
 How glBSP works and stuff
 -------------------------

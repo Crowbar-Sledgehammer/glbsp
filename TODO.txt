@@ -2,11 +2,7 @@
 TODO
 ====
 
-*  implement a Unix/GTK+ version.
-
 +  improve file errors in wad.c, return GLBSP_E_{Read,Write}Error.
 
--  write debugging code in system.c.
-
--  detect overflow of wad lumps (esp. GL_SEGS) and show a message.
+-  implement a Unix/GTK+ version.
 
