@@ -2,7 +2,7 @@
 // PROGRESS : Unix/FLTK Progress display
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -26,6 +26,9 @@
 #ifndef GLBSP_GUI
 #error GLBSP_GUI should be defined when compiling this file
 #endif
+
+
+#define TICKER_TIME  10
 
 
 #define BAR_YELLOWY  \
@@ -124,6 +127,8 @@ void Guix_ProgressBox::SetupOneBar(guix_bar_t& bar, int y,
 
   bar.perc->position(bar.perc->x(), y+4);
   bar.perc->show();
+
+  bar.perc_shown = -1;  // invalid value, forces update.
 }
 
 
@@ -183,7 +188,26 @@ void Guix_ProgressBox::SetBarName(int which, const char *label_short)
 //
 void GUI_Ticker(void)
 {
+  // this routine was causing a massive slow-down (under MacOSX at least,
+  // didn't have access to Win32/Linux to test).  Seems that Fl::check()
+  // is pretty expensive (and the main glbsp code calls here a lot).
+  //
+  // By fixing this (and a optimisation in the progress bars), build time
+  // for DOOM2.WAD fell from 3m14s down to just 11 seconds !
+
+  static unsigned int last_millis = 0;
+
+  unsigned int cur_millis = HelperGetMillis();
+
+  if (cur_millis >= last_millis && cur_millis >= TICKER_TIME &&
+      cur_millis - TICKER_TIME < last_millis)
+  {
+    return;
+  }
+
   Fl::check();
+
+  last_millis = cur_millis;
 }
 
 
@@ -298,6 +322,11 @@ void GUI_DisplaySetBar(int barnum, int count)
   {
     perc = (int)(count * 100.0 / bar->slide->maximum());
   }
+
+  if (perc == bar->perc_shown)
+    return;
+
+  bar->perc_shown = perc;
 
   sprintf(bar->perc_buf, "%d%%", perc);
 
