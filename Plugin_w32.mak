@@ -1,5 +1,5 @@
 #
-# glBSP Plugin Makefile for Win32
+# glBSP Plugin: < Win32 + MinGW MAKEFILE >
 #
 # (Note: requires GNU make)
 # 
