@@ -29,9 +29,6 @@ static bool inited_FLTK = false;
 
 static int main_result = 0;
 
-wad_c *the_wad;
-wad_c *the_gwa;
-
 
 static void ShowTitle(void)
 {
@@ -131,9 +128,21 @@ int main(int argc, char **argv)
 				filename = arg_list[idx + 1];
 		}
 
+		if (CheckExtension(filename, "gwa"))
+			FatalError("Main file must be a normal WAD (not GWA).\n");
+
 		the_wad = wad_c::Load(filename);
 		if (!the_wad)
-			FatalError("Unable to read file: %s\n", filename);
+			FatalError("Unable to read WAD file: %s\n", filename);
+
+		const char *gwa_name = ReplaceExtension(filename, "gwa");
+		
+		if (FileExists(gwa_name))
+		{
+			the_gwa = wad_c::Load(gwa_name);
+			if (!the_gwa)
+				FatalError("Unable to read GWA file: %s\n", gwa_name);
+		}
 
 		const char *level_name = NULL;
 		{
@@ -169,11 +178,9 @@ int main(int argc, char **argv)
 		DisplayError("An unknown problem occurred (UI code)");
 	}
 
-	if (guix_win)
-	{
-		delete guix_win;
-		guix_win = NULL;
-	}
+	delete guix_win;
+	delete the_wad;
+	delete the_gwa;
 
 	TermDebug();
 

@@ -27,8 +27,6 @@
 
 bool lev_doing_hexen;
 
-extern wad_c *the_wad;  //!!!! FIXME
-
 
 #define LEVELARRAY(TYPE, BASEVAR, NAMESTR)  \
     container_tp<TYPE> BASEVAR(NAMESTR);
@@ -838,6 +836,8 @@ void GetGLNodes(wad_c *base)
 //
 void LoadLevel(const char *level_name)
 {
+	// ---- Normal stuff ----
+
 	if (level_name)
 	{
 		if (! the_wad->FindLevel(level_name))
@@ -858,18 +858,26 @@ void LoadLevel(const char *level_name)
 	GetLinedefs(the_wad);
 	GetThings(the_wad);
 
+	// ---- GL stuff ----
+
 	char gl_name[16];
 	
 	sprintf(gl_name, "GL_%s", the_wad->current_level->name);
 
-	// !!!! FIXME check gwa file if exists
-	if (! the_wad->FindLevel(gl_name))
-		FatalError("Unable to find GL level: %s\n", gl_name);
+	wad_c *gl_wad = the_wad;
 
-	GetGLVerts(the_wad);
-	GetGLSegs(the_wad);
-	GetGLSubsecs(the_wad);
-	GetGLNodes(the_wad);
+	if (! gl_wad->FindLevel(gl_name))
+	{
+		gl_wad = the_gwa;
+
+		if (! gl_wad || ! gl_wad->FindLevel(gl_name))
+			FatalError("Unable to find GL level: %s\n", gl_name);
+	}
+
+	GetGLVerts(gl_wad);
+	GetGLSegs(gl_wad);
+	GetGLSubsecs(gl_wad);
+	GetGLNodes(gl_wad);
 
 ///	PrintMsg("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
 ///			num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
