@@ -27,6 +27,11 @@
 #error GLBSP_GUI should be defined when compiling this file
 #endif
 
+// use this for inlining.  Usually defined in the makefile.
+#ifndef INLINE_G
+#define INLINE_G  /* nothing */
+#endif
+
 
 //
 //  INCLUDES
