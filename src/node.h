@@ -49,10 +49,11 @@ void FreeSuper(superblock_t *block);
 // segs are converted to a subsector, and `*S' is the new subsector
 // (and `*N' is set to NULL).  Otherwise the seg list is divided into
 // two halves, a node is created by calling this routine recursively,
-// and `*N' is the new node (and `*S' is set to NULL).
+// and `*N' is the new node (and `*S' is set to NULL).  Normally
+// returns GLBSP_E_OK, or GLBSP_E_Cancelled if user stopped it.
 //
-void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
-    int depth);
+glbsp_ret_e BuildNodes(superblock_t *seg_list,
+    node_t ** N, subsec_t ** S, int depth);
 
 // compute the height of the bsp tree, starting at `node'.
 int ComputeHeight(node_t *node);

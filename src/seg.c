@@ -615,7 +615,8 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
 }
 
 
-static void PickNodeWorker(superblock_t *part_list, 
+// returns FALSE if cancelled
+static boolean_g PickNodeWorker(superblock_t *part_list, 
     superblock_t *seg_list, seg_t ** best, int *best_cost,
     int *progress, int prog_step)
 {
@@ -627,6 +628,9 @@ static void PickNodeWorker(superblock_t *part_list,
   // use each Seg as partition
   for (part=part_list->segs; part; part = part->next)
   {
+    if (cur_comms->cancelled)
+      return FALSE;
+
     #if DEBUG_PICKNODE
     PrintDebug("PickNode:   %sSEG %p  sector=%d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
       part->linedef ? "" : "MINI", part, 
@@ -642,6 +646,8 @@ static void PickNodeWorker(superblock_t *part_list,
       cur_build_pos++;
       DisplaySetBar(1, cur_build_pos);
     }
+
+    DisplayTicker();
 
     // ignore minisegs as partition candidates
     if (! part->linedef)
@@ -668,6 +674,8 @@ static void PickNodeWorker(superblock_t *part_list,
       PickNodeWorker(part_list->subs[num], seg_list, best, best_cost,
         progress, prog_step);
   }
+
+  return TRUE;
 }
 
 //
@@ -705,8 +713,12 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
     }
   }
  
-  PickNodeWorker(seg_list, seg_list, &best, &best_cost, &progress,
-      prog_step);
+  if (FALSE == PickNodeWorker(seg_list, seg_list, &best, &best_cost, 
+      &progress, prog_step))
+  {
+    // hack here : BuildNodes will detect the cancellation
+    return NULL;
+  }
 
   #if DEBUG_PICKNODE
   if (! best)
@@ -828,6 +840,8 @@ void SeparateSegs(superblock_t *seg_list, seg_t *part,
     intersection_t ** cut_list)
 {
   int num;
+
+  DisplayTicker();
 
   while (seg_list->segs)
   {

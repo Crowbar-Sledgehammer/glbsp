@@ -29,6 +29,7 @@ void TextShutdown(void);
 
 void TextFatalError(const char *str, ...);
 void TextPrintMsg(const char *str, ...);
+void TextTicker(void);
 
 boolean_g TextDisplayOpen(displaytype_e type);
 void TextDisplaySetTitle(const char *str);

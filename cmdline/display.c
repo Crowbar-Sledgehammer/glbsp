@@ -62,6 +62,7 @@ const nodebuildfuncs_t cmdline_funcs =
 {
   TextFatalError,
   TextPrintMsg,
+  TextTicker,
 
   TextDisplayOpen,
   TextDisplaySetTitle,
@@ -128,6 +129,15 @@ void TextFatalError(const char *str, ...)
 
   exit(5);
 }
+
+//
+// TextTicker
+//
+void TextTicker(void)
+{
+  /* does nothing */
+}
+
 
 static void ClearProgress(void)
 {

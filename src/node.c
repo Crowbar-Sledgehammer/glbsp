@@ -387,6 +387,8 @@ superblock_t *CreateSegs(void)
 
   // step through linedefs and get side numbers
 
+  DisplayTicker();
+
   for (i=0; i < num_linedefs; i++)
   {
     linedef_t *line = LookupLinedef(i);
@@ -740,8 +742,8 @@ int ComputeHeight(node_t *node)
 //
 // BuildNodes
 //
-void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
-    int depth)
+glbsp_ret_e BuildNodes(superblock_t *seg_list, 
+    node_t ** N, subsec_t ** S, int depth)
 {
   node_t *node;
   seg_t *best;
@@ -751,8 +753,13 @@ void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
 
   intersection_t *cut_list;
 
+  glbsp_ret_e ret;
+
   *N = NULL;
   *S = NULL;
+
+  if (cur_comms->cancelled)
+    return GLBSP_E_Cancelled;
 
   #if DEBUG_BUILDER
   PrintDebug("Build: BEGUN @ %d\n", depth);
@@ -769,12 +776,15 @@ void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
 
   if (best == NULL)
   {
+    if (cur_comms->cancelled)
+      return GLBSP_E_Cancelled;
+
     #if DEBUG_BUILDER
     PrintDebug("Build: CONVEX\n");
     #endif
 
     *S = CreateSubsec(seg_list);
-    return;
+    return GLBSP_E_OK;
   }
 
   #if DEBUG_BUILDER
@@ -803,6 +813,8 @@ void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
   if (lefts->real_num + lefts->mini_num == 0)
     InternalError("Separated seg-list has no LEFT side");
 
+  DisplayTicker();
+
   AddMinisegs(best, lefts, rights, cut_list);
 
   *N = node = NewNode();
@@ -820,19 +832,27 @@ void BuildNodes(superblock_t *seg_list, node_t ** N, subsec_t ** S,
   PrintDebug("Build: Going LEFT\n");
   #endif
 
-  BuildNodes(lefts,  &node->l.node, &node->l.subsec, depth+1);
+  ret = BuildNodes(lefts,  &node->l.node, &node->l.subsec, depth+1);
   FreeSuper(lefts);
+
+  if (ret != GLBSP_E_OK)
+  {
+    FreeSuper(rights);
+    return ret;
+  }
 
   #if DEBUG_BUILDER
   PrintDebug("Build: Going RIGHT\n");
   #endif
 
-  BuildNodes(rights, &node->r.node, &node->r.subsec, depth+1);
+  ret = BuildNodes(rights, &node->r.node, &node->r.subsec, depth+1);
   FreeSuper(rights);
 
   #if DEBUG_BUILDER
   PrintDebug("Build: DONE\n");
   #endif
+
+  return ret;
 }
 
 //
@@ -843,6 +863,8 @@ void ClockwiseBspTree(node_t *root)
   int i;
 
   (void) root;
+
+  DisplayTicker();
 
   for (i=0; i < num_subsecs; i++)
   {
@@ -913,6 +935,8 @@ void NormaliseBspTree(node_t *root)
   int i;
 
   (void) root;
+
+  DisplayTicker();
 
   // unlink all minisegs from each subsector:
 
@@ -1049,6 +1073,8 @@ void RoundOffBspTree(node_t *root)
   (void) root;
 
   num_complete_seg = 0;
+
+  DisplayTicker();
 
   for (i=0; i < num_subsecs; i++)
   {

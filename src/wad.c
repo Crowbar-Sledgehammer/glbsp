@@ -268,6 +268,8 @@ static void ReadDirEntry(void)
   raw_wad_entry_t entry;
   lump_t *lump;
   
+  DisplayTicker();
+
   len = fread(&entry, sizeof(entry), 1, in_file);
 
   if (len != 1)
@@ -424,6 +426,7 @@ static void ReadLumpData(lump_t *lump)
 
   cur_file_pos++;
   DisplaySetBar(1, cur_file_pos);
+  DisplayTicker();
 
   #if DEBUG_LUMP
   PrintDebug("Reading... %s (%d)\n", lump->name, lump->length);
@@ -693,6 +696,7 @@ static void WriteLumpData(lump_t *lump)
 
   cur_file_pos++;
   DisplaySetBar(1, cur_file_pos);
+  DisplayTicker();
 
   #if DEBUG_LUMP
   if (lump->flags & LUMP_COPY_ME)
@@ -787,6 +791,8 @@ static void WriteDirEntry(lump_t *lump)
 {
   int len;
   raw_wad_entry_t entry;
+
+  DisplayTicker();
 
   strncpy(entry.name, lump->name, 8);
 
@@ -1125,6 +1131,7 @@ int CheckLevelLumpZero(lump_t *lump)
 void ReadWadFile(const char *filename)
 {
   int check;
+  char strbuf[256];
 
   // open input wad file & read header
   in_file = fopen(filename, "rb");
@@ -1145,7 +1152,9 @@ void ReadWadFile(const char *filename)
   DisplayOpen(DIS_FILEPROGRESS);
   DisplaySetTitle("Reading wad file");
   
-  DisplaySetBarText(1, "Progress:");
+  sprintf(strbuf, "Reading: %s", filename);
+
+  DisplaySetBarText(1, strbuf);
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_READ_ME, LUMP_READ_ME));
   DisplaySetBar(1, 0);
 
@@ -1170,6 +1179,7 @@ void ReadWadFile(const char *filename)
 void WriteWadFile(const char *filename)
 {
   int check1, check2;
+  char strbuf[256];
 
   PrintMsg("\nSaving WAD as %s\n", filename);
 
@@ -1186,7 +1196,9 @@ void WriteWadFile(const char *filename)
   DisplayOpen(DIS_FILEPROGRESS);
   DisplaySetTitle("Writing wad file");
   
-  DisplaySetBarText(1, "Progress:");
+  sprintf(strbuf, "Writing: %s", filename);
+
+  DisplaySetBarText(1, strbuf);
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_IGNORE_ME, 0));
   DisplaySetBar(1, 0);
 
@@ -1203,8 +1215,6 @@ void WriteWadFile(const char *filename)
   if (check1 != wad.num_entries || check2 != wad.num_entries)
     PrintWarn("Write directory count consistency failure (%d,%d,%d\n",
       check1, check2, wad.num_entries);
-
-//  PrintMsg("All done.\n");
 }
 
 

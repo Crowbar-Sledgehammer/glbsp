@@ -244,11 +244,16 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
 
 /* ----- build nodes for a single level --------------------------- */
 
-static void HandleLevel(void)
+static glbsp_ret_e HandleLevel(void)
 {
   superblock_t *seg_list;
   node_t *root_node;
   subsec_t *root_sub;
+
+  glbsp_ret_e ret;
+
+  if (cur_comms->cancelled)
+    return GLBSP_E_Cancelled;
 
   DisplaySetBarLimit(1, 100);
   DisplaySetBar(1, 0);
@@ -263,25 +268,28 @@ static void HandleLevel(void)
   seg_list = CreateSegs();
 
   // recursively create nodes
-  BuildNodes(seg_list, &root_node, &root_sub, 0);
+  ret = BuildNodes(seg_list, &root_node, &root_sub, 0);
   FreeSuper(seg_list);
 
-  //!!!! ClearProgress();
+  if (ret == GLBSP_E_OK)
+  {
+    ClockwiseBspTree(root_node);
 
-  ClockwiseBspTree(root_node);
+    PrintMsg("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
+        num_nodes, num_subsecs, num_segs, num_normal_vert + num_gl_vert);
 
-  PrintMsg("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
-      num_nodes, num_subsecs, num_segs, num_normal_vert + num_gl_vert);
+    if (root_node)
+      PrintMsg("Heights of left and right subtrees = (%d,%d)\n",
+          ComputeHeight(root_node->r.node), ComputeHeight(root_node->l.node));
 
-  if (root_node)
-    PrintMsg("Heights of left and right subtrees = (%d,%d)\n",
-        ComputeHeight(root_node->r.node), ComputeHeight(root_node->l.node));
-
-  SaveLevel(root_node);
+    SaveLevel(root_node);
+  }
 
   FreeLevel();
   FreeQuickAllocCuts();
   FreeQuickAllocSupers();
+
+  return ret;
 }
 
 
@@ -290,6 +298,10 @@ static void HandleLevel(void)
 glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     const nodebuildfuncs_t *funcs, volatile nodebuildcomms_t *comms)
 {
+  char strbuf[256];
+
+  glbsp_ret_e ret = GLBSP_E_OK;
+
   cur_info  = info;
   cur_funcs = funcs;
   cur_comms = comms;
@@ -326,16 +338,21 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   DisplayOpen(DIS_BUILDPROGRESS);
   DisplaySetTitle("glBSP Progress");
 
-  DisplaySetBarText(2, "Overall progress:");
+  sprintf(strbuf, "File: %s", cur_info->input_file);
+  
+  DisplaySetBarText(2, strbuf);
   DisplaySetBarLimit(2, CountLevels());
   DisplaySetBar(2, 0);
 
   cur_file_pos = 0;
   
   // loop over each level in the wad
-  while (FindNextLevel() && !comms->cancelled)
+  while (FindNextLevel())
   {
-    HandleLevel();
+    ret = HandleLevel();
+
+    if (ret != GLBSP_E_OK)
+      break;
 
     cur_file_pos++;
     DisplaySetBar(2, cur_file_pos);
@@ -344,7 +361,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   DisplayClose();
 
   // writes all the lumps to the output wad
-  if (!cur_comms->cancelled)
+  if (ret == GLBSP_E_OK)
     WriteWadFile(cur_info->output_file);
 
   // close wads and free memory
@@ -352,9 +369,6 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
 
   TermDebug();
 
-  if (comms->cancelled)
-    return GLBSP_E_Cancelled;
-
-  return GLBSP_E_OK;
+  return ret;
 }
 

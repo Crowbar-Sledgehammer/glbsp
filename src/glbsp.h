@@ -82,6 +82,21 @@ typedef struct nodebuildinfo_s
 }
 nodebuildinfo_t;
 
+// This is for two-way communication (esp. with the GUI).
+// Should be flagged `volatile' since multiple threads (real or
+// otherwise, e.g. signals) may read or change the values.
+//
+typedef struct nodebuildcomms_s
+{
+  // if the node builder failed, this will contain the error
+  const char *message;
+
+  // the GUI can set this to tell the node builder to stop
+  boolean_g cancelled;
+}
+nodebuildcomms_t;
+
+
 // Display Prototypes
 typedef enum
 {
@@ -98,6 +113,7 @@ typedef struct nodebuildfuncs_s
   // FIXME: COMMENT ALL OF THESE
   void (* fatal_error)(const char *str, ...);
   void (* print_msg)(const char *str, ...);
+  void (* ticker)(void);
 
   boolean_g (* display_open)(displaytype_e type);
   void (* display_setTitle)(const char *str);
@@ -108,21 +124,6 @@ typedef struct nodebuildfuncs_s
   void (* display_close)(void);
 }
 nodebuildfuncs_t;
-
-// This is for two-way communication (esp. with the GUI).
-// Should be flagged `volatile' since multiple threads (real or
-// otherwise, e.g. signals) may read or change the values.
-//
-typedef struct nodebuildcomms_s
-{
-  // if the node builder failed, this will contain the error
-  const char *message;
-
-  // the GUI can set this to tell the node builder to stop
-  boolean_g cancelled;
-}
-nodebuildcomms_t;
-
 
 // Default build info and comms
 extern const nodebuildinfo_t default_buildinfo;

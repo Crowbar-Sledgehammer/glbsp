@@ -223,6 +223,8 @@ void GetVertices(void)
   if (lump)
     count = lump->length / sizeof(raw_vertex_t);
 
+  DisplayTicker();
+
   #if DEBUG_LOAD
   PrintDebug("GetVertices: num = %d\n", count);
   #endif
@@ -261,6 +263,8 @@ void GetSectors(void)
 
   if (!lump || count == 0)
     FatalError("Couldn't find any Sectors");
+
+  DisplayTicker();
 
   #if DEBUG_LOAD
   PrintDebug("GetSectors: num = %d\n", count);
@@ -304,6 +308,8 @@ void GetSidedefs(void)
   if (!lump || count == 0)
     FatalError("Couldn't find any Sidedefs");
 
+  DisplayTicker();
+
   #if DEBUG_LOAD
   PrintDebug("GetSidedefs: num = %d\n", count);
   #endif
@@ -346,6 +352,8 @@ void GetLinedefs(void)
 
   if (!lump || count == 0)
     FatalError("Couldn't find any Linedefs");
+
+  DisplayTicker();
 
   #if DEBUG_LOAD
   PrintDebug("GetLinedefs: num = %d\n", count);
@@ -414,6 +422,8 @@ void GetLinedefsHexen(void)
 
   if (!lump || count == 0)
     FatalError("Couldn't find any Linedefs");
+
+  DisplayTicker();
 
   #if DEBUG_LOAD
   PrintDebug("GetLinedefs: num = %d\n", count);
@@ -540,6 +550,8 @@ static void DetectDuplicateVertices(void)
   int i;
   uint16_g *array = UtilCalloc(num_vertices * sizeof(uint16_g));
 
+  DisplayTicker();
+
   // sort array of indices
   for (i=0; i < num_vertices; i++)
     array[i] = i;
@@ -573,6 +585,8 @@ static void DetectDuplicateSidedefs(void)
   int i;
   uint16_g *array = UtilCalloc(num_sidedefs * sizeof(uint16_g));
 
+  DisplayTicker();
+
   // sort array of indices
   for (i=0; i < num_sidedefs; i++)
     array[i] = i;
@@ -603,6 +617,8 @@ static void PruneLinedefs(void)
 {
   int i;
   int new_num;
+
+  DisplayTicker();
 
   // scan all linedefs
   for (i=0, new_num=0; i < num_linedefs; i++)
@@ -669,6 +685,8 @@ static void PruneVertices(void)
   int new_num;
   int unused = 0;
 
+  DisplayTicker();
+
   // scan all vertices
   for (i=0, new_num=0; i < num_vertices; i++)
   {
@@ -716,6 +734,8 @@ static void PruneSidedefs(void)
   int new_num;
   int unused = 0;
 
+  DisplayTicker();
+
   // scan all sidedefs
   for (i=0, new_num=0; i < num_sidedefs; i++)
   {
@@ -761,6 +781,8 @@ static void PruneSectors(void)
 {
   int i;
   int new_num;
+
+  DisplayTicker();
 
   // scan all sectors
   for (i=0, new_num=0; i < num_sectors; i++)
@@ -867,6 +889,8 @@ static void VertexAddWallTip(vertex_t *vert, float_g dx, float_g dy,
 static void CalculateWallTips(void)
 {
   int i;
+
+  DisplayTicker();
 
   for (i=0; i < num_linedefs; i++)
   {
@@ -1059,6 +1083,8 @@ static void GroupPolyobjLinedefs(void)
   int count;
   int i;
 
+  DisplayTicker();
+
   do
   {
     count = 0;
@@ -1101,6 +1127,8 @@ void PutVertices(char *name, int do_gl)
   int count, i;
   lump_t *lump;
 
+  DisplayTicker();
+
   if (do_gl)
     lump = CreateGLLump(name);
   else
@@ -1137,6 +1165,8 @@ void PutV2Vertices(void)
 
   static uint8_g v2_magic[4] = "gNd2";
  
+  DisplayTicker();
+
   lump = CreateGLLump("GL_VERT");
 
   AppendLevelLump(lump, v2_magic, 4);
@@ -1167,6 +1197,8 @@ void PutSectors(void)
   int i;
   lump_t *lump = CreateLevelLump("SECTORS");
 
+  DisplayTicker();
+
   for (i=0; i < num_sectors; i++)
   {
     raw_sector_t raw;
@@ -1190,6 +1222,8 @@ void PutSidedefs(void)
 {
   int i;
   lump_t *lump = CreateLevelLump("SIDEDEFS");
+
+  DisplayTicker();
 
   for (i=0; i < num_sidedefs; i++)
   {
@@ -1215,6 +1249,8 @@ void PutLinedefs(void)
   int i;
   lump_t *lump = CreateLevelLump("LINEDEFS");
 
+  DisplayTicker();
+
   for (i=0; i < num_linedefs; i++)
   {
     raw_linedef_t raw;
@@ -1238,6 +1274,8 @@ void PutLinedefsHexen(void)
 {
   int i, j;
   lump_t *lump = CreateLevelLump("LINEDEFS");
+
+  DisplayTicker();
 
   for (i=0; i < num_linedefs; i++)
   {
@@ -1265,6 +1303,8 @@ void PutSegs(void)
 {
   int i, count;
   lump_t *lump = CreateLevelLump("SEGS");
+
+  DisplayTicker();
 
   // sort segs into ascending index
   qsort(segs, num_segs, sizeof(seg_t *), SegCompare);
@@ -1307,6 +1347,8 @@ void PutGLSegs(void)
 {
   int i, count;
   lump_t *lump = CreateGLLump("GL_SEGS");
+
+  DisplayTicker();
 
   // sort segs into ascending index
   qsort(segs, num_segs, sizeof(seg_t *), SegCompare);
@@ -1355,6 +1397,8 @@ void PutSubsecs(char *name, int do_gl)
 {
   int i;
   lump_t *lump;
+
+  DisplayTicker();
 
   if (do_gl)
     lump = CreateGLLump(name);
@@ -1434,6 +1478,8 @@ static void PutOneNode(node_t *node, lump_t *lump)
 void PutNodes(char *name, int do_gl, node_t *root)
 {
   lump_t *lump;
+
+  DisplayTicker();
 
   if (do_gl)
     lump = CreateGLLump(name);

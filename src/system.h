@@ -71,5 +71,7 @@ void PrintDebug(const char *str, ...);
 #define DisplaySetBarText  (* cur_funcs->display_setBarText)
 #define DisplayClose       (* cur_funcs->display_close)
 
+#define DisplayTicker      (* cur_funcs->ticker)
+
 
 #endif /* __GLBSP_SYSTEM_H__ */

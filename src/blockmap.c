@@ -258,6 +258,9 @@ static void CreateBlockmap(void)
       continue;
 
     BlockAddLine(L);
+
+    if ((i % 100) == 0)
+      DisplayTicker();
   }
 }
 
@@ -300,6 +303,8 @@ static void CompressBlockmap(void)
   block_ptrs = UtilCalloc(block_count * sizeof(uint16_g));
   block_dups = UtilCalloc(block_count * sizeof(uint16_g));
 
+  DisplayTicker();
+
   // sort duplicate-detecting array.  After the sort, all duplicates
   // will be next to each other.  The duplicate array gives the order
   // of the blocklists in the BLOCKMAP lump.
@@ -320,6 +325,9 @@ static void CompressBlockmap(void)
   {
     int blk_num = block_dups[i];
     int count;
+
+    if ((i % 100) == 0)
+      DisplayTicker();
 
     // empty block ?
     if (block_lines[blk_num] == NULL)
@@ -571,6 +579,8 @@ void PutReject(void)
   int i, reject_size = (num_sectors * num_sectors + 7) / 8;
 
   uint8_g zero = 0;
+
+  DisplayTicker();
 
   lump = CreateLevelLump("REJECT");
 

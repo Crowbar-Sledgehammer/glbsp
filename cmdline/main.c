@@ -49,7 +49,8 @@ static void ShowTitle(void)
   TextPrintMsg(
     "\n"
     "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2000 Andrew Apted.  ***\n"
-    "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n");
+    "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
+  );
 }
 
 static void ShowUsage(void)
@@ -112,6 +113,7 @@ int main(int argc, char **argv)
   if (argc == 0)
   {
     ShowUsage();
+    TextShutdown();
     exit(1);
   }
 
@@ -120,6 +122,7 @@ int main(int argc, char **argv)
       strcmp(argv[0], "-HELP") == 0 || strcmp(argv[0], "--HELP") == 0)
   {
     ShowHelp();
+    TextShutdown();
     exit(1);
   }
 
