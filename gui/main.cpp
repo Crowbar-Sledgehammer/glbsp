@@ -2,7 +2,7 @@
 // MAIN : Unix/FLTK Main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -77,7 +77,7 @@ static void ShowTitle(void)
 {
   GUI_PrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2001 Andrew Apted.  ***\n"
+    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2003 Andrew Apted.  ***\n"
     "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
   );
 }
@@ -178,7 +178,6 @@ int main(int argc, char **argv)
 
   // load icons for file chooser
   Fl_File_Icon::load_system_icons();
-
 
   guix_win = new Guix_MainWin(MY_TITLE);
    

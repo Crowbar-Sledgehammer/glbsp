@@ -2,7 +2,7 @@
 // FILES : Unix/FLTK File boxes
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -134,6 +134,7 @@ Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
   // the out_file widget.  When GWA mode is selected, the normal
   // output box is hidden and this one is shown instead.
 
+  gwa_filename = GlbspStrDup("");
   out_gwa_file = new Fl_Output(CX, CY, len, 26);
   out_gwa_file->textcolor(MY_GWA_COLOR);
   out_gwa_file->selection_color(FL_CYAN);

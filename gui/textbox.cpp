@@ -2,7 +2,7 @@
 // TEXTBOX : Unix/FLTK Text messages
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -40,6 +40,14 @@ Guix_TextBox::Guix_TextBox(int x, int y, int w, int h) :
  
   textfont(FL_COURIER);
   textsize(14);
+
+#ifdef MACOSX
+  // the resize box in the lower right corner is a pain, it ends up
+  // covering the text box scroll button.  Luckily when both scrollbars
+  // are active, FLTK leaves a square space in that corner and it
+  // fits in nicely.
+  has_scrollbar(BOTH_ALWAYS);
+#endif
 }
 
 
@@ -52,8 +60,8 @@ Guix_TextBox::~Guix_TextBox()
 }
 
 
-void Guix_TextBox::AddMsg(const char *msg, Fl_Color col = FL_BLACK,
-    boolean_g bold = FALSE)
+void Guix_TextBox::AddMsg(const char *msg, Fl_Color col, // = FL_BLACK,
+    boolean_g bold) // = FALSE)
 {
   const char *r;
 
