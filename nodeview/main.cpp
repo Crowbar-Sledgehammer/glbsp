@@ -135,8 +135,7 @@ int main(int argc, char **argv)
 		if (!the_wad)
 			FatalError("Unable to read file: %s\n", filename);
 
-		// FIXME: use first level if no argument
-		const char *level_name = "MAP01";
+		const char *level_name = NULL;
 		{
 			int params;
 			int idx = ArgvFind(0, "warp", &params);

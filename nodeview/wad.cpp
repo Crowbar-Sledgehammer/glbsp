@@ -485,7 +485,23 @@ bool wad_c::FindLevel(const char *map_name)
 	return (L != NULL);
 }
 
-// !!!! FIXME bool FindFirstLevel();
+//
+// FindFirstLevel
+//
+bool wad_c::FindFirstLevel()
+{
+	lump_c *L;
+
+	for (L = (lump_c*)dir.begin(); L != NULL; L = L->LumpNext())
+	{
+		if (L->lev_info)
+			break;
+	}
+
+	current_level = L;
+
+	return (L != NULL);
+}
 
 //
 // FindLumpInLevel

@@ -838,8 +838,16 @@ void GetGLNodes(wad_c *base)
 //
 void LoadLevel(const char *level_name)
 {
-	if (! the_wad->FindLevel(level_name))
-		FatalError("Unable to find level: %s\n", level_name);
+	if (level_name)
+	{
+		if (! the_wad->FindLevel(level_name))
+			FatalError("Unable to find level: %s\n", level_name);
+	}
+	else
+	{
+		if (! the_wad->FindFirstLevel())
+			FatalError("Unable to find ANY level in WAD.\n");
+	}
 
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (the_wad->FindLumpInLevel("BEHAVIOR") != NULL);
@@ -852,7 +860,7 @@ void LoadLevel(const char *level_name)
 
 	char gl_name[16];
 	
-	sprintf(gl_name, "GL_%s", level_name);
+	sprintf(gl_name, "GL_%s", the_wad->current_level->name);
 
 	// !!!! FIXME check gwa file if exists
 	if (! the_wad->FindLevel(gl_name))
