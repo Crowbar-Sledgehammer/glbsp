@@ -546,8 +546,8 @@ int W_Grid::handle(int event)
 			{
 				// select new subsector
 				route_len = 0;
-				do { /* nothing */ }
 				while (descend_by_mouse(Fl::event_x(), Fl::event_y()));
+				{ /* nothing */ }
 			}
 			else
 			{
