@@ -2,23 +2,17 @@
 TODO
 ====
 
++  pull makefiles / project files into top-level directory.
+
 
 LATER / IDEAS
 =============
 
 +  simplify callback interface.
 
-+  pull makefiles / project files into top-level directory.
-
-+  convert into C++.
-
--  put Changelog on GLBSP page.
+-  convert into C++.
 
 -  MacOS X: Project builder setup for glBSPX.
-
--  "binary" mode: split directly in half using fake horiz/vert seg.
-
--  make the command line and GUI versions use the plugin library.
 
 -  Autoconf / Automake.
 
