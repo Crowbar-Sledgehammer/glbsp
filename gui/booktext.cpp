@@ -31,7 +31,7 @@ static const char *contents_text[] =
   "@-",
   "",
   "@r by Andrew Apted   ",
-  "@r Updated: 30th August 2002   ",
+  "@r Updated: 25th December 2003   ",
   "",
   "@c@m Table of Contents",
   "",
