@@ -173,7 +173,12 @@ void FreeSuper(superblock_t *block)
   int num;
 
   if (block->segs)
+#if 0  // this can happen, but only under abnormal circumstances, in
+       // particular when the node-building was cancelled by the GUI.
     InternalError("FreeSuper: block contains segs");
+#else
+    block->segs = NULL;
+#endif
 
   // recursively handle sub-blocks
   for (num=0; num < 2; num++)
@@ -399,10 +404,6 @@ superblock_t *CreateSegs(void)
     if (line->zero_len)
       continue;
     
-    // ignore hexen polyobj lines
-    if (line->polyobj)
-      continue;
-
     // check for Humungously long lines
     if (ABS(line->start->x - line->end->x) >= 10000 ||
         ABS(line->start->y - line->end->y) >= 10000)
@@ -633,7 +634,7 @@ static void SanityCheckSameSector(subsec_t *sub)
     if (cur->sector == compare->sector)
       continue;
  
-    // All ssectors must come from same sector unless it's marked
+    // All subsectors must come from same sector unless it's marked
     // "special" with sector tag >= 900. Original idea, Lee Killough
     if (cur->sector->coalesce)
       continue;
