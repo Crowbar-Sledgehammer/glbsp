@@ -2,9 +2,9 @@
 TODO
 ====
 
-**  WIN32 + FLTK: have a proper makefile.
++  Put Changelog on GLBSP page.
 
-*  Convert new icon from MacOSX into Win32 (and Linux ??).
+**  WIN32 + FLTK: have a proper makefile.
 
 TEST: cookie under linux (use .glbspX_rc if exists, otherwise .glBSPX_rc).
 
@@ -12,6 +12,10 @@ TOO COMPLEX: -modify option: directly modifies the input wad.
 
 LATER
 -----
+
+-  Project builder setup for MacOS X.
+
+?  -shrink option: finds duplicated LUMPS and merges them (for GFX).
 
 *  .GOR files (Glbsp ORganisation).  Applies parameters to WAD file
    with the same base name.
