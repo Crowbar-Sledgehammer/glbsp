@@ -4,7 +4,7 @@
 #  Makefile for Unix/FLTK
 #
 
-PROGNAME=nodeview
+BIN=nodeview
 SRC_DIR=nodeview
 
 FLTK_CFLAGS=-I/usr/local/lib
@@ -32,16 +32,16 @@ OBJS=./main.o     \
 
 # ----- TARGETS ------------------------------------------------------
 
-all:    $(PROGNAME)
+all:    $(BIN)
 
 clean:
-	rm -f $(PROGNAME) *.o core core.* ERRS
+	rm -f $(BIN) *.o core core.* ERRS nv_debug.txt
 
-$(PROGNAME): $(OBJS)
-	$(CXX) $(CFLAGS) $(OBJS) -o $(PROGNAME) $(LDFLAGS) $(LIBS)
+$(BIN): $(OBJS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $(BIN) $(LDFLAGS) $(LIBS)
 
 bin: all
-	strip --strip-unneeded $(PROGNAME)
+	strip --strip-unneeded $(BIN)
 
 .PHONY: all clean bin install
 
