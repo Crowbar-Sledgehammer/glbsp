@@ -2,7 +2,7 @@
 // DISPLAY : Command-line display routines
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -26,6 +26,7 @@ extern const nodebuildfuncs_t cmdline_funcs;
 
 void TextStartup(void);
 void TextShutdown(void);
+void TextDisableProgress(void);
 
 void TextFatalError(const char *str, ...);
 void TextPrintMsg(const char *str, ...);

@@ -2,7 +2,7 @@
 // MAIN : Command-line version main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -48,7 +48,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2001 Andrew Apted.  ***\n"
+    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2003 Andrew Apted.  ***\n"
     "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
   );
 }
@@ -71,7 +71,7 @@ static void ShowInfo(void)
     "Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
     "accompanying documentation for more details.\n"
     "\n"
-    "Usage: glbsp [options] input.wad [ -o output.wad ]\n"
+    "Usage: glbsp [options] input.wad ... [ -o output.wad ]\n"
     "\n"
     "For a list of the available options, type: glbsp -help\n"
   );
@@ -80,22 +80,23 @@ static void ShowInfo(void)
 static void ShowOptions(void)
 {
   TextPrintMsg(
-    "Usage: glbsp [options] input.wad [ -o output.wad ]\n"
+    "Usage: glbsp [options] input.wad ... [ -o output.wad ]\n"
     "\n"
     "General Options:\n"
-    "  -factor <nnn>    Changes the cost assigned to SEG splits\n"
+    "  -quiet           Quieter output, no level statistics\n"
+    "  -factor  <nnn>   Changes the cost assigned to SEG splits\n"
     "  -fresh           Choose fresh partition lines\n"
-    "  -noreject        Does not clobber the reject map\n"
-    "  -noprog          Does not show progress indicator\n"
+    "  -noreject        Don't clobber the reject map\n"
+    "  -noprog          Don't show progress indicator\n"
     "  -warn            Show extra warning messages\n"
-    "  -normal          Forces the normal nodes to be recomputed\n"
     "  -packsides       Pack sidedefs (remove duplicates)\n"
-    "  -v1              Output V1.0 vertices (backwards compat.)\n"
+    "  -normal          Forces the normal nodes to be recomputed\n"
     "\n"
     "Rarely Useful:\n"
+    "  -v1              Output V1.0 vertices (backwards compat.)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"
-    "  -nogl            Does not compute the GL-friendly nodes\n"
-    "  -nonormal        Does not add (if missing) the normal nodes\n"
+    "  -nogl            Don't compute the GL-friendly nodes\n"
+    "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
     "  -keepsect        Don't prune unused sectors\n"
     "  -noprune         Don't prune anything which is unused\n"
@@ -103,11 +104,31 @@ static void ShowOptions(void)
   );
 }
 
+static void ShowDivider(void)
+{
+  TextPrintMsg("\n------------------------------------------------------------\n\n");
+}
+
+static int FileExists(const char *filename)
+{
+  FILE *fp = fopen(filename, "rb");
+
+  if (fp)
+  {
+    fclose(fp);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 
 /* ----- main program ----------------------------- */
 
 int main(int argc, char **argv)
 {
+  int extra_idx = 0;
+
   TextStartup();
 
   ShowTitle();
@@ -141,16 +162,68 @@ int main(int argc, char **argv)
         "(Unknown error when parsing args)");
   }
 
-  if (GLBSP_E_OK != GlbspCheckInfo(&info, &comms)) 
+  if (info.extra_files)
   {
-    TextFatalError("Error: %s\n", comms.message ? comms.message : 
-        "(Unknown error when checking args)");
+    int ext_j;
+
+    /* catch this mistake: glbsp in.wad out.wad (forget the -o) */
+
+    if (info.input_file && info.extra_files[0] && ! info.extra_files[1] &&
+        FileExists(info.input_file) && ! FileExists(info.extra_files[0]))
+    {
+      TextFatalError("Error: Cannot find WAD file %s ("
+          "Maybe you forgot -o)\n", info.extra_files[0]);
+    }
+
+    /* balk NOW if any of the input files doesn't exist */
+
+    if (! FileExists(info.input_file))
+      TextFatalError("Error: Cannot find WAD file %s\n",
+          info.input_file);
+
+    for (ext_j = 0; info.extra_files[ext_j]; ext_j++)
+    {
+      if (FileExists(info.extra_files[ext_j]))
+        continue;
+
+      TextFatalError("Error: Cannot find WAD file %s\n",
+          info.extra_files[ext_j]);
+    }
   }
 
-  if (GLBSP_E_OK != GlbspBuildNodes(&info, &cmdline_funcs, &comms))
+  /* process each input file */
+
+  for (;;)
   {
-    TextFatalError("Error: %s\n", comms.message ? comms.message : 
-        "(Unknown error during build)");
+    if (GLBSP_E_OK != GlbspCheckInfo(&info, &comms)) 
+    {
+      TextFatalError("Error: %s\n", comms.message ? comms.message : 
+          "(Unknown error when checking args)");
+    }
+
+    if (info.no_progress)
+      TextDisableProgress();
+
+    if (GLBSP_E_OK != GlbspBuildNodes(&info, &cmdline_funcs, &comms))
+    {
+      TextFatalError("Error: %s\n", comms.message ? comms.message : 
+          "(Unknown error during build)");
+    }
+
+    /* when there are extra input files, process them too */
+
+    if (! info.extra_files || ! info.extra_files[extra_idx])
+      break;
+
+    ShowDivider();
+
+    GlbspFree(info.input_file);
+    GlbspFree(info.output_file);
+
+    info.input_file  = GlbspStrDup(info.extra_files[extra_idx]);
+    info.output_file = NULL;
+
+    extra_idx++;
   }
 
   TextShutdown();
