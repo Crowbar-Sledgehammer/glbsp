@@ -47,7 +47,7 @@ static void prefs_reset_all_CB(Fl_Widget *w, void *data)
 //
 // PrefWin Constructor
 //
-Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
+Guix_PrefWin::Guix_PrefWin() : Fl_Window(480, 280, "glBSP Preferences")
 {
   // cancel the automatic `begin' in Fl_Group constructor
   end();
@@ -64,7 +64,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   
   // create buttons in top row
 
-  groups[0] = new Fl_Group(0, 0, w(), 110, "Warn about...");
+  groups[0] = new Fl_Group(0, 0, w(), 110, "Pop-up dialog options:");
   groups[0]->box(FL_THIN_UP_BOX);
   groups[0]->resizable(0);
   groups[0]->labelfont(FL_HELVETICA | FL_BOLD);
@@ -72,21 +72,35 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   groups[0]->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP);
   add(groups[0]);
  
-  int ay = 24;
-    
-  overwrite = new Fl_Check_Button(20, ay+22*0, 22, 22,
-      "Overwriting files");
+  int CX = 20;
+  int CY = 24;
+   
+  overwrite = new Fl_Check_Button(CX, CY, 22, 22,
+      "Warn before overwriting files");
   overwrite->down_box(FL_DOWN_BOX);
   overwrite->align(FL_ALIGN_RIGHT);
   overwrite->value(guix_prefs.overwrite_warn ? 1 : 0);
   groups[0]->add(overwrite);
 
-  same_file = new Fl_Check_Button(20, ay+22*1, 22, 22,
-      "Output and Input files are the same");
+  CY += 22;
+
+  same_file = new Fl_Check_Button(CX, CY, 22, 22,
+      "Warn if Input and Output files are the same");
   same_file->down_box(FL_DOWN_BOX);
   same_file->align(FL_ALIGN_RIGHT);
   same_file->value(guix_prefs.same_file_warn ? 1 : 0);
   groups[0]->add(same_file);
+
+  CY += 22;
+
+  lack_ext = new Fl_Check_Button(CX, CY, 22, 22,
+      "Warn about missing extensions (otherwise add the default)");
+  lack_ext->down_box(FL_DOWN_BOX);
+  lack_ext->align(FL_ALIGN_RIGHT);
+  lack_ext->value(guix_prefs.lack_ext_warn ? 1 : 0);
+  groups[0]->add(lack_ext);
+
+  CY += 22;
 
   // create reset button
   
@@ -116,7 +130,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   groups[2]->resizable(0);
   add(groups[2]);
   
-  quit = new Fl_Button(w() - 100, h() - 40, 80, 26, "Done");
+  quit = new Fl_Button(w() - 100, h() - 40, 80, 26, "Close");
   quit->callback((Fl_Callback *) prefs_quit_CB);
   groups[2]->add(quit);
 
@@ -139,6 +153,7 @@ Guix_PrefWin::~Guix_PrefWin()
   // write new preferences
   guix_prefs.overwrite_warn = overwrite->value() ? TRUE : FALSE;
   guix_prefs.same_file_warn = same_file->value() ? TRUE : FALSE;
+  guix_prefs.lack_ext_warn  = lack_ext->value()  ? TRUE : FALSE;
  
   // update window_pos if user moved the window
   if (x() != init_x || y() != init_y)
@@ -156,5 +171,8 @@ void Guix_PrefWin::PrefsChanged()
 
   same_file->value(guix_prefs.same_file_warn ? 1 : 0);
   same_file->redraw();
+
+  lack_ext->value(guix_prefs.lack_ext_warn ? 1 : 0);
+  lack_ext->redraw();
 }
 

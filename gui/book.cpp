@@ -84,25 +84,36 @@ Guix_Book::Guix_Book() : Fl_Window(guix_prefs.manual_w,
   group->resizable(0);
   add(group);
   
-  quit = new Fl_Button(4, 4, 96, 26, "&Quit");
-  quit->box(FL_THIN_UP_BOX);
-  quit->callback((Fl_Callback *) book_quit_CB);
-  group->add(quit);
+  int CX = 4;
+  int CY = 4;
 
-  contents = new Fl_Button(104, 4, 96, 26, "&Contents");
+  contents = new Fl_Button(CX, CY, 96, 26, "&Contents");
   contents->box(FL_THIN_UP_BOX);
   contents->callback((Fl_Callback *) book_contents_CB);
   group->add(contents);
 
-  prev = new Fl_Button(204, 4, 96, 26, "<<  &Prev");
+  CX += 100;
+
+  prev = new Fl_Button(CX, CY, 96, 26, "<<  &Prev");
   prev->box(FL_THIN_UP_BOX);
   prev->callback((Fl_Callback *) book_prev_CB);
   group->add(prev);
 
-  next = new Fl_Button(304, 4, 96, 26, "&Next  >>");
+  CX += 100;
+
+  next = new Fl_Button(CX, CY, 96, 26, "&Next  >>");
   next->box(FL_THIN_UP_BOX);
   next->callback((Fl_Callback *) book_next_CB);
   group->add(next);
+
+  CX += 100;
+
+  quit = new Fl_Button(CX, 4, 96, 26, "Close");
+  quit->box(FL_THIN_UP_BOX);
+  quit->callback((Fl_Callback *) book_quit_CB);
+  group->add(quit);
+
+  CX += 100;
 
   // create the browser
 
@@ -405,7 +416,7 @@ Guix_License::Guix_License() : Fl_Window(guix_prefs.manual_w,
   group->resizable(0);
   add(group);
   
-  quit = new Fl_Button(4, 4, 96, 26, "&Quit");
+  quit = new Fl_Button(4, 4, 96, 26, "Close");
   quit->box(FL_THIN_UP_BOX);
   quit->callback((Fl_Callback *) license_quit_CB);
   group->add(quit);

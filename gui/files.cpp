@@ -21,7 +21,7 @@
 // this includes everything we need
 #include "local.h"
 
-#include <unistd.h>
+/// #include <unistd.h>
 
 
 #define MY_GWA_COLOR  \
@@ -101,21 +101,31 @@ Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
   resizable(file_group);
 
   // create input and output file widgets
+   
+  int CX = x;
+  int CY = y+18;
     
-  in_label = new Fl_Box(x, y+18+30*0, 62, 26, "Input");
+  in_label = new Fl_Box(CX, CY, 62, 26, "Input ");
   in_label->align(FL_ALIGN_INSIDE | FL_ALIGN_RIGHT);
   add(in_label);
    
-  out_label = new Fl_Box(x, y+18+30*1, 62, 26, "Output");
+  CY += 30;
+
+  out_label = new Fl_Box(CX, CY, 62, 26, "Output ");
   out_label->align(FL_ALIGN_INSIDE | FL_ALIGN_RIGHT);
   add(out_label);
    
-  in_file = new Fl_Input(x + 62, y+18+30*0, len, 26);
+  CX = x+62;
+  CY = y+18;
+
+  in_file = new Fl_Input(CX, CY, len, 26);
   in_file->callback((Fl_Callback *) file_box_inout_CB);
   in_file->when(FL_WHEN_CHANGED);
   file_group->add(in_file);
 
-  out_file = new Fl_Input(x + 62, y+18+30*1, len, 26);
+  CY += 30;
+
+  out_file = new Fl_Input(CX, CY, len, 26);
   out_file->callback((Fl_Callback *) file_box_inout_CB);
   out_file->when(FL_WHEN_CHANGED);
   file_group->add(out_file);
@@ -124,23 +134,30 @@ Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
   // the out_file widget.  When GWA mode is selected, the normal
   // output box is hidden and this one is shown instead.
 
-  out_gwa_file = new Fl_Output(x + 62, y+18+30*1, len, 26);
+  out_gwa_file = new Fl_Output(CX, CY, len, 26);
   out_gwa_file->textcolor(MY_GWA_COLOR);
   out_gwa_file->selection_color(FL_CYAN);
   out_gwa_file->hide();
   file_group->add(out_gwa_file);
 
-  in_browse = new Fl_Button(x+70+len, y+18+30*0, 80, 26, "Browse");
+  CX = x+70+len;
+  CY = y+18;
+
+  in_browse = new Fl_Button(CX, CY, 80, 26, "Browse");
   in_browse->align(FL_ALIGN_INSIDE);
   in_browse->callback((Fl_Callback *) file_in_browse_CB, in_file);
   add(in_browse);
 
-  out_browse = new Fl_Button(x+70+len, y+18+30*1, 80, 26, "Browse");
+  CY += 30;
+
+  out_browse = new Fl_Button(CX, CY, 80, 26, "Browse");
   out_browse->align(FL_ALIGN_INSIDE);
   out_browse->callback((Fl_Callback *) file_out_browse_CB, out_file);
   add(out_browse);
 
-  out_guess = new Fl_Button(x+70+86+len, y+18+30*1, 70, 26, "Guess");
+  CX += 86;
+
+  out_guess = new Fl_Button(CX, CY, 70, 26, "Guess");
   out_guess->align(FL_ALIGN_INSIDE);
   out_guess->callback((Fl_Callback *) file_out_guess_CB, out_file);
   add(out_guess);
@@ -262,7 +279,7 @@ Guix_FactorBox::Guix_FactorBox(int x, int y, int w, int h) :
   
   // create factor input box
 
-  factor = new Fl_Counter(x+60, y+8, 100, 24, "Factor");
+  factor = new Fl_Counter(x+60, y+8, 100, 24, "Factor ");
   factor->align(FL_ALIGN_LEFT);
   factor->type(FL_SIMPLE_COUNTER);
   factor->range(1, 99);
@@ -361,42 +378,52 @@ static boolean_g BuildValidateOptions(void)
  
   if (! HelperHasExt(guix_info.input_file))
   {
-    sprintf(buffer,
-        "The Input file you selected has no extension.\n"
-        "\n"
-        "Do you want to add \".WAD\" and continue ?");
+    if (guix_prefs.lack_ext_warn)
+    {
+      sprintf(buffer,
+          "The Input file you selected has no extension.\n"
+          "\n"
+          "Do you want to add \".WAD\" and continue ?");
 
-    choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-        buffer, "OK", "Cancel");
+      choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
+          buffer, "OK", "Cancel");
 
-    if (choice != 0)
-      return FALSE;
+      if (choice != 0)
+        return FALSE;
+    }
 
     char *new_input = HelperReplaceExt(guix_info.input_file, "wad");
 
     GlbspFree(guix_info.input_file);
     guix_info.input_file = GlbspStrDup(new_input);
+
+    guix_win->files->ReadInfo();
   }
 
   if (! HelperHasExt(guix_info.output_file))
   {
-    sprintf(buffer,
-        "The Output file you selected has no extension.\n"
-        "\n"
-        "Do you want to add \".%s\" and continue ?",
-        guix_info.gwa_mode ? "GWA" : "WAD");
+    if (guix_prefs.lack_ext_warn)
+    {
+      sprintf(buffer,
+          "The Output file you selected has no extension.\n"
+          "\n"
+          "Do you want to add \".%s\" and continue ?",
+          guix_info.gwa_mode ? "GWA" : "WAD");
 
-    choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-        buffer, "OK", "Cancel");
+      choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
+          buffer, "OK", "Cancel");
 
-    if (choice != 0)
-      return FALSE;
+      if (choice != 0)
+        return FALSE;
+    }
 
     char *new_output = HelperReplaceExt(guix_info.output_file, 
         guix_info.gwa_mode ? "gwa" : "wad");
 
     GlbspFree(guix_info.output_file);
     guix_info.output_file = GlbspStrDup(new_output);
+
+    guix_win->files->ReadInfo();
   }
 
  
@@ -426,7 +453,7 @@ static boolean_g BuildValidateOptions(void)
         "but GWA files do not contain any level data, so "
         "there wouldn't be anything to build nodes for.\n"
         "\n"
-        "Please choose another Input filename.");
+        "Please choose another Input file.");
     return FALSE;
   }
 
@@ -520,7 +547,7 @@ static boolean_g BuildCheckInfo(void)
     {
       sprintf(buffer, 
           "The following problem was detected with the current "
-          "options:\n"
+          "node building options:\n"
           "\n"
           "      %s\n"
           "\n"
@@ -536,11 +563,12 @@ static boolean_g BuildCheckInfo(void)
 
     sprintf(buffer,
         "The following problem was detected with the current "
-        "options:\n"
+        "node building options:\n"
         "\n"
         "      %s\n"
         "\n"
-        "However, the option causing the problem has been changed.\n"
+        "However, the option causing the problem has now been "
+        "changed into something that should work.  "
         "Do you want to continue ?",
         guix_comms.message ? guix_comms.message : MISSING_COMMS);
 
@@ -571,49 +599,54 @@ static void BuildDoBuild(void)
 
   // something went wrong :(
  
-  const char *err_short;
+  char err_kind = '?';
 
   switch (ret)
   {
     case GLBSP_E_ReadError:
       guix_win->text_box->AddMsg("\n*** Read Error ***\n", FL_BLUE, TRUE);
-      err_short = "Read";
+      err_kind = 'r';
       break;
 
     case GLBSP_E_WriteError:
       guix_win->text_box->AddMsg("\n*** Write Error ***\n", FL_BLUE, TRUE);
-      err_short = "Write";
+      err_kind = 'w';
       break;
 
     // these two shouldn't happen
     case GLBSP_E_BadArgs:
     case GLBSP_E_BadInfoFixed:
       guix_win->text_box->AddMsg("\n*** Option Error ***\n", FL_BLUE, TRUE);
-      err_short = "Option";
+      err_kind = 'o';
       break;
 
     case GLBSP_E_Unknown:
     default:
       guix_win->text_box->AddMsg("\n*** Error ***\n", FL_BLUE, TRUE);
-      err_short = "";
       break;
   }
 
   char buffer[1024];
 
   sprintf(buffer, 
-      "The following Error occurred when trying to "
+      "The following problem was encountered when trying to "
       "build the nodes:\n"
       "\n"
-      "      %s\n"
-      "\n"
-      "For Read errors, check that the input file is a valid "
-      "wad file, and is not corrupt. For Write errors, check "
-      "that your hard disk (or floppy, etc) has not run out of "
-      "storage space.",
+      "      %s\n",
       guix_comms.message ? guix_comms.message : MISSING_COMMS);
 
-  DialogShowAndGetChoice("glBSP Error", pldie_image, buffer);
+  if (err_kind == 'r')
+  {
+    strcat(buffer, "\nCheck that the Input file is a valid WAD "
+        "file, and it is not corrupted.");
+  }
+  else if (err_kind == 'w')
+  {
+    strcat(buffer, "\nCheck that your hard disk (or floppy disk, etc) "
+        "has not run out of storage space.");
+  }
+
+  DialogShowAndGetChoice(ALERT_TXT, pldie_image, buffer);
 }
 
 static void builder_build_CB(Fl_Widget *w, void *data)

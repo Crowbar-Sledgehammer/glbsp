@@ -102,6 +102,9 @@ typedef struct guix_preferences_s
   // warn about input file == output file
   boolean_g same_file_warn;
 
+  // warn about missing extensions
+  boolean_g lack_ext_warn;
+
   // filename for saving the log
   const char *save_log_file;
 }
@@ -269,10 +272,10 @@ void DialogLoadImages(void);
 void DialogFreeImages(void);
 
 int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic, 
-    const char *message, const char *right = "OK", 
-    const char *middle = NULL, const char *left = NULL);
+    const char *message, const char *left = "OK", 
+    const char *middle = NULL, const char *right = NULL);
 
-int DialogQueryFilename(const char *title, const char *message,
+int DialogQueryFilename(const char *message,
     const char ** name_ptr, const char *guess_name);
 
 void GUI_FatalError(const char *str, ...);
@@ -484,6 +487,7 @@ public:
 
   Fl_Button *overwrite;
   Fl_Button *same_file;
+  Fl_Button *lack_ext;
 
   // color stuff ??
  

@@ -200,12 +200,19 @@ static void menu_do_save_log(Fl_Widget *w, void * data)
 
   for (;;)
   {
-    choice = DialogQueryFilename("glBSP Query (Save Log)",
+    choice = DialogQueryFilename(
         "Please select the file to save the log into:",
         & guix_prefs.save_log_file, guess_name);
 
     if (choice != 0)
       return;
+
+    if (!guix_prefs.save_log_file || guix_prefs.save_log_file[0] == 0)
+    {
+      DialogShowAndGetChoice(ALERT_TXT, skull_image, 
+          "Please choose a Log filename.");
+      continue;
+    }
 
     if (! HelperFilenameValid(guix_prefs.save_log_file))
     {
@@ -225,19 +232,22 @@ static void menu_do_save_log(Fl_Widget *w, void * data)
 
     if (! HelperHasExt(guix_prefs.save_log_file))
     {
-      sprintf(buffer,
-          "The Log file you selected has no extension.\n"
-          "\n"
-          "Do you want to add \".LOG\" and continue ?");
+      if (guix_prefs.lack_ext_warn)
+      {
+        sprintf(buffer,
+            "The Log file you selected has no extension.\n"
+            "\n"
+            "Do you want to add \".LOG\" and continue ?");
 
-      choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
-          buffer, "OK", "Re-Select", "Cancel");
+        choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
+            buffer, "OK", "Re-Select", "Cancel");
 
-      if (choice < 0 || choice == 2)
-        return;
+        if (choice < 0 || choice == 2)
+          return;
 
-      if (choice == 1)
-        continue;
+        if (choice == 1)
+          continue;
+      }
 
       // choice == 0
       {
@@ -261,7 +271,7 @@ static void menu_do_save_log(Fl_Widget *w, void * data)
           "Do you want to overwrite it ?",
           guix_prefs.save_log_file);
 
-      choice = DialogShowAndGetChoice("glBSP Alert", skull_image,
+      choice = DialogShowAndGetChoice(ALERT_TXT, skull_image,
           buffer, "OK", "Re-Select", "Cancel");
 
       if (choice < 0 || choice == 2)

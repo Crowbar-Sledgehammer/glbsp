@@ -65,6 +65,7 @@ const guix_preferences_t default_guiprefs =
 
   TRUE,        // overwrite_warn
   TRUE,        // same_file_warn
+  TRUE,        // lack_ext_warn
   NULL         // save_log_file
 };
 

@@ -159,6 +159,10 @@ static boolean_g CookieSetPrefVar(const char *name, const char *value)
   if (strcasecmp(name, "same_file_warn") == 0)
     return SetBooleanVar(guix_prefs.same_file_warn, value);
 
+  // missing extension warning
+  if (strcasecmp(name, "lack_ext_warn") == 0)
+    return SetBooleanVar(guix_prefs.lack_ext_warn, value);
+
   // save log filename
   if (strcasecmp(name, "save_log_file") == 0)
     return SetStringVar(guix_prefs.save_log_file, value);
@@ -500,7 +504,8 @@ static void CookieWritePrefs(FILE *fp)
   
   fprintf(fp, "overwrite_warn = %d\n", guix_prefs.overwrite_warn);
   fprintf(fp, "same_file_warn = %d\n", guix_prefs.same_file_warn);
-  
+  fprintf(fp, "lack_ext_warn = %d\n", guix_prefs.lack_ext_warn);
+ 
   fprintf(fp, "save_log_file = \"%s\"\n", guix_prefs.save_log_file ?
       guix_prefs.save_log_file : "");
 

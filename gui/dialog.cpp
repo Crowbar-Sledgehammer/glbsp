@@ -110,7 +110,7 @@ static void dialog_closed_CB(Fl_Widget *w, void *data)
   cur_diag_done = TRUE;
 }
 
-static void dialog_right_button_CB(Fl_Widget *w, void *data)
+static void dialog_left_button_CB(Fl_Widget *w, void *data)
 {
   cur_diag_result = 0;
   cur_diag_done = TRUE;
@@ -122,7 +122,7 @@ static void dialog_middle_button_CB(Fl_Widget *w, void *data)
   cur_diag_done = TRUE;
 }
 
-static void dialog_left_button_CB(Fl_Widget *w, void *data)
+static void dialog_right_button_CB(Fl_Widget *w, void *data)
 {
   cur_diag_result = 2;
   cur_diag_done = TRUE;
@@ -193,13 +193,13 @@ static void DialogRun()
 // left) or -1 if escape was pressed or window manually closed.
 // 
 int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic, 
-    const char *message, const char *right = "OK", 
-    const char *middle = NULL, const char *left = NULL)
+    const char *message, const char *left = "OK", 
+    const char *middle = NULL, const char *right = NULL)
 {
   cur_diag_result = -1;
   cur_diag_done = FALSE;
 
-  int but_width = left ? (120*3) : middle ? (120*2) : (120*1);
+  int but_width = right ? (120*3) : middle ? (120*2) : (120*1);
 
   // determine required size
   int width = 120 * 3;
@@ -248,28 +248,37 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
   // create buttons
   Fl_Button *button;
   
+  int CX = width - 120;
+  int CY = height - 40;
+
   if (right)
   {
-    button = new Fl_Return_Button(width - 120*1, height-40, 104, 30, right);
+    button = new Fl_Return_Button(CX, CY, 104, 30, right);
     button->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
     button->callback((Fl_Callback *) dialog_right_button_CB);
     cur_diag->add(button);
+
+    CX -= 120;
   }
 
   if (middle)
   {
-    button = new Fl_Button(width - 120*2, height-40, 104, 30, middle);
+    button = new Fl_Button(CX, CY, 104, 30, middle);
     button->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
     button->callback((Fl_Callback *) dialog_middle_button_CB);
     cur_diag->add(button);
+
+    CX -= 120;
   }
 
   if (left)
   {
-    button = new Fl_Button(width - 120*3, height-40, 104, 30, left);
+    button = new Fl_Button(CX, CY, 104, 30, left);
     button->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
     button->callback((Fl_Callback *) dialog_left_button_CB);
     cur_diag->add(button);
+
+    CX -= 120;
   }
 
   // show time !
@@ -297,7 +306,7 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
 // Returns 0 if "OK" was pressed, 1 if "Cancel" was pressed, or -1 if
 // escape was pressed or the window was manually closed.
 // 
-int DialogQueryFilename(const char *title, const char *message,
+int DialogQueryFilename(const char *message,
         const char ** name_ptr, const char *guess_name)
 {
   cur_diag_result = -1;
@@ -320,10 +329,10 @@ int DialogQueryFilename(const char *title, const char *message,
     height = 16;
  
   width  += 60 + 20 + 16;  // 16 extra, just in case
-  height += 60 + 40 + 16;  // 
+  height += 60 + 50 + 16;  // 
 
   // create window
-  cur_diag = new Fl_Window(0, 0, width, height, title);
+  cur_diag = new Fl_Window(0, 0, width, height, "glBSP Query");
   cur_diag->end();
   cur_diag->size_range(width, height, width, height);
   cur_diag->callback((Fl_Callback *) dialog_closed_CB);
@@ -342,23 +351,31 @@ int DialogQueryFilename(const char *title, const char *message,
   
   // create buttons
   
+  int CX = width - 120;
+  int CY = height - 50;
+
   Fl_Button *b_ok;
   Fl_Button *b_cancel;
   
-  b_ok = new Fl_Return_Button(width - 120*1, height-40, 104, 30, "OK");
-  b_ok->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
-  b_ok->callback((Fl_Callback *) dialog_right_button_CB);
-  cur_diag->add(b_ok);
-
-  b_cancel = new Fl_Button(width - 120*2, height-40, 104, 30, "Cancel");
+  b_cancel = new Fl_Button(CX, CY, 104, 30, "Cancel");
   b_cancel->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
   b_cancel->callback((Fl_Callback *) dialog_middle_button_CB);
   cur_diag->add(b_cancel);
 
+  CX -= 120;
+
+  b_ok = new Fl_Return_Button(CX, CY, 104, 30, "OK");
+  b_ok->align(FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
+  b_ok->callback((Fl_Callback *) dialog_left_button_CB);
+  cur_diag->add(b_ok);
+
   // create input box
   Fl_Input *inp_box;
   
-  inp_box = new Fl_Input(20, height-90, width - 230, 26);
+  CX = width - 120;
+  CY = height - 100;
+
+  inp_box = new Fl_Input(20, CY, CX - 20 - 90, 26);
   inp_box->value(*name_ptr);
   cur_diag->add(inp_box);
  
@@ -366,13 +383,14 @@ int DialogQueryFilename(const char *title, const char *message,
   Fl_Button *b_browse;
   Fl_Button *b_guess;
 
-  b_guess = new Fl_Button(width - 120, inp_box->y(), 70, 26, "Guess");
+  b_guess = new Fl_Button(CX, CY, 70, 26, "Guess");
   b_guess->align(FL_ALIGN_INSIDE);
   b_guess->callback((Fl_Callback *) dialog_file_guess_CB, inp_box);
   cur_diag->add(b_guess);
 
-  b_browse = new Fl_Button(width - 205, inp_box->y(), 80, 
-      b_guess->h(), "Browse");
+  CX -= 85;
+
+  b_browse = new Fl_Button(CX, CY, 80, b_guess->h(), "Browse");
   b_browse->align(FL_ALIGN_INSIDE);
   b_browse->callback((Fl_Callback *) dialog_file_browse_CB, inp_box);
   cur_diag->add(b_browse);
@@ -403,19 +421,42 @@ int DialogQueryFilename(const char *title, const char *message,
 void GUI_FatalError(const char *str, ...)
 {
   char buffer[2048];
+  char main_err[2048];
+  char *m_ptr;
 
   // create message
   va_list args;
 
   va_start(args, str);
-  vsprintf(buffer, str, args);
+  vsprintf(main_err, str, args);
   va_end(args);
 
-  if (buffer[0] == 0 || buffer[strlen(buffer)-1] != '\n')
-    strcat(buffer, "\n");
+  // remove leading and trailing whitespace
+  int len = strlen(main_err);
 
-  strcat(buffer, "\nglBSPX will now shut down.");
-    
+  for (; len > 0 && isspace(main_err[len-1]); len--)
+  {
+    main_err[len-1] = 0;
+  }
+  
+  for (m_ptr = main_err; isspace(*m_ptr); m_ptr++)
+  { /* nothing else needed */ }
+
+  if (HelperCaseCmpLen(m_ptr, "Error: ", 7) == 0)
+    m_ptr += 7;
+
+  sprintf(buffer,
+      "The following unexpected error occurred:\n"
+      "\n"
+      "      %s\n"
+      "\n"
+      "This may indicate a serious problem within the WAD you "
+      "were trying to build the nodes for.  Check that the WAD "
+      "file isn't corrupt.\n"
+      "\n"
+      "glBSPX will now shut down.",
+      m_ptr);
+   
   DialogShowAndGetChoice("glBSP Fatal Error", pldie_image, buffer);
 
   // Q/ save cookies ?  

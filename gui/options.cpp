@@ -59,7 +59,10 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
 
   // create the children
 
-  gwa = new Fl_Check_Button(x+12, y+16+22*0, 
+  int CX = x+12;
+  int CY = y+16;
+
+  gwa = new Fl_Check_Button(CX, CY, 
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GWA Mode");
   gwa->down_box(BM_BUTTONTYPE);
   gwa->type(FL_RADIO_BUTTON);
@@ -67,7 +70,9 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   gwa->callback((Fl_Callback *) build_mode_radio_CB);
   add(gwa);
 
-  maybe_normal = new Fl_Check_Button(x+12, y+16+22*1,
+  CY += 22;
+
+  maybe_normal = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL, Normal if missing");
   maybe_normal->down_box(BM_BUTTONTYPE);
   maybe_normal->type(FL_RADIO_BUTTON);
@@ -75,7 +80,9 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   maybe_normal->callback((Fl_Callback *) build_mode_radio_CB);
   add(maybe_normal);
 
-  both = new Fl_Check_Button(x+12, y+16+22*2,
+  CY += 22;
+
+  both = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL and Normal nodes");
   both->down_box(BM_BUTTONTYPE);
   both->type(FL_RADIO_BUTTON);
@@ -83,7 +90,9 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   both->callback((Fl_Callback *) build_mode_radio_CB);
   add(both);
 
-  gl_only = new Fl_Check_Button(x+12, y+16+22*3,
+  CY += 22;
+
+  gl_only = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL nodes only");
   gl_only->down_box(BM_BUTTONTYPE);
   gl_only->type(FL_RADIO_BUTTON);
@@ -91,13 +100,17 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   gl_only->callback((Fl_Callback *) build_mode_radio_CB);
   add(gl_only);
 
-  normal_only = new Fl_Check_Button(x+12, y+16+22*4,
+  CY += 22;
+
+  normal_only = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "Normal nodes only");
   normal_only->down_box(BM_BUTTONTYPE);
   normal_only->type(FL_RADIO_BUTTON);
   normal_only->align(FL_ALIGN_RIGHT);
   normal_only->callback((Fl_Callback *) build_mode_radio_CB);
   add(normal_only);
+
+  CY += 22;
 
   ReadInfo();
 }
@@ -214,33 +227,40 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
 
   // create children
 
-  warnings = new Fl_Check_Button(x+12, y+20+22*0, 22, 22,
-      "Extra Warnings");
+  int CX = x+12;
+  int CY = y+20;
+
+  warnings = new Fl_Check_Button(CX, CY, 22, 22, "Extra Warnings");
   warnings->down_box(FL_DOWN_BOX);
   warnings->align(FL_ALIGN_RIGHT);
   warnings->callback((Fl_Callback *) misc_opts_check_CB);
   add(warnings);
 
-  v1_vert = new Fl_Check_Button(x+12, y+20+22*1, 22, 22,
-      "V1 GL Nodes");
+  CY += 22;
+
+  v1_vert = new Fl_Check_Button(CX, CY, 22, 22, "V1 GL Nodes");
   v1_vert->down_box(FL_DOWN_BOX);
   v1_vert->align(FL_ALIGN_RIGHT);
   v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
   add(v1_vert);
 
-  no_reject = new Fl_Check_Button(x+12, y+20+22*2, 22, 22,
-      "Don't clobber REJECT");
+  CY += 22;
+
+  no_reject = new Fl_Check_Button(CX, CY, 22, 22, "Don't clobber REJECT");
   no_reject->down_box(FL_DOWN_BOX);
   no_reject->align(FL_ALIGN_RIGHT);
   no_reject->callback((Fl_Callback *) misc_opts_check_CB);
   add(no_reject);
 
-  pack_sides = new Fl_Check_Button(x+12, y+20+22*3, 22, 22,
-      "Pack Sidedefs");
+  CY += 22;
+
+  pack_sides = new Fl_Check_Button(CX, CY, 22, 22, "Pack Sidedefs");
   pack_sides->down_box(FL_DOWN_BOX);
   pack_sides->align(FL_ALIGN_RIGHT);
   pack_sides->callback((Fl_Callback *) misc_opts_check_CB);
   add(pack_sides);
+
+  CY += 22;
 
   ReadInfo();
 }
