@@ -675,7 +675,7 @@ static seg_t *FindSegFromStaleNode(superblock_t *part_list,
 
 
 /* returns FALSE if cancelled */
-static boolean_g PickNodeWorker(superblock_t *part_list, 
+static int PickNodeWorker(superblock_t *part_list, 
     superblock_t *seg_list, seg_t ** best, int *best_cost,
     int *progress, int prog_step)
 {

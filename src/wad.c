@@ -242,7 +242,7 @@ static void FreeLump(lump_t *lump)
 // Returns TRUE if successful, or FALSE if there was a problem (in
 // which case the error message as been setup).
 //
-static boolean_g ReadHeader(const char *filename)
+static int ReadHeader(const char *filename)
 {
   size_t len;
   raw_wad_header_t header;
