@@ -154,6 +154,10 @@ int main(int argc, char **argv)
 
 		guix_win = new Guix_MainWin(MY_TITLE);
 
+		double lx, ly, hx, hy;
+		LevelGetBounds(&lx, &ly, &hx, &hy);
+		guix_win->grid->FitBBox(lx, ly, hx, hy);
+
 		// run the GUI until the user quits
 		while (! guix_win->want_quit)
 			Fl::wait();

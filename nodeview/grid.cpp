@@ -66,9 +66,30 @@ void W_Grid::SetZoom(int new_zoom)
 
 void W_Grid::SetPos(double new_x, double new_y)
 {
-	/// FIXME
+	mid_x = new_x;
+	mid_y = new_y;
 
 	redraw();
+}
+
+void W_Grid::FitBBox(double lx, double ly, double hx, double hy)
+{
+	double dx = hx - lx;
+	double dy = hy - ly;
+
+	zoom = MAX_GRID_ZOOM;
+
+	for (; zoom > MIN_GRID_ZOOM; zoom--)
+	{
+		zoom_mul = pow(2.0, (zoom / 2.0 - 9.0));
+
+		if (dx * zoom_mul < w() && dy * zoom_mul < h())
+			break;
+	}
+
+	zoom_mul = pow(2.0, (zoom / 2.0 - 9.0));
+
+	SetPos(lx + dx / 2.0, ly + dy / 2.0);
 }
 
 void W_Grid::MapToWin(double mx, double my, int *X, int *Y) const
@@ -129,10 +150,10 @@ void W_Grid::draw()
 		draw_grid(512);
 	}
 
-	node_c *nd = lev_nodes.Get(lev_nodes.num - 1);
+	node_c *root = lev_nodes.Get(lev_nodes.num - 1);
 
-	draw_partition(nd);
-	draw_node(nd);
+	draw_partition(root);
+	draw_node(root);
 
 	fl_pop_clip();
 }

@@ -156,11 +156,6 @@ public:
 	// 0 for right, 1 for left
 	int side;
 
-///	// seg on other side, or NULL if one-sided.  This relationship is
-///	// always one-to-one -- if one of the segs is split, the partner seg
-///	// must also be split.
-///	struct seg_c *partner;
-
 	// seg index.  Only valid once the seg has been added to a
 	// subsector.  A negative value means it is invalid -- there
 	// shouldn't be any of these once the BSP tree has been built.
@@ -335,21 +330,12 @@ EXTERN_LEVELARRAY(node_c,    lev_nodes)
 
 /* ----- function prototypes ----------------------- */
 
-///--- // lookup routines
-///--- vertex_c *LookupVertex(int index);
-///--- linedef_c *LookupLinedef(int index);
-///--- sidedef_c *LookupSidedef(int index);
-///--- sector_c *LookupSector(int index);
-///--- thing_c *LookupThing(int index);
-///--- seg_c *LookupSeg(int index);
-///--- subsec_c *LookupSubsec(int index);
-///--- node_c *LookupNode(int index);
-///--- node_c *LookupStaleNode(int index);
-
 // load all level data for the current level
 void LoadLevel(void);
 
 // free all level data
 void FreeLevel(void);
+
+void LevelGetBounds(double *lx, double *ly, double *hx, double *hy);
 
 #endif /* __NODEVIEW_LEVEL_H__ */

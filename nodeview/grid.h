@@ -31,6 +31,9 @@ public:
 	void SetPos(double new_x, double new_y);
 	// changes the current position.
 
+	void FitBBox(double lx, double ly, double hx, double hy);
+	// set zoom and position so that the bounding area fits.
+
 	void MapToWin(double mx, double my, int *X, int *Y) const;
 	// convert a map coordinate into a window coordinate, using
 	// current grid position and zoom factor.

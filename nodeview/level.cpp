@@ -843,3 +843,15 @@ void FreeLevel(void)
     lev_nodes.FreeAll();
 }
 
+//
+// LevelGetBounds
+//
+void LevelGetBounds(double *lx, double *ly, double *hx, double *hy)
+{
+	node_c *root = lev_nodes.Get(lev_nodes.num - 1);
+
+	*lx = MIN(root->l.bounds.minx, root->r.bounds.minx);
+	*ly = MIN(root->l.bounds.miny, root->r.bounds.miny);
+	*hx = MAX(root->l.bounds.maxx, root->r.bounds.maxx);
+	*hy = MAX(root->l.bounds.maxy, root->r.bounds.maxy);
+}

@@ -4,12 +4,11 @@ NodeView TODO list
 
 - support GWA files.
 
-- start: center screen on map (or player#1), select zoom to fit map.
-
 - class-ify the wad structures.  [partially done]
 
 - fix drawing bugs at high zoom levels.
 
+DONE: start: center screen on map (or player#1), select zoom to fit map.
 DONE: debugging: make it run-time selectable.
 
 TEST: add code to load GL_SEGS, GL_SSECT and GL_NODES.
