@@ -152,7 +152,6 @@ int RoundPOW2(int x)
 }
 
 
-#if 0
 //
 // FileExists
 //
@@ -168,4 +167,3 @@ int FileExists(const char *filename)
 
   return FALSE;
 }
-#endif
