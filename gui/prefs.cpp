@@ -2,7 +2,7 @@
 // PREFS : Unix/FLTK Preference Window
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -64,7 +64,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   
   // create buttons in top row
 
-  groups[0] = new Fl_Group(0, 0, w(), 160, "Warn about...");
+  groups[0] = new Fl_Group(0, 0, w(), 110, "Warn about...");
   groups[0]->box(FL_THIN_UP_BOX);
   groups[0]->resizable(0);
   groups[0]->labelfont(FL_HELVETICA | FL_BOLD);
@@ -90,17 +90,25 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
 
   // create reset button
   
-  groups[1] = new Fl_Group(0, 160, w(), 60);
+  groups[1] = new Fl_Group(0, 110, w(), 110);
   groups[1]->box(FL_THIN_UP_BOX);
   groups[1]->resizable(0);
   add(groups[1]);
-  
-  reset_all = new Fl_Button((w() - 240) / 2, 160+17, 240, 26,
-      "Reset All Options To Defaults");
+
+  reset_all = new Fl_Button((w() - 240) / 2, 110+17, 240, 26,
+      "Reset All To Defaults");
   reset_all->labelfont(FL_HELVETICA | FL_BOLD);
   reset_all->callback((Fl_Callback *) prefs_reset_all_CB);
   groups[1]->add(reset_all);
 
+  Fl_Box *reset_txt = new Fl_Box(FL_FLAT_BOX, 20, 166, w() - 40, 50,
+      "This resets all user-changeable options to default "
+      "values, including everything in the main window.");
+
+  reset_txt->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | 
+      FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+  groups[1]->add(reset_txt);
+  
   // create quit button
   
   groups[2] = new Fl_Group(0, 220, w(), 60);
@@ -108,7 +116,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   groups[2]->resizable(0);
   add(groups[2]);
   
-  quit = new Fl_Button(w() - 100, h() - 40, 80, 26, "OK");
+  quit = new Fl_Button(w() - 100, h() - 40, 80, 26, "Done");
   quit->callback((Fl_Callback *) prefs_quit_CB);
   groups[2]->add(quit);
 
