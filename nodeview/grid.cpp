@@ -160,55 +160,66 @@ void W_Grid::draw()
 
 void W_Grid::draw_grid(int spacing)
 {
-	int x1 = x();
-	int y1 = y();
-
-	int x2 = x() + w();
-	int y2 = y() + h();
+	double mlx = mid_x - w() * 0.5 / zoom_mul;
+	double mly = mid_y - h() * 0.5 / zoom_mul;
+	double mhx = mid_x + w() * 0.5 / zoom_mul;
+	double mhy = mid_y + h() * 0.5 / zoom_mul;
 
 	int gx = GRID_FIND(mid_x, spacing);
 	int gy = GRID_FIND(mid_y, spacing);
+
+	int x1 = x();
+	int y1 = y();
+	int x2 = x() + w();
+	int y2 = y() + h();
 
 	int dx, dy;
 	int wx, wy;
 
 	for (dx = 0; true; dx++)
 	{
+		if (gx + dx * spacing < mlx) continue;
+		if (gx + dx * spacing > mhx) break;
+
 		MapToWin(gx + dx * spacing, gy, &wx, &wy);
-		if (wx > x2) break;
 		fl_yxline(wx, y1, y2);
 	}
 
 	for (dx = -1; true; dx--)
 	{
+		if (gx + dx * spacing > mhx) continue;
+		if (gx + dx * spacing < mlx) break;
+
 		MapToWin(gx + dx * spacing, gy, &wx, &wy);
-		if (wx < x1) break;
 		fl_yxline(wx, y1, y2);
 	}
 
 	for (dy = 0; true; dy++)
 	{
+		if (gy + dy * spacing < mly) continue;
+		if (gy + dy * spacing > mhy) break;
+
 		MapToWin(gx, gy + dy * spacing, &wy, &wy);
-		if (wy < y1) break;
 		fl_xyline(x1, wy, x2);
 	}
 
 	for (dy = -1; true; dy--)
 	{
+		if (gy + dy * spacing > mhy) continue;
+		if (gy + dy * spacing < mly) break;
+
 		MapToWin(gx, gy + dy * spacing, &wy, &wy);
-		if (wy > y2) break;
 		fl_xyline(x1, wy, x2);
 	}
-
-	int rx1, ry1;
-	int rx2, ry2;
-
-	MapToWin(-500, +300, &rx1, &ry1);
-	MapToWin(+200, -400, &rx2, &ry2);
 }
 
 void W_Grid::draw_partition(const node_c *nd)
 {
+	double mlx = mid_x - w() * 0.5 / zoom_mul;
+	double mly = mid_y - h() * 0.5 / zoom_mul;
+	double mhx = mid_x + w() * 0.5 / zoom_mul;
+	double mhy = mid_y + h() * 0.5 / zoom_mul;
+
 	int x1 = x();
 	int y1 = y();
 
@@ -252,6 +263,7 @@ void W_Grid::draw_partition(const node_c *nd)
 	}
 
 	fl_color(FL_MAGENTA);
+
 	fl_line(nx1, ny1, nx2, ny2);
 }
 
@@ -279,19 +291,12 @@ void W_Grid::draw_child(const child_t *ch)
 
 	for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
 	{
-		int sx1, sy1;
-		int sx2, sy2;
-
 		// skip left sides (for efficiency)
-
 		if (seg->side)
 			continue;
 
-		MapToWin(seg->start->x, seg->start->y, &sx1, &sy1);
-		MapToWin(seg->end  ->x, seg->end  ->y, &sx2, &sy2);
-		
 		if (! seg->linedef)
-			fl_color(fl_color_cube(0,4,3));  // miniseg
+			/* continue; */ fl_color(fl_color_cube(0,4,3));  // miniseg
 		else if (! seg->linedef->left || ! seg->linedef->right)
 			fl_color(FL_WHITE);  // 1-sided line
 		else
@@ -299,16 +304,114 @@ void W_Grid::draw_child(const child_t *ch)
 			sector_c *front = seg->linedef->right->sector;
 			sector_c *back  = seg->linedef->left->sector;
 
+			int floor_max = MAX(front->floor_h, back->floor_h);
+			int ceil_min = MIN(front->ceil_h, back->ceil_h);
+
 			if (front->ceil_h <= back->floor_h || back->ceil_h <= front->floor_h)
 				fl_color(FL_RED);  // closed door
 			else if (ABS(front->floor_h - back->floor_h) > 24)
 				fl_color(FL_GREEN);  // unclimbable floor change
+			else if (ceil_min > floor_max && ceil_min < floor_max+56)
+				fl_color(fl_color_cube(4,4,0));  // gap too narrow
+			else if (seg->linedef->flags & 1)
+				fl_color(FL_YELLOW);  // impassable
 			else
-				fl_color(FL_GRAY_RAMP+14);  // everything else
+				/* continue; */ fl_color(FL_GRAY_RAMP+14);  // everything else
 		}
 
-		fl_line(sx1, sy1, sx2, sy2);
+		draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
 	}
+}
+
+void W_Grid::draw_line(double x1, double y1, double x2, double y2)
+{
+	double mlx = mid_x - w() * 0.5 / zoom_mul;
+	double mly = mid_y - h() * 0.5 / zoom_mul;
+	double mhx = mid_x + w() * 0.5 / zoom_mul;
+	double mhy = mid_y + h() * 0.5 / zoom_mul;
+
+	// Based on Cohen-Sutherland clipping algorithm
+
+	int out1 = MAP_OUTCODE(x1, y1, mlx, mly, mhx, mhy);
+	int out2 = MAP_OUTCODE(x2, y2, mlx, mly, mhx, mhy);
+
+/// PrintDebug("LINE (%1.3f,%1.3f) --> (%1.3f,%1.3f)\n", x1, y1, x2, y2);
+/// PrintDebug("RECT (%1.3f,%1.3f) --> (%1.3f,%1.3f)\n", mlx, mly, mhx, mhy);
+/// PrintDebug("  out1 = %d  out2 = %d\n", out1, out2);
+
+	while ((out1 & out2) == 0 && (out1 | out2) != 0)
+	{
+/// PrintDebug("> LINE (%1.3f,%1.3f) --> (%1.3f,%1.3f)\n", x1, y1, x2, y2);
+/// PrintDebug(">   out1 = %d  out2 = %d\n", out1, out2);
+
+		// may be partially inside box, find an outside point
+		int outside = (out1 ? out1 : out2);
+
+		SYS_ZERO_CHECK(outside);
+
+		double dx = x2 - x1;
+		double dy = y2 - y1;
+
+		if (fabs(dx) < 0.1 && fabs(dy) < 0.1)
+			break;
+
+		double tmp_x, tmp_y;
+
+		// clip to each side
+		if (outside & O_BOTTOM)
+		{
+			tmp_x = x1 + dx * (mly - y1) / dy;
+			tmp_y = mly;
+		}
+		else if (outside & O_TOP)
+		{
+			tmp_x = x1 + dx * (mhy - y1) / dy;
+			tmp_y = mhy;
+		}
+		else if (outside & O_LEFT)
+		{
+			tmp_y = y1 + dy * (mlx - x1) / dx;
+			tmp_x = mlx;
+		}
+		else  /* outside & O_RIGHT */
+		{
+			SYS_ASSERT(outside & O_RIGHT);
+
+			tmp_y = y1 + dy * (mhx - x1) / dx;
+			tmp_x = mhx;
+		}
+
+/// PrintDebug(">   outside = %d  temp = (%1.3f, %1.3f)\n", tmp_x, tmp_y);
+		SYS_ASSERT(out1 != out2);
+
+		if (outside == out1)
+		{
+			x1 = tmp_x;
+			y1 = tmp_y;
+
+			out1 = MAP_OUTCODE(x1, y1, mlx, mly, mhx, mhy);
+		}
+		else
+		{
+			SYS_ASSERT(outside == out2);
+
+			x2 = tmp_x;
+			y2 = tmp_y;
+
+			out2 = MAP_OUTCODE(x1, y1, mlx, mly, mhx, mhy);
+		}
+	}
+
+	if (out1 & out2)
+		return;
+
+	int sx, sy;
+	int ex, ey;
+
+	MapToWin(x1, y1, &sx, &sy);
+	MapToWin(x2, y2, &ex, &ey);
+
+	fl_line(sx, sy, ex, ey);
 }
 
 void W_Grid::scroll(int dx, int dy)
