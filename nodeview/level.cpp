@@ -806,8 +806,6 @@ void GetGLNodes(void)
 //
 void LoadLevel(void)
 {
-	const char *level_name = GetLevelName();
-
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 

@@ -659,13 +659,10 @@ int ReadWadFile(const char *filename)
 //
 void CloseWads(void)
 {
-	int i;
-
 	if (in_file)
 	{
 		fclose(in_file);
 		in_file = NULL;
 	}
-
 }
 

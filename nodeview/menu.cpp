@@ -23,10 +23,12 @@
 static bool menu_want_to_quit;
 
 
+#if 0
 static void menu_quit_CB(Fl_Widget *w, void *data)
 {
 	menu_want_to_quit = true;
 }
+#endif
 
 
 #ifndef MACOSX
