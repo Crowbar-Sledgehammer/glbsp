@@ -434,16 +434,15 @@ public:
   Fl_Button *maybe_normal;
   Fl_Button *both;
   Fl_Button *gl_only;
-  Fl_Button *normal_only;
 
   // this routine sets one of the radio buttons on, based on the given
   // build-information.
   //
   void ReadInfo();
 
-  // this routine does the reverse, setting the `gwa_mode', `no_gl',
-  // `no_normal' and `force_normal' fields based on which radio button
-  // is currently active.
+  // this routine does the reverse, setting the 'gwa_mode', 'no_normal'
+  // and 'force_normal' fields based on which radio button is currently
+  // active.
   //
   void WriteInfo();
 

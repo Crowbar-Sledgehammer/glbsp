@@ -94,7 +94,6 @@ static void ShowOptions(void)
     "Rarely Useful:\n"
     "  -v1 .. -v3       Version of GL-Nodes to use (1, 2 or 3)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"
-    "  -nogl            Don't compute the GL-friendly nodes\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
     "  -keepsect        Don't remove unused sectors\n"

@@ -59,7 +59,8 @@ then.
 .BI \-noreject
 Normally glBSP will create an simple REJECT map for
 each level.  This options prevents any existing
-REJECT map from being clobbered.
+REJECT map, such as one time-consumingly built by a
+dedicated reject builder, from being clobbered.
 .TP
 .BI \-noprog
 Turn off the progress indicator.
@@ -82,7 +83,7 @@ final WAD for public release.
 These next set of options normally don't need to be used, but they are
 provided to allow complete control or for special circumstances:
 .TP
-\-v1 .. \-v3
+.B \-v1 .. \-v3
 Specify the version of the "GL Nodes" spec to use.
 Using -v1 provides backwards compatibility.
 The default is -v2.
@@ -103,9 +104,6 @@ loaded into memory.  This allows you to run glBSP using
 the same file for both input and output, but I strongly
 recommend _against_ it: you could lose your original
 WAD if something goes wrong (and you know Murphy...).
-.TP
-.BI \-nogl
-Forces glBSP to not create the GL node info.
 .TP
 .BI \-nonormal
 Forces glBSP to not create the normal node information

@@ -103,16 +103,6 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
 
   CY += 22;
 
-  normal_only = new Fl_Check_Button(CX, CY,
-      BM_BUTTONSIZE, BM_BUTTONSIZE, "Normal nodes only");
-  normal_only->down_box(BM_BUTTONTYPE);
-  normal_only->type(FL_RADIO_BUTTON);
-  normal_only->align(FL_ALIGN_RIGHT);
-  normal_only->callback((Fl_Callback *) build_mode_radio_CB);
-  add(normal_only);
-
-  CY += 22;
-
   ReadInfo();
 }
 
@@ -131,9 +121,6 @@ void Guix_BuildMode::ReadInfo()
   if (guix_info.gwa_mode)
     gwa->setonly();
   
-  else if (guix_info.no_gl)
-    normal_only->setonly();
- 
   else if (guix_info.no_normal)
     gl_only->setonly();
   
@@ -145,7 +132,6 @@ void Guix_BuildMode::ReadInfo()
 
   // redraw them all (just to be safe)
   gwa->redraw();
-  normal_only->redraw();
   gl_only->redraw();
   both->redraw();
   maybe_normal->redraw();
@@ -156,18 +142,12 @@ void Guix_BuildMode::WriteInfo()
 {
   // default: everything false
   guix_info.gwa_mode = FALSE;
-  guix_info.no_gl = FALSE;
   guix_info.no_normal = FALSE;
   guix_info.force_normal = FALSE;
 
   if (gwa->value())
   {
     guix_info.gwa_mode = TRUE;
-  }
-  else if (normal_only->value())
-  {
-    guix_info.no_gl = TRUE;
-    guix_info.force_normal = TRUE;
   }
   else if (gl_only->value())
   {
@@ -188,7 +168,6 @@ void Guix_BuildMode::LockOut(boolean_g lock_it)
     maybe_normal->set_output();
     both->set_output();
     gl_only->set_output();
-    normal_only->set_output();
   }
   else
   {
@@ -196,7 +175,6 @@ void Guix_BuildMode::LockOut(boolean_g lock_it)
     maybe_normal->clear_output();
     both->clear_output();
     gl_only->clear_output();
-    normal_only->clear_output();
   }
 }
 

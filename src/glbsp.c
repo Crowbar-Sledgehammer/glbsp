@@ -64,7 +64,6 @@ const nodebuildinfo_t default_buildinfo =
   2,   // spec_version
 
   FALSE,   // load_all
-  FALSE,   // no_gl
   FALSE,   // no_normal
   FALSE,   // force_normal
   FALSE,   // gwa_mode
@@ -264,7 +263,6 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("normal",      force_normal)
 
     HANDLE_BOOLEAN("loadall",     load_all)
-    HANDLE_BOOLEAN("nogl",        no_gl)
     HANDLE_BOOLEAN("nonormal",    no_normal)
     HANDLE_BOOLEAN("forcegwa",    gwa_mode)
     HANDLE_BOOLEAN("keepsect",    keep_sect)
@@ -277,7 +275,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("keepsec",     keep_sect)
     HANDLE_BOOLEAN("keepsectors", keep_sect)
 
-    // ignore -fresh and -keepdummy for backwards compatibility
+    // ignore these options for backwards compatibility
     if (UtilStrCaseCmp(opt_str, "fresh") == 0 ||
         UtilStrCaseCmp(opt_str, "keepdummy") == 0)
     {
@@ -351,13 +349,6 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     return GLBSP_E_BadInfoFixed;
   }
 
-  if (info->gwa_mode && info->no_gl)
-  {
-    info->no_gl = FALSE;
-    SetErrorMsg("-nogl with GWA file: nothing to do !");
-    return GLBSP_E_BadInfoFixed;
-  }
- 
   if (info->gwa_mode && info->force_normal)
   {
     info->force_normal = FALSE;
@@ -496,12 +487,6 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
       !cur_info->output_file || cur_info->output_file[0] == 0)
   {
     SetErrorMsg("INTERNAL ERROR: Missing in/out filename !");
-    return GLBSP_E_BadArgs;
-  }
-
-  if (cur_info->no_normal && cur_info->no_gl)
-  {
-    SetErrorMsg("-nonormal and -nogl specified: nothing to do !");
     return GLBSP_E_BadArgs;
   }
 

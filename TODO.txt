@@ -2,10 +2,9 @@
 TODO
 ====
 
-+  remove ability to do plain nodes (glBSPX too).
-
 -  manpage: add authors/credits section
 
+DONE: remove ability to do plain nodes (glBSPX too).
 DONE: allow -v2 and -v3 options (generalise it).
 DONE: check ROUNDING issues, e.g. (int)X --> (int)rint(X).
 DONE: implement V3 of GL-Nodes specs (new GL_SEGS and GL_SSECT format).

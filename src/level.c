@@ -49,7 +49,6 @@
 // per-level variables
 
 boolean_g lev_doing_normal;
-boolean_g lev_doing_gl;
 boolean_g lev_doing_hexen;
 
 static boolean_g lev_v3_segs;
@@ -1227,22 +1226,16 @@ void LoadLevel(void)
   lev_doing_normal = !cur_info->gwa_mode && (cur_info->force_normal || 
     (!cur_info->no_normal && !normal_exists));
 
-  lev_doing_gl = cur_info->gwa_mode || !cur_info->no_gl;
-
   // -JL- Identify Hexen mode by presence of BEHAVIOR lump
   lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
   lev_v3_segs = (cur_info->spec_version == 3) ? TRUE : FALSE;
   lev_v3_subsecs = lev_v3_segs;
 
-  if (lev_doing_normal && lev_doing_gl)
+  if (lev_doing_normal)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
-  else if (lev_doing_normal)
-    sprintf(message, "Building normal nodes only on %s", level_name);
-  else if (lev_doing_gl)
-    sprintf(message, "Building GL nodes on %s", level_name);
   else
-    sprintf(message, "Building _nothing_ on %s", level_name);
+    sprintf(message, "Building GL nodes on %s", level_name);
  
   if (lev_doing_hexen)
     strcat(message, " (Hexen)");
@@ -1334,7 +1327,7 @@ void SaveLevel(node_t *root_node)
   if (cur_info->spec_version == 1)
     RoundOffBspTree(root_node);
 
-  if (lev_doing_gl)
+  // GL Nodes
   {
     if (num_normal_vert > 32767 || num_gl_vert > 32767)
     {

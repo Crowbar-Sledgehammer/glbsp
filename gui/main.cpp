@@ -202,19 +202,19 @@ int main(int argc, char **argv)
 
     case COOKIE_E_NO_FILE:
       guix_win->text_box->AddMsg(
-          "** Missing INI file -- Using defaults **\n", FL_RED, TRUE);
+          "** Missing INI file -- Using defaults **\n\n", FL_RED, TRUE);
       break;
 
     case COOKIE_E_PARSE_ERRORS:
     case COOKIE_E_CHECK_ERRORS:
       guix_win->text_box->AddMsg(
-          "** Warning: Errors found in INI file **\n", FL_RED, TRUE);
+          "** Warning: Errors found in INI file **\n\n", FL_RED, TRUE);
       break;
   }
 
   if (unused_args)
     guix_win->text_box->AddMsg(
-        "** Warning: Ignoring extra arguments to glBSPX **\n", FL_RED, TRUE);
+        "** Warning: Ignoring extra arguments to glBSPX **\n\n", FL_RED, TRUE);
 
   // run the GUI until the user quits
   while (! guix_win->want_quit)

@@ -55,7 +55,6 @@ extern sidedef_t ** lev_sidedefs;
 extern sector_t  ** lev_sectors;
 
 extern boolean_g lev_doing_normal;
-extern boolean_g lev_doing_gl;
 
 
 /* ----- polyobj handling ----------------------------- */
@@ -981,7 +980,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   vert->ref_count = seg->partner ? 4 : 2;
 
-  if (lev_doing_gl && !(cur_info->spec_version == 1 && lev_doing_normal))
+  if (! (cur_info->spec_version == 1 && lev_doing_normal))
   {
     vert->index = num_gl_vert | IS_GL_VERTEX;
     num_gl_vert++;
@@ -1002,7 +1001,7 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   // create a duplex vertex if needed
 
-  if (lev_doing_normal && lev_doing_gl && cur_info->spec_version >= 2)
+  if (lev_doing_normal && cur_info->spec_version != 1)
   {
     vert->normal_dup = NewVertex();
 

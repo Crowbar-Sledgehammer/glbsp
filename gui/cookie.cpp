@@ -123,7 +123,13 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
 
   // API change to main glbsp code: 'choose_fresh' --> 'fast'.
   if (strcasecmp(name, "choose_fresh") == 0)
-    return SetBooleanVar(guix_info.fast, ! value);
+  {
+    if (! SetBooleanVar(guix_info.fast, value))
+      return FALSE;
+
+    guix_info.fast = ! guix_info.fast;
+    return TRUE;
+  }
 
   // API change in main glbsp code: 'v1_vert' --> 'spec_version'.
   if (strcasecmp(name, "v1_vert") == 0)
@@ -146,9 +152,6 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
   // build mode
   if (strcasecmp(name, "gwa_mode") == 0)
     return SetBooleanVar(guix_info.gwa_mode, value);
-
-  if (strcasecmp(name, "no_gl") == 0)
-    return SetBooleanVar(guix_info.no_gl, value);
 
   if (strcasecmp(name, "no_normal") == 0)
     return SetBooleanVar(guix_info.no_normal, value);
@@ -525,7 +528,6 @@ static void CookieWriteBuildInfo(FILE *fp)
 
   // build-mode
   fprintf(fp, "gwa_mode = %d\n", guix_info.gwa_mode ? 1 : 0);
-  fprintf(fp, "no_gl = %d\n", guix_info.no_gl ? 1 : 0);
   fprintf(fp, "no_normal = %d\n", guix_info.no_normal ? 1 : 0);
   fprintf(fp, "force_normal = %d\n", guix_info.force_normal ? 1 : 0);
  

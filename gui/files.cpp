@@ -472,7 +472,6 @@ static boolean_g BuildValidateOptions(void)
       return FALSE;
 
     guix_info.gwa_mode = TRUE;
-    guix_info.no_gl = FALSE;
     guix_info.no_normal = FALSE;
     guix_info.force_normal = FALSE;
 

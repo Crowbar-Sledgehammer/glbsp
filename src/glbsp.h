@@ -94,7 +94,6 @@ typedef struct nodebuildinfo_s
   int spec_version;  // 1, 2 or 3
 
   boolean_g load_all;
-  boolean_g no_gl;
   boolean_g no_normal;
   boolean_g force_normal;
   boolean_g gwa_mode;  
