@@ -141,4 +141,10 @@ public:
 };
 
 
+/* ------ Global variables ------ */
+
+extern wad_c *the_wad;
+extern wad_c *the_gwa;
+
+
 #endif /* __NODEVIEW_WAD_H__ */

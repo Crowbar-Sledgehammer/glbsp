@@ -29,6 +29,11 @@
 #define ALIGN_LEN(len)  ((((len) + 3) / 4) * 4)
 
 
+// Global variables
+wad_c *the_wad;
+wad_c *the_gwa;
+
+
 wad_c::wad_c() :
 	in_file(NULL), kind(-1),
 	num_entries(0), dir_start(-1),
