@@ -2,13 +2,11 @@
 TODO
 ====
 
-+  write plugin/makefile.bcc and plugin/makefile.dj.
-
 *  implement a Unix/GTK+ version.
 
-+  write debugging code in system.c.
++  improve file errors in wad.c, return GLBSP_E_{Read,Write}Error.
 
--  improve file errors in wad.c, return GLBSP_E_{Read,Write}Error.
+-  write debugging code in system.c.
 
 -  detect overflow of wad lumps (esp. GL_SEGS) and show a message.
 
