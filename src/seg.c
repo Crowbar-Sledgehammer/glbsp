@@ -185,13 +185,13 @@ static seg_t *SplitSeg(seg_t *old_seg, float_g x, float_g y)
   seg_t *new_seg;
   vertex_t *new_vert;
 
-  #if DEBUG_SPLIT
+# if DEBUG_SPLIT
   if (old_seg->linedef)
     PrintDebug("Splitting Linedef %d (%p) at (%1.1f,%1.1f)\n",
         old_seg->linedef->index, old_seg, x, y);
   else
     PrintDebug("Splitting Miniseg %p at (%1.1f,%1.1f)\n", old_seg, x, y);
-  #endif
+# endif
 
   // update superblock, if needed
   if (old_seg->block)
@@ -210,18 +210,18 @@ static seg_t *SplitSeg(seg_t *old_seg, float_g x, float_g y)
   new_seg->start = new_vert;
   RecomputeSeg(new_seg);
 
-  #if DEBUG_SPLIT
+# if DEBUG_SPLIT
   PrintDebug("Splitting Vertex is %04X at (%1.1f,%1.1f)\n",
       new_vert->index, new_vert->x, new_vert->y);
-  #endif
+# endif
 
   // handle partners
 
   if (old_seg->partner)
   {
-    #if DEBUG_SPLIT
+#   if DEBUG_SPLIT
     PrintDebug("Splitting Partner %p\n", old_seg->partner);
-    #endif
+#   endif
 
     // update superblock, if needed
     if (old_seg->partner->block)
@@ -392,13 +392,13 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
     return FALSE;
   }
 
-  #define ADD_LEFT()  \
+# define ADD_LEFT()  \
       do {  \
         if (check->linedef) info->real_left += 1;  \
         else                info->mini_left += 1;  \
       } while (0)
 
-  #define ADD_RIGHT()  \
+# define ADD_RIGHT()  \
       do {  \
         if (check->linedef) info->real_right += 1;  \
         else                info->mini_right += 1;  \
@@ -578,11 +578,11 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
   // make sure there is at least one real seg on each side
   if (!info.real_left || !info.real_right)
   {
-    #if DEBUG_PICKNODE
+#   if DEBUG_PICKNODE
     PrintDebug("Eval : No real segs on %s%sside\n", 
         info.real_left  ? "" : "left ", 
         info.real_right ? "" : "right ");
-    #endif
+#   endif
 
     return -1;
   }
@@ -602,12 +602,12 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
   if (part->pdx != 0 && part->pdy != 0)
     info.cost += 25;
 
-  #if DEBUG_PICKNODE
+# if DEBUG_PICKNODE
   PrintDebug("Eval %p: splits=%d iffy=%d near=%d left=%d+%d right=%d+%d "
       "cost=%d.%02d\n", part, info.splits, info.iffy, info.near_miss, 
       info.real_left, info.mini_left, info.real_right, info.mini_right, 
       info.cost / 100, info.cost % 100);
-  #endif
+# endif
  
   return info.cost;
 }
@@ -629,12 +629,12 @@ static boolean_g PickNodeWorker(superblock_t *part_list,
     if (cur_comms->cancelled)
       return FALSE;
 
-    #if DEBUG_PICKNODE
+#   if DEBUG_PICKNODE
     PrintDebug("PickNode:   %sSEG %p  sector=%d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
       part->linedef ? "" : "MINI", part, 
       part->sector ? part->sector->index : -1,
       part->start->x, part->start->y, part->end->x, part->end->y);
-    #endif
+#   endif
 
     // something for the user to look at
     (*progress) += 1;
@@ -691,9 +691,9 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
   int progress=0;
   int prog_step=1<<24;
 
-  #if DEBUG_PICKNODE
+# if DEBUG_PICKNODE
   PrintDebug("PickNode: BEGUN\n");
-  #endif
+# endif
 
   // compute info for showing progress
   if (depth <= 3)
@@ -720,7 +720,7 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
     return NULL;
   }
 
-  #if DEBUG_PICKNODE
+# if DEBUG_PICKNODE
   if (! best)
   {
     PrintDebug("PickNode: NO BEST FOUND !\n");
@@ -731,7 +731,7 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
       best_cost / 100, best_cost % 100, best->start->x, best->start->y,
       best->end->x, best->end->y);
   }
-  #endif
+# endif
 
   // all finished, return best Seg
   return best;
@@ -931,7 +931,7 @@ void AddMinisegs(seg_t *part,
   intersection_t *cur, *next;
   seg_t *seg, *buddy;
 
-  #if DEBUG_CUTLIST
+# if DEBUG_CUTLIST
   PrintDebug("CUT LIST:\n");
   for (cur=cut_list; cur; cur=cur->next)
   {
@@ -943,7 +943,7 @@ void AddMinisegs(seg_t *part,
         cur->r.left ? cur->r.left->index : -1,
         cur->r.right ? cur->r.right->index : -1);
   }
-  #endif
+# endif
 
   // scan the intersection list...
 
@@ -1047,7 +1047,7 @@ void AddMinisegs(seg_t *part,
     AddSegToSuper(right_list, seg);
     AddSegToSuper(left_list, buddy);
 
-    #if DEBUG_CUTLIST
+#   if DEBUG_CUTLIST
     PrintDebug("AddMiniseg: %p RIGHT  sector %d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
         seg, seg->sector ? seg->sector->index : -1, 
         seg->start->x, seg->start->y, seg->end->x, seg->end->y);
@@ -1055,7 +1055,7 @@ void AddMinisegs(seg_t *part,
     PrintDebug("AddMiniseg: %p LEFT   sector %d  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n",
         buddy, buddy->sector ? buddy->sector->index : -1, 
         buddy->start->x, buddy->start->y, buddy->end->x, buddy->end->y);
-    #endif
+#   endif
   }
 
   // free intersection structures into quick-alloc list

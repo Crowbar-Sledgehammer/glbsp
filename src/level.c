@@ -227,9 +227,9 @@ void GetVertices(void)
 
   DisplayTicker();
 
-  #if DEBUG_LOAD
+# if DEBUG_LOAD
   PrintDebug("GetVertices: num = %d\n", count);
-  #endif
+# endif
 
   if (!lump || count == 0)
     FatalError("Couldn't find any Vertices");
@@ -268,9 +268,9 @@ void GetSectors(void)
 
   DisplayTicker();
 
-  #if DEBUG_LOAD
+# if DEBUG_LOAD
   PrintDebug("GetSectors: num = %d\n", count);
-  #endif
+# endif
 
   raw = (raw_sector_t *) lump->data;
 
@@ -315,9 +315,9 @@ void GetSidedefs(void)
 
   DisplayTicker();
 
-  #if DEBUG_LOAD
+# if DEBUG_LOAD
   PrintDebug("GetSidedefs: num = %d\n", count);
-  #endif
+# endif
 
   raw = (raw_sidedef_t *) lump->data;
 
@@ -360,9 +360,9 @@ void GetLinedefs(void)
 
   DisplayTicker();
 
-  #if DEBUG_LOAD
+# if DEBUG_LOAD
   PrintDebug("GetLinedefs: num = %d\n", count);
-  #endif
+# endif
 
   raw = (raw_linedef_t *) lump->data;
 
@@ -432,9 +432,9 @@ void GetLinedefsHexen(void)
 
   DisplayTicker();
 
-  #if DEBUG_LOAD
+# if DEBUG_LOAD
   PrintDebug("GetLinedefs: num = %d\n", count);
-  #endif
+# endif
 
   raw = (raw_hexen_linedef_t *) lump->data;
 
@@ -507,9 +507,9 @@ static void MarkPolyobjSector(sector_t *sector)
   if (! sector)
     return;
 
-  #if DEBUG_POLYOBJ
+# if DEBUG_POLYOBJ
   PrintDebug("  Marking SECTOR %d\n", sector->index);
-  #endif
+# endif
 
   // mark all lines of this sector as precious, to prevent the sector
   // from being split.
@@ -582,10 +582,10 @@ static void MarkPolyobjPoint(float_g x, float_g y)
   y1 = best_match->start->y;
   y2 = best_match->end->y;
 
-  #if DEBUG_POLYOBJ
+# if DEBUG_POLYOBJ
   PrintDebug("  Closest line was %d Y=%1.0f..%1.0f (dist=%1.1f)\n",
       best_match->index, y1, y2, best_dist);
-  #endif
+# endif
 
   // directly on the line ?
   if (fabs(best_dist) < DIST_EPSILON)
@@ -607,10 +607,10 @@ static void MarkPolyobjPoint(float_g x, float_g y)
   else
     sector = best_match->left ? best_match->left->sector : NULL;
 
-  #if DEBUG_POLYOBJ
+# if DEBUG_POLYOBJ
   PrintDebug("  Sector %d contains the polyobj.\n", 
       sector ? sector->index : -1);
-  #endif
+# endif
 
   if (! sector)
   {
@@ -654,10 +654,10 @@ void FindPolyobjSectors(void)
     if (type != PO_SPAWN_TYPE && type != PO_SPAWNCRUSH_TYPE)
       continue;
 
-    #if DEBUG_POLYOBJ
+#   if DEBUG_POLYOBJ
     PrintDebug("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n",
         i, x, y);
-    #endif
+#   endif
     
     MarkPolyobjPoint(x, y);
   }
@@ -1092,7 +1092,7 @@ static void CalculateWallTips(void)
     VertexAddWallTip(line->end,   x1-x2, y1-y2, right, left);
   }
  
-  #if DEBUG_WALLTIPS
+# if DEBUG_WALLTIPS
   for (i=0; i < num_vertices; i++)
   {
     vertex_t *vert = vertices[i];
@@ -1107,7 +1107,7 @@ static void CalculateWallTips(void)
         tip->right ? tip->right->index : -1);
     }
   }
-  #endif
+# endif
 }
 
 //
@@ -1291,7 +1291,7 @@ static void GroupPolyobjLinedefs(void)
     }
   } while (count > 0);
 
-  #if DEBUG_POLYOBJ
+# if DEBUG_POLYOBJ
   PrintDebug("\n");
   for (i=0; i < num_linedefs; i++)
   {
@@ -1300,7 +1300,7 @@ static void GroupPolyobjLinedefs(void)
     if (line->polyobj)
       PrintDebug("Linedef #%d belongs to a polyobj\n", i);
   }
-  #endif
+# endif
 }
 
 
@@ -1537,13 +1537,13 @@ void PutSegs(void)
 
     count++;
 
-    #if DEBUG_BSP
+#   if DEBUG_BSP
     PrintDebug("PUT SEG: %04X  Vert %04X->%04X  Line %04X %s  "
         "Angle %04X  (%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index,
         UINT16(raw.start), UINT16(raw.end), UINT16(raw.linedef), 
         seg->side ? "L" : "R", UINT16(raw.angle), 
         seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-    #endif
+#   endif
   }
 
   if (count >= 32768)
@@ -1592,12 +1592,12 @@ void PutGLSegs(void)
 
     count++;
 
-    #if DEBUG_BSP
+#   if DEBUG_BSP
     PrintDebug("PUT GL SEG: %04X  Line %04X %s  Partner %04X  "
       "(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, UINT16(raw.linedef), 
       seg->side ? "L" : "R", UINT16(raw.partner),
       seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-    #endif
+#   endif
   }
 
   if (count >= 32768)
@@ -1631,10 +1631,10 @@ void PutSubsecs(char *name, int do_gl)
 
     AppendLevelLump(lump, &raw, sizeof(raw));
 
-    #if DEBUG_BSP
+#   if DEBUG_BSP
     PrintDebug("PUT SUBSEC %04X  First %04X  Num %04X\n",
       sub->index, UINT16(raw.first), UINT16(raw.num));
-    #endif
+#   endif
   }
 
   if (num_subsecs >= 32768)
@@ -1687,12 +1687,12 @@ static void PutOneNode(node_t *node, lump_t *lump)
 
   AppendLevelLump(lump, &raw, sizeof(raw));
 
-  #if DEBUG_BSP
+# if DEBUG_BSP
   PrintDebug("PUT NODE %04X  Left %04X  Right %04X  "
     "(%d,%d) -> (%d,%d)\n", node->index, UINT16(raw.left),
     UINT16(raw.right), node->x, node->y,
     node->x + node->dx, node->y + node->dy);
-  #endif
+# endif
 }
 
 void PutNodes(char *name, int do_gl, node_t *root)

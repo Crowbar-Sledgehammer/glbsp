@@ -305,9 +305,9 @@ static void ReadDirEntry(void)
   lump->start = UINT32(entry.start);
   lump->length = UINT32(entry.length);
 
-  #if DEBUG_DIR
+# if DEBUG_DIR
   PrintDebug("Read dir... %s\n", lump->name);
-  #endif
+# endif
 
   // link it in
   lump->next = NULL;
@@ -341,9 +341,9 @@ static void DetermineLevelNames(void)
     if (i != 4)
       continue;
 
-    #if DEBUG_DIR
+#   if DEBUG_DIR
     PrintDebug("Found level name: %s\n", L->name);
-    #endif
+#   endif
 
     // check for invalid name and duplicate levels
     if (strlen(L->name) > 5)
@@ -365,9 +365,9 @@ static void ProcessDirEntry(lump_t *lump)
   // ignore previous GL lump info
   if (CheckGLLumpName(lump->name))
   {
-    #if DEBUG_DIR
+#   if DEBUG_DIR
     PrintDebug("Discarding previous GL info: %s\n", lump->name);
-    #endif
+#   endif
 
     FreeLump(lump);
     wad.num_entries--;
@@ -394,9 +394,9 @@ static void ProcessDirEntry(lump_t *lump)
     lump->flags |= LUMP_IS_LEVEL;
     wad.current_level = lump;
 
-    #if DEBUG_DIR
+#   if DEBUG_DIR
     PrintDebug("Process dir... %s :\n", lump->name);
-    #endif
+#   endif
 
     // link it in
     lump->next = NULL;
@@ -430,9 +430,9 @@ static void ProcessDirEntry(lump_t *lump)
         return;
       }
 
-      #if DEBUG_DIR
+#     if DEBUG_DIR
       PrintDebug("Process dir... |--- %s\n", lump->name);
-      #endif
+#     endif
 
       // mark it to be loaded
       lump->flags |= LUMP_READ_ME;
@@ -455,9 +455,9 @@ static void ProcessDirEntry(lump_t *lump)
 
   // --- ORDINARY LUMPS ---
 
-  #if DEBUG_DIR
+# if DEBUG_DIR
   PrintDebug("Process dir... %s\n", lump->name);
-  #endif
+# endif
 
   if (CheckLevelLumpName(lump->name))
     PrintWarn("Level lump `%s' found outside any level\n", lump->name);
@@ -524,9 +524,9 @@ static void ReadLumpData(lump_t *lump)
   DisplaySetBar(1, cur_file_pos);
   DisplayTicker();
 
-  #if DEBUG_LUMP
+# if DEBUG_LUMP
   PrintDebug("Reading... %s (%d)\n", lump->name, lump->length);
-  #endif
+# endif
   
   if (lump->length == 0)
     return;
@@ -794,12 +794,12 @@ static void WriteLumpData(lump_t *lump)
   DisplaySetBar(1, cur_file_pos);
   DisplayTicker();
 
-  #if DEBUG_LUMP
+# if DEBUG_LUMP
   if (lump->flags & LUMP_COPY_ME)
     PrintDebug("Copying... %s (%d)\n", lump->name, lump->length);
   else
     PrintDebug("Writing... %s (%d)\n", lump->name, lump->length);
-  #endif
+# endif
   
   if (ftell(out_file) != lump->new_start)
     PrintWarn("Consistency failure writing %s (%08X, %08X\n", 
@@ -924,12 +924,12 @@ static int WriteDirectory(void)
     WriteDirEntry(cur);
     count++;
 
-    #if DEBUG_DIR
+#   if DEBUG_DIR
     if (cur->flags & (LUMP_IS_LEVEL | LUMP_IS_GL_LEVEL))
       PrintDebug("Write dir... %s\n", cur->name);
     else
       PrintDebug("Write dir... %s :\n", cur->name);
-    #endif
+#   endif
 
     if (cur->flags & LUMP_IS_LEVEL)
     {
@@ -938,9 +938,9 @@ static int WriteDirectory(void)
         if (cur->flags & LUMP_IGNORE_ME)
           continue;
 
-        #if DEBUG_DIR
+#       if DEBUG_DIR
         PrintDebug("Write dir... |--- %s\n", L->name);
-        #endif
+#       endif
 
         WriteDirEntry(L);
         count++;
@@ -954,9 +954,9 @@ static int WriteDirectory(void)
         if (cur->flags & LUMP_IGNORE_ME)
           continue;
 
-        #if DEBUG_DIR
+#       if DEBUG_DIR
         PrintDebug("Write dir... |--- %s\n", L->name);
-        #endif
+#       endif
 
         WriteDirEntry(L);
         count++;
@@ -1023,9 +1023,9 @@ lump_t *CreateLevelLump(const char *name)
 {
   lump_t *cur;
 
-  #if DEBUG_DIR
+# if DEBUG_DIR
   PrintDebug("Create Lump... %s\n", name);
-  #endif
+# endif
 
   // already exists ?
   for (cur=wad.current_level->level_list; cur; cur=cur->next)
@@ -1070,9 +1070,9 @@ lump_t *CreateGLLump(const char *name)
   lump_t *cur;
   lump_t *gl_level;
 
-  #if DEBUG_DIR
+# if DEBUG_DIR
   PrintDebug("Create GL Lump... %s\n", name);
-  #endif
+# endif
 
   // create GL level marker if necessary
   if (! wad.current_level->level_buddy)

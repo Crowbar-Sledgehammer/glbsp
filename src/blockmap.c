@@ -140,9 +140,9 @@ static void BlockAdd(int blk_num, int line_index)
 {
   uint16_g *cur = block_lines[blk_num];
 
-  #if DEBUG_BLOCKMAP
+# if DEBUG_BLOCKMAP
   PrintDebug("Block %d has line %d\n", blk_num, line_index);
-  #endif
+# endif
 
   if (blk_num < 0 || blk_num >= block_count)
     InternalError("BlockAdd: bad block number %d", blk_num);
@@ -188,10 +188,10 @@ static void BlockAddLine(linedef_t *L)
   int bx, by;
   int line_index = L->index;
 
-  #if DEBUG_BLOCKMAP
+# if DEBUG_BLOCKMAP
   PrintDebug("BlockAddLine: %d (%d,%d) -> (%d,%d)\n", line_index, 
       x1, y1, x2, y2);
-  #endif
+# endif
 
   // handle truncated blockmaps
   if (bx1 < 0) bx1 = 0;
@@ -373,10 +373,10 @@ static void CompressBlockmap(void)
     PrintWarn("Blockmap has OVERFLOWED!  May cause problems "
         "or even crash\n");
 
-  #if DEBUG_BLOCKMAP
+# if DEBUG_BLOCKMAP
   PrintDebug("Blockmap: Last ptr = %d  duplicates = %d\n", 
       cur_offset, dup_count);
-  #endif
+# endif
 
   block_compression = (orig_size - new_size) * 100 / orig_size;
 
