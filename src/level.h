@@ -83,8 +83,14 @@ typedef struct sector_s
   // sector index.  Always valid after loading & pruning.
   int index;
 
-  // allow segs from other sectors to coexist in a subsector
-  int coalesce;
+  // allow segs from other sectors to coexist in a subsector.
+  char coalesce;
+
+  // -JL- non-zero if this sector contains a polyobj.
+  int has_polyobj;
+
+  // this is a dummy sector (for extrafloors).
+  char is_dummy;
 
   // reference count.  When building normal nodes, unused sectors will
   // be pruned.
@@ -101,9 +107,6 @@ typedef struct sector_s
   int light;
   int special;
   int tag;
-
-  // -JL- non-zero if this sector contains a polyobj.
-  int polyobj;
 
   // used when building REJECT table.  Each set of sectors that are
   // isolated from other sectors will have a different group number.
@@ -182,6 +185,21 @@ typedef struct linedef_s
   int index;
 }
 linedef_t;
+
+
+typedef struct thing_s
+{
+  int x, y;
+  int type;
+  int options;
+
+  // other info (angle, and hexen stuff) omitted.  We don't need to
+  // write the THING lump, only read it.
+
+  // Always valid (thing indices never change).
+  int index;
+}
+thing_t;
 
 
 typedef struct seg_s
@@ -334,6 +352,7 @@ extern int num_vertices;
 extern int num_linedefs;
 extern int num_sidedefs;
 extern int num_sectors;
+extern int num_things;
 extern int num_segs;
 extern int num_subsecs;
 extern int num_nodes;
@@ -351,6 +370,7 @@ vertex_t *NewVertex(void);
 linedef_t *NewLinedef(void);
 sidedef_t *NewSidedef(void);
 sector_t *NewSector(void);
+thing_t *NewThing(void);
 seg_t *NewSeg(void);
 subsec_t *NewSubsec(void);
 node_t *NewNode(void);
@@ -361,6 +381,7 @@ vertex_t *LookupVertex(int index);
 linedef_t *LookupLinedef(int index);
 sidedef_t *LookupSidedef(int index);
 sector_t *LookupSector(int index);
+thing_t *LookupThing(int index);
 seg_t *LookupSeg(int index);
 subsec_t *LookupSubsec(int index);
 node_t *LookupNode(int index);

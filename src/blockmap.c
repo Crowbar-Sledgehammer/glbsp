@@ -259,6 +259,10 @@ static void CreateBlockmap(void)
     if (L->zero_len)
       continue;
 
+    // ignore lines from dummy sectors
+    if (L->right && L->right->sector && L->right->sector->is_dummy)
+      continue;
+
     BlockAddLine(L);
   }
 }

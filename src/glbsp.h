@@ -97,6 +97,7 @@ typedef struct nodebuildinfo_s
   boolean_g force_normal;
   boolean_g gwa_mode;  
   boolean_g keep_sect;
+  boolean_g keep_dummy;
   boolean_g no_prune;
 
   int block_limit;

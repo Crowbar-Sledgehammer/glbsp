@@ -44,6 +44,7 @@
 #define DEBUG_SORTER    0
 #define DEBUG_WALLTIPS  0
 #define DEBUG_POLYOBJ   0
+#define DEBUG_DUMMY     0
 
 #define ALLOC_BLKNUM  1024
 
@@ -67,6 +68,7 @@ LEVELARRAY(vertex_t,  vertices,   num_vertices)
 LEVELARRAY(linedef_t, linedefs,   num_linedefs)
 LEVELARRAY(sidedef_t, sidedefs,   num_sidedefs)
 LEVELARRAY(sector_t,  sectors,    num_sectors)
+LEVELARRAY(thing_t,   things,     num_things)
 LEVELARRAY(seg_t,     segs,       num_segs)
 LEVELARRAY(subsec_t,  subsecs,    num_subsecs)
 LEVELARRAY(node_t,    nodes,      num_nodes)
@@ -77,6 +79,10 @@ LEVELARRAY(wall_tip_t,wall_tips,  num_wall_tips)
 int num_normal_vert = 0;
 int num_gl_vert = 0;
 int num_complete_seg = 0;
+
+
+// forward declarations
+static int VertexCheckMultiSectors(vertex_t *v);
 
 
 /* ----- allocation routines ---------------------------- */
@@ -105,6 +111,9 @@ sidedef_t *NewSidedef(void)
 
 sector_t *NewSector(void)
   ALLIGATOR(sector_t, sectors, num_sectors)
+
+thing_t *NewThing(void)
+  ALLIGATOR(thing_t, things, num_things)
 
 seg_t *NewSeg(void)
   ALLIGATOR(seg_t, segs, num_segs)
@@ -147,6 +156,9 @@ void FreeSidedefs(void)
 void FreeSectors(void)
   FREEMASON(sector_t, sectors, num_sectors)
 
+void FreeThings(void)
+  FREEMASON(thing_t, things, num_things)
+
 void FreeSegs(void)
   FREEMASON(seg_t, segs, num_segs)
 
@@ -185,6 +197,9 @@ sidedef_t *LookupSidedef(int index)
 sector_t *LookupSector(int index)
   LOOKERUPPER(sectors, num_sectors, "sector")
   
+thing_t *LookupThing(int index)
+  LOOKERUPPER(things, num_things, "thing")
+  
 seg_t *LookupSeg(int index)
   LOOKERUPPER(segs, num_segs, "seg")
   
@@ -204,7 +219,7 @@ node_t *LookupStaleNode(int index)
 //
 // CheckForNormalNodes
 //
-boolean_g CheckForNormalNodes(void)
+int CheckForNormalNodes(void)
 {
   lump_t *lump;
   
@@ -307,6 +322,90 @@ void GetSectors(void)
     sector->index = i;
 
     /* Note: rej_* fields are handled completely in reject.c */
+  }
+}
+
+//
+// GetThings
+//
+void GetThings(void)
+{
+  int i, count=-1;
+  raw_thing_t *raw;
+  lump_t *lump = FindLevelLump("THINGS");
+
+  if (lump)
+    count = lump->length / sizeof(raw_thing_t);
+
+  if (!lump || count == 0)
+  {
+    // Note: no error if no things exist, even though technically a map
+    // will be unplayable without the player starts.
+    PrintWarn("Couldn't find any Things");
+    return;
+  }
+
+  DisplayTicker();
+
+# if DEBUG_LOAD
+  PrintDebug("GetThings: num = %d\n", count);
+# endif
+
+  raw = (raw_thing_t *) lump->data;
+
+  for (i=0; i < count; i++, raw++)
+  {
+    thing_t *thing = NewThing();
+
+    thing->x = SINT16(raw->x);
+    thing->y = SINT16(raw->y);
+
+    thing->type = UINT16(raw->type);
+    thing->options = UINT16(raw->options);
+
+    thing->index = i;
+  }
+}
+
+//
+// GetThingsHexen
+//
+void GetThingsHexen(void)
+{
+  int i, count=-1;
+  raw_hexen_thing_t *raw;
+  lump_t *lump = FindLevelLump("THINGS");
+
+  if (lump)
+    count = lump->length / sizeof(raw_hexen_thing_t);
+
+  if (!lump || count == 0)
+  {
+    // Note: no error if no things exist, even though technically a map
+    // will be unplayable without the player starts.
+    PrintWarn("Couldn't find any Things");
+    return;
+  }
+
+  DisplayTicker();
+
+# if DEBUG_LOAD
+  PrintDebug("GetThingsHexen: num = %d\n", count);
+# endif
+
+  raw = (raw_hexen_thing_t *) lump->data;
+
+  for (i=0; i < count; i++, raw++)
+  {
+    thing_t *thing = NewThing();
+
+    thing->x = SINT16(raw->x);
+    thing->y = SINT16(raw->y);
+
+    thing->type = UINT16(raw->type);
+    thing->options = UINT16(raw->options);
+
+    thing->index = i;
   }
 }
 
@@ -445,7 +544,7 @@ void GetLinedefsHexen(void)
   DisplayTicker();
 
 # if DEBUG_LOAD
-  PrintDebug("GetLinedefs: num = %d\n", count);
+  PrintDebug("GetLinedefsHexen: num = %d\n", count);
 # endif
 
   raw = (raw_hexen_linedef_t *) lump->data;
@@ -562,6 +661,9 @@ void GetStaleNodes(void)
   }
 }
 
+
+/* ----- polyobj handling ----------------------------- */
+
 static void MarkPolyobjSector(sector_t *sector)
 {
   int i;
@@ -574,13 +676,13 @@ static void MarkPolyobjSector(sector_t *sector)
 # endif
 
   /* already marked ? */
-  if (sector->polyobj)
+  if (sector->has_polyobj)
     return;
 
   /* mark all lines of this sector as precious, to prevent the sector
    * from being split.
    */ 
-  sector->polyobj = TRUE;
+  sector->has_polyobj = TRUE;
 
   for (i = 0; i < num_linedefs; i++)
   {
@@ -726,15 +828,13 @@ static void MarkPolyobjPoint(float_g x, float_g y)
 //
 void FindPolyobjSectors(void)
 {
-  int i, count=-1;
-  raw_hexen_thing_t *raw;
-  lump_t *lump;
+  int i;
   int hexen_style;
 
   // -JL- There's a conflict between Hexen polyobj thing types and Doom thing
   //      types. In Doom type 3001 is for Imp and 3002 for Demon. To solve
   //      this problem, first we are going through all lines to see if the
-  //      level has any polyobjs. If found, we also must detect wat polyobj
+  //      level has any polyobjs. If found, we also must detect what polyobj
   //      thing types are used - Hexen ones or ZDoom ones. That's why we
   //      are going through all things searching for ZDoom polyobj thing
   //      types. If any found, we assume that ZDoom polyobj thing types are
@@ -755,26 +855,14 @@ void FindPolyobjSectors(void)
     return;
   }
 
-  lump = FindLevelLump("THINGS");
-  if (lump)
-    count = lump->length / sizeof(raw_hexen_thing_t);
-
-  /* Note: no error if no things exist, even though technically a map
-   * will be unplayable without the player starts.
-   */
-  if (!lump || count==0)
-    return;
-
-  raw = (raw_hexen_thing_t*) lump->data;
-
   // -JL- Detect what polyobj thing types are used - Hexen ones or ZDoom ones
   hexen_style = TRUE;
   
-  for (i = 0; i < count; i++, raw++)
+  for (i = 0; i < num_things; i++)
   {
-    int type = UINT16(raw->type);
+    thing_t *T = things[i];
 
-    if (type == ZDOOM_PO_SPAWN_TYPE || type == ZDOOM_PO_SPAWNCRUSH_TYPE)
+    if (T->type == ZDOOM_PO_SPAWN_TYPE || T->type == ZDOOM_PO_SPAWNCRUSH_TYPE)
     {
       // -JL- A ZDoom style polyobj thing found
       hexen_style = FALSE;
@@ -787,37 +875,56 @@ void FindPolyobjSectors(void)
       hexen_style ? "HEXEN" : "ZDOOM");
 # endif
    
-  // -JL- Reset to the begining.
-  raw = (raw_hexen_thing_t*) lump->data;
-
-  for (i = 0; i < count; i++, raw++)
+  for (i = 0; i < num_things; i++)
   {
-    float_g x = (float_g) SINT16(raw->x);
-    float_g y = (float_g) SINT16(raw->y);
+    thing_t *T = things[i];
 
-    int type = UINT16(raw->type);
+    float_g x = (float_g) T->x;
+    float_g y = (float_g) T->y;
 
     // ignore everything except polyobj start spots
     if (hexen_style)
     {
       // -JL- Hexen style polyobj things
-      if (type != PO_SPAWN_TYPE && type != PO_SPAWNCRUSH_TYPE)
+      if (T->type != PO_SPAWN_TYPE && T->type != PO_SPAWNCRUSH_TYPE)
         continue;
     }
     else
     {
       // -JL- ZDoom style polyobj things
-      if (type != ZDOOM_PO_SPAWN_TYPE && type != ZDOOM_PO_SPAWNCRUSH_TYPE)
+      if (T->type != ZDOOM_PO_SPAWN_TYPE && T->type != ZDOOM_PO_SPAWNCRUSH_TYPE)
         continue;
     }
 
 #   if DEBUG_POLYOBJ
-    PrintDebug("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n",
-        i, x, y);
+    PrintDebug("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n", i, x, y);
 #   endif
-    
+ 
     MarkPolyobjPoint(x, y);
   }
+}
+
+//
+// BoxContainsThing
+//
+static int BoxContainsThing(const bbox_t *bbox)
+{
+  int i;
+
+  for (i = 0; i < num_things; i++)
+  {
+    thing_t *T = things[i];
+
+    if (T->x < bbox->minx || T->x > bbox->maxx)
+      continue;
+
+    if (T->y < bbox->miny || T->y > bbox->maxy)
+      continue;
+
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 
@@ -1151,6 +1258,146 @@ static void PruneSectors(void)
     FatalError("Couldn't find any Sectors");
 }
 
+static void FindDummySectors()
+{
+  // Dummy sectors are detected with the following criteria:
+  //   (a) not larger than 128x128.
+  //   (b) all linedefs are one-sided (isolated from main area).
+  //   (c) contains NO things.
+
+  int i;
+  int count;
+
+  char *notdummy;
+  bbox_t *bboxes;
+
+  if (num_sectors == 0)
+    return;
+
+  DisplayTicker();
+
+  notdummy = (char *) UtilCalloc(num_sectors);
+  bboxes = (bbox_t *) UtilCalloc(num_sectors * sizeof(bbox_t));
+
+  // reset bounding boxes
+  for (i = 0; i < num_sectors; i++) 
+  {
+    notdummy[i] = FALSE;
+
+    bboxes[i].minx = bboxes[i].miny = SHRT_MAX;
+    bboxes[i].maxx = bboxes[i].maxy = SHRT_MIN;
+  }
+
+  // pass over all linedefs, checking if two-sided and computing bboxes
+  for (i = 0; i < num_linedefs; i++)
+  {
+    linedef_t *L = linedefs[i];
+
+    int s1 = (L->right && L->right->sector) ? L->right->sector->index : -1;
+    int s2 = (L->left  && L->left->sector)  ? L->left->sector->index  : -1;
+
+    if (L->zero_len)
+      continue;
+
+    if ((L->left && L->right) || 
+        VertexCheckMultiSectors(L->start) ||
+        VertexCheckMultiSectors(L->end))
+    {
+      if (s1 >= 0) notdummy[s1] = TRUE;
+      if (s2 >= 0) notdummy[s2] = TRUE;
+    }
+    else  // update BBOX
+    {
+      float_g x1 = L->start->x;
+      float_g y1 = L->start->y;
+      float_g x2 = L->end->x;
+      float_g y2 = L->end->y;
+
+      int minx = MIN((int)floor(x1), (int)floor(x2));
+      int miny = MIN((int)floor(y1), (int)floor(y2));
+      int maxx = MAX((int)ceil(x1), (int)ceil(x2));
+      int maxy = MAX((int)ceil(y1), (int)ceil(y2));
+
+      if (s1 >= 0)
+      {
+        bboxes[s1].minx = MIN(bboxes[s1].minx, minx);
+        bboxes[s1].miny = MIN(bboxes[s1].miny, miny);
+        bboxes[s1].maxx = MAX(bboxes[s1].maxx, maxx);
+        bboxes[s1].maxy = MAX(bboxes[s1].maxy, maxy);
+      }
+      if (s2 >= 0)
+      {
+        bboxes[s2].minx = MIN(bboxes[s2].minx, minx);
+        bboxes[s2].miny = MIN(bboxes[s2].miny, miny);
+        bboxes[s2].maxx = MAX(bboxes[s2].maxx, maxx);
+        bboxes[s2].maxy = MAX(bboxes[s2].maxy, maxy);
+      }
+    }
+  }
+
+  // check the bboxes, and count the dummies
+  count = 0;
+
+  for (i = 0; i < num_sectors; i++)
+  {
+    if (notdummy[i])
+      continue;
+
+    if (sectors[i]->coalesce || sectors[i]->has_polyobj)
+    {
+      notdummy[i] = TRUE;
+      continue;
+    }
+
+    // ignore sectors which have no linedefs
+    if (bboxes[i].minx == SHRT_MAX)
+    {
+      notdummy[i] = TRUE;
+      continue;
+    }
+
+#   if DEBUG_DUMMY
+    PrintDebug("  Bounding box for isolated sector %d: (%d,%d) .. (%d,%d)\n",
+        i, bboxes[i].minx, bboxes[i].miny, bboxes[i].maxx, bboxes[i].maxy);
+#   endif
+
+    if (bboxes[i].maxx - bboxes[i].minx > 128 ||
+        bboxes[i].maxy - bboxes[i].miny > 128)
+    {
+      notdummy[i] = TRUE;
+      continue;
+    }
+
+    // check if the sector contains a thing
+    if (BoxContainsThing(bboxes + i))
+    {
+#     if DEBUG_DUMMY
+      PrintDebug("  Isolated sector %d contains a thing\n", i);
+#     endif
+
+      notdummy[i] = TRUE;
+      continue;
+    }
+
+    // must be a dummy sector
+    count++;
+
+    sectors[i]->is_dummy = TRUE;
+
+#   if DEBUG_DUMMY
+    PrintDebug("  Sector %d is DUMMY\n", i);
+#   endif
+  }
+
+  if (count > 0)
+  {
+      PrintVerbose("Ignoring %d dummy sectors\n", count);
+  }
+
+  UtilFree(bboxes);
+  UtilFree(notdummy);
+}
+
 static INLINE_G int TransformSegDist(const seg_t *seg)
 {
   float_g sx = seg->side ? seg->linedef->end->x : seg->linedef->start->x;
@@ -1417,6 +1664,36 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
   return FALSE;
 }
 
+//
+// VertexCheckMultiSectors
+//
+static int VertexCheckMultiSectors(vertex_t *vert)
+{
+  sector_t *sec = NULL;
+
+  wall_tip_t *tip;
+
+  for (tip = vert->tip_set; tip; tip=tip->next)
+  {
+    if (tip->left)
+    {
+      if (! sec)
+        sec = tip->left;
+      else if (sec != tip->left)
+        return TRUE;
+    }
+
+    if (tip->right)
+    {
+      if (! sec)
+        sec = tip->right;
+      else if (sec != tip->right)
+        return TRUE;
+    }
+  }
+
+  return FALSE;  // zero or one sector
+}
 
 /* ----- writing routines ------------------------------ */
 
@@ -1911,12 +2188,18 @@ void LoadLevel(void)
   GetSidedefs();
 
   if (doing_hexen)
+  {
     GetLinedefsHexen();
+    GetThingsHexen();
+  }
   else
+  {
     GetLinedefs();
+    GetThings();
+  }
 
-  PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines\n", 
-      num_vertices, num_sectors, num_sidedefs, num_linedefs);
+  PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
+      num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
   if (!cur_info->choose_fresh && !doing_normal &&
       normal_exists && num_sectors > 5 && num_linedefs > 100)
@@ -1939,14 +2222,17 @@ void LoadLevel(void)
     if (!cur_info->keep_sect)
       PruneSectors();
   }
+ 
+  CalculateWallTips();
 
   if (doing_hexen)
   {
     // -JL- Find sectors containing polyobjs
     FindPolyobjSectors();
   }
-  
-  CalculateWallTips();
+
+  if (!cur_info->keep_dummy && num_sectors > 10)
+    FindDummySectors();
 }
 
 //
@@ -1958,6 +2244,7 @@ void FreeLevel(void)
   FreeSidedefs();
   FreeLinedefs();
   FreeSectors();
+  FreeThings();
   FreeSegs();
   FreeSubsecs();
   FreeNodes();

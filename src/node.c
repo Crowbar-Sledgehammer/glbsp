@@ -404,7 +404,11 @@ superblock_t *CreateSegs(void)
     // ignore zero-length lines
     if (line->zero_len)
       continue;
-    
+
+    // ignore lines from dummy sectors
+    if (line->right && line->right->sector && line->right->sector->is_dummy)
+      continue;
+
     // check for Humungously long lines
     if (ABS(line->start->x - line->end->x) >= 10000 ||
         ABS(line->start->y - line->end->y) >= 10000)

@@ -98,8 +98,9 @@ static void ShowOptions(void)
     "  -nogl            Don't compute the GL-friendly nodes\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
-    "  -keepsect        Don't prune unused sectors\n"
-    "  -noprune         Don't prune anything which is unused\n"
+    "  -keepdummy       Keep dummy sectors in the BSP tree\n"
+    "  -keepsect        Don't remove unused sectors\n"
+    "  -noprune         Don't remove anything which is unused\n"
     "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"
   );
 }
