@@ -190,17 +190,17 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
 
   // create children
 
-  v1_vert = new Fl_Round_Button(x+12, y+16+22*0, 26, 26,
-      "V1 GL Nodes");
-  v1_vert->align(FL_ALIGN_RIGHT);
-  v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
-  add(v1_vert);
-
-  warnings = new Fl_Round_Button(x+12, y+16+22*1, 26, 26,
+  warnings = new Fl_Round_Button(x+12, y+16+22*0, 26, 26,
       "Extra Warnings");
   warnings->align(FL_ALIGN_RIGHT);
   warnings->callback((Fl_Callback *) misc_opts_check_CB);
   add(warnings);
+
+  v1_vert = new Fl_Round_Button(x+12, y+16+22*1, 26, 26,
+      "V1 GL Nodes");
+  v1_vert->align(FL_ALIGN_RIGHT);
+  v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
+  add(v1_vert);
 
   no_reject = new Fl_Round_Button(x+12, y+16+22*2, 26, 26,
       "Don't clobber REJECT");

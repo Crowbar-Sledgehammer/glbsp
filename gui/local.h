@@ -392,9 +392,9 @@ public:
   virtual ~Guix_MiscOptions();
 
   // child widgets: a set of toggle buttons
+  Fl_Round_Button *warnings;
   Fl_Round_Button *v1_vert;
   Fl_Round_Button *no_reject;
-  Fl_Round_Button *warnings;
   Fl_Round_Button *pack_sides;
   
   // routine to set the buttons based on the build-info.

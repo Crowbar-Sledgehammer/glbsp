@@ -340,10 +340,19 @@ void Guix_Book::ParaAddLine(const char *line)
     while (*line && word_len < 98)
     {
       // handle escapes:
-      //   #-  : non-break space.
+      //  `#-'  : non-break space.
+      //  `. '  : add a non-break space after dot
 
       if (line[0] == '#' && line[1] == '-')
       {
+        word_buf[word_len++] = ' ';
+        line += 2;
+        continue;
+      }
+      else if (line[0] == '.' && line[1] == ' ')
+      {
+        word_buf[word_len++] = '.';
+        word_buf[word_len++] = ' ';
         word_buf[word_len++] = ' ';
         line += 2;
         continue;

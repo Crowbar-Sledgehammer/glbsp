@@ -93,7 +93,7 @@ Guix_PrefWin::Guix_PrefWin() : Fl_Window(400, 280, "glBSP Preferences")
   
   reset_all = new Fl_Button((w() - 240) / 2, 160+17, 240, 26,
       "Reset All Options To Defaults");
-  reset_all->box(FL_ROUND_UP_BOX);
+///---  reset_all->box(FL_SHADOW_BOX);
   reset_all->labelfont(FL_HELVETICA | FL_BOLD);
   reset_all->callback((Fl_Callback *) prefs_reset_all_CB);
   groups[1]->add(reset_all);
