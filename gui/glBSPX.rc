@@ -1,0 +1,25 @@
+//----------------------------------------------------------------------------
+//  glBSPX WIN32 RESOURCE FILE
+//----------------------------------------------------------------------------
+//
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
+//
+//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 2
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//------------------------------------------------------------------------
+
+#define IDI_ICON1  101
+#define IDI_APPLICATION  0x7F00
+
+IDI_APPLICATION  ICON  DISCARDABLE  "glBSPX.ico"
+
