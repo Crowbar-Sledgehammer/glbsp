@@ -227,6 +227,11 @@ void ArgvTerm(void)
 		delete[] arg_list;
 }
 
+//
+// ArgvFind
+//
+// Returns index number, or -1 if not found.
+// 
 int ArgvFind(char short_name, const char *long_name, int *num_params)
 {
 	SYS_ASSERT(short_name || long_name);
