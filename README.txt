@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted. 30th August 2002.
+by Andrew Apted. 2nd August 2002.
 
 
 Introduction
@@ -88,17 +88,17 @@ The "GL Friendly Nodes" specifications can be found here:
 The EDGE homepage can be found here:
    http://edge.sourceforge.net/
 
-The JDOOM homepage is here:
-   http://www.newdoom.com/jdoom
+The DoomsDay (JDOOM) homepage is here:
+   http://www.doomsdayhq.com/
 
 The Doom3D site can be found here:
-   http://www.redrival.com/fudgefactor/doom3d.html
+   http://doomworld.com/doom3d/
 
 Look here for PrBOOM:
    http://prboom.sourceforge.net/
 
 The Vavoom site is here:
-   http://www.raven-games.com/hosted/vavoom
+   http://www.vavoom-engine.com/
 
 
 Acknowledgements

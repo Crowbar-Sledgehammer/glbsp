@@ -455,10 +455,10 @@ static const char *contact_text[] =
   "@m Compatible Engines",
   "",
   "@t   EDGE     http://edge.sourceforge.net/",
-  "@t   JDOOM    http://www.newdoom.com/jdoom",
-  "@t   Doom3D   http://www.redrival.com/fudgefactor/doom3d.html",
+  "@t   JDOOM    http://www.doomsdayhq.com/",
+  "@t   Doom3D   http://doomworld.com/doom3d/",
   "@t   PrBOOM   http://prboom.sourceforge.net/",
-  "@t   Vavoom   http://www.raven-games.com/hosted/vavoom",
+  "@t   Vavoom   http://www.vavoom-engine.com/",
   "",
   NULL
 };
