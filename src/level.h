@@ -179,6 +179,11 @@ typedef struct linedef_s
 
   // Hexen support
   int specials[5];
+  
+  // normally NULL, except when this linedef directly overlaps an earlier
+  // one (a rarely-used trick to create higher mid-masked textures).
+  // No segs should be created for these overlapping linedefs.
+  struct linedef_s *overlap;
 
   // linedef index.  Always valid after loading & pruning of zero
   // length lines has occurred.

@@ -413,10 +413,7 @@ void DetectDuplicateVertices(void)
       vertex_t *B = lev_vertices[array[i+1]];
 
       // found a duplicate !
-      if (A->equiv)
-        B->equiv = A->equiv;
-      else
-        B->equiv = A;
+      B->equiv = A->equiv ? A->equiv : A;
     }
   }
 
@@ -446,10 +443,7 @@ void DetectDuplicateSidedefs(void)
       sidedef_t *B = lev_sidedefs[array[i+1]];
 
       // found a duplicate !
-      if (A->equiv)
-        B->equiv = A->equiv;
-      else
-        B->equiv = A;
+      B->equiv = A->equiv ? A->equiv : A;
     }
   }
 
@@ -788,11 +782,110 @@ void DetectDummySectors(void)
 
   if (count > 0)
   {
-      PrintVerbose("Ignoring %d dummy sectors\n", count);
+      PrintVerbose("Detected %d dummy sectors\n", count);
   }
 
   UtilFree(bboxes);
   UtilFree(notdummy);
+}
+
+static INLINE_G int LineVertexLowest(const linedef_t *L)
+{
+  // returns the "lowest" vertex (normally the left-most, but if the
+  // line is vertical, then the bottom-most) => 0 for start, 1 for end.
+
+  return ((int)L->start->x < (int)L->end->x ||
+          ((int)L->start->x == (int)L->end->x && 
+           (int)L->start->y <  (int)L->end->y)) ? 0 : 1;
+}
+
+static int LineStartCompare(const void *p1, const void *p2)
+{
+  int line1 = ((const int *) p1)[0];
+  int line2 = ((const int *) p2)[0];
+
+  linedef_t *A = lev_linedefs[line1];
+  linedef_t *B = lev_linedefs[line2];
+
+  vertex_t *C;
+  vertex_t *D;
+
+  if (line1 == line2)
+    return 0;
+
+  // determine left-most vertex of each line
+  C = LineVertexLowest(A) ? A->end : A->start;
+  D = LineVertexLowest(B) ? B->end : B->start;
+
+  if ((int)C->x != (int)D->x)
+    return (int)C->x - (int)D->x; 
+
+  return (int)C->y - (int)D->y;
+}
+
+static int LineEndCompare(const void *p1, const void *p2)
+{
+  int line1 = ((const int *) p1)[0];
+  int line2 = ((const int *) p2)[0];
+
+  linedef_t *A = lev_linedefs[line1];
+  linedef_t *B = lev_linedefs[line2];
+
+  vertex_t *C;
+  vertex_t *D;
+
+  if (line1 == line2)
+    return 0;
+
+  // determine right-most vertex of each line
+  C = LineVertexLowest(A) ? A->start : A->end;
+  D = LineVertexLowest(B) ? B->start : B->end;
+
+  if ((int)C->x != (int)D->x)
+    return (int)C->x - (int)D->x; 
+
+  return (int)C->y - (int)D->y;
+}
+
+void DetectOverlappingLines(void)
+{
+  // Algorithm:
+  //   Sort all lines by left-most vertex (for vertical lines, bottom-most).
+  //   Overlapping lines will then be contiguous in this set.
+
+  int i;
+  int *array = UtilCalloc(num_linedefs * sizeof(int));
+  int count = 0;
+
+  DisplayTicker();
+
+  // sort array of indices
+  for (i=0; i < num_linedefs; i++)
+    array[i] = i;
+  
+  qsort(array, num_linedefs, sizeof(int), LineStartCompare);
+
+  for (i=0; i < num_linedefs - 1; i++)
+  {
+    if (LineStartCompare(array + i, array + i+1) == 0 &&
+          LineEndCompare(array + i, array + i+1) == 0)
+    {
+      linedef_t *A = lev_linedefs[array[i]];
+      linedef_t *B = lev_linedefs[array[i+1]];
+
+      // found an overlap !
+      B->overlap = A->overlap ? A->overlap : A;
+
+      count++;
+    }
+  }
+
+  if (count > 0)
+  {
+      PrintVerbose("Detected %d overlapped linedefs\n", count);
+  }
+
+  UtilFree(array);
 }
 
 

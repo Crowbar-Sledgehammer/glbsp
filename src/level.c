@@ -1195,7 +1195,7 @@ void LoadLevel(void)
   PrintVerbose("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", 
       num_vertices, num_sectors, num_sidedefs, num_linedefs, num_things);
 
-  if (!cur_info->choose_fresh && !lev_doing_normal &&
+  if (cur_info->fast && !lev_doing_normal &&
       normal_exists && num_sectors > 5 && num_linedefs > 100)
   {
     PrintVerbose("Using original nodes to speed things up\n");
@@ -1227,6 +1227,8 @@ void LoadLevel(void)
 
   if (!cur_info->keep_dummy && num_sectors > 10)
     DetectDummySectors();
+
+  DetectOverlappingLines();
 }
 
 //
