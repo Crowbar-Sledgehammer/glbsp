@@ -55,14 +55,14 @@ private:
 
 	void draw_grid(int spacing);
 	void draw_partition(const node_c *nd, int ity);
-	void draw_node(const node_c *nd, int foo);
-	void draw_child(const child_t *ch, int foo);
+	void draw_all_partitions();
+	void draw_node(const node_c *nd, int pos, bool shade);
+	void draw_child(const child_t *ch, int pos, bool shade);
 
 	bool set_seg_color(seg_c *seg, bool on);
 	void draw_line(double x1, double y1, double x2, double y2);
 
 	void scroll(int dx, int dy);
-	// scroll the map.
 
 public:
 	int handle_key(int key);
@@ -84,6 +84,19 @@ private:
 	bool grid_MODE;
 	int partition_MODE;
 	int miniseg_MODE;
+
+	static const int MAX_ROUTE = 2000;
+
+	static const char RT_RIGHT = 0;
+	static const char RT_LEFT  = 1;
+
+	char *visit_route;
+	int route_len;
+
+	bool descend_by_mouse(int wx, int wy);  // true if OK
+	bool descend_tree(char side);  // true if OK
+
+	node_c *W_Grid::lowest_node();
 
 	static inline int GRID_FIND(double x, double y)
 	{

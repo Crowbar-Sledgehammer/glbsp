@@ -20,9 +20,11 @@
 #include "defs.h"
 
 
+#if 0
 static void foo_win_close_CB(Fl_Widget *w, void *data)
 {
 }
+#endif
 
 
 //
@@ -32,8 +34,10 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
         Fl_Widget(X, Y, W, H, label),
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
         mid_x(0), mid_y(0),
-		grid_MODE(true), partition_MODE(1), miniseg_MODE(2)
+		grid_MODE(true), partition_MODE(1), miniseg_MODE(2),
+		route_len(0)
 {
+	visit_route = new char[MAX_ROUTE];
 }
 
 //
@@ -41,6 +45,7 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
 //
 W_Grid::~W_Grid()
 {
+	delete[] visit_route;
 }
 
 
@@ -154,12 +159,12 @@ void W_Grid::draw()
 	node_c *root = lev_nodes.Get(lev_nodes.num - 1);
 
 	if (partition_MODE == 1)
-		draw_partition(root, 3);
+		draw_all_partitions();
 
-	draw_node(root, -1);
+	draw_node(root, 0, false);
 
 	if (partition_MODE == 2)
-		draw_partition(root, 3);
+		draw_all_partitions();
 
 	fl_pop_clip();
 }
@@ -229,28 +234,28 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
 	double mhx = mid_x + w() * 0.5 / zoom_mul;
 	double mhy = mid_y + h() * 0.5 / zoom_mul;
 
-	int nx1 = nd->x;
-	int ny1 = nd->y;
-	int nx2 = nx1 + nd->dx;
-	int ny2 = ny1 + nd->dy;
-
 	double tlx, tly;
 	double thx, thy;
+
+	// intersect the partition line (which extends to infinity) with
+	// the sides of the screen (in map coords).  Whether we use the
+	// left/right sides to top/bottom depends on the angle of the
+	// partition line.
 
 	if (ABS(nd->dx) > ABS(nd->dy))
 	{
 		tlx = mlx;
 		thx = mhx;
-		tly = nd->y + nd->dy * (mlx - nx1) / double(nd->dx);
-		thy = nd->y + nd->dy * (mhx - nx1) / double(nd->dx);
+		tly = nd->y + nd->dy * (mlx - nd->x) / double(nd->dx);
+		thy = nd->y + nd->dy * (mhx - nd->x) / double(nd->dx);
 
 		if (MAX(tly, thy) < mly || MIN(tly, thy) > mhy)
 			return;
 	}
 	else
 	{
-		tlx = nd->x + nd->dx * (mly - ny1) / double(nd->dy);
-		thx = nd->x + nd->dx * (mhy - ny1) / double(nd->dy);
+		tlx = nd->x + nd->dx * (mly - nd->y) / double(nd->dy);
+		thx = nd->x + nd->dx * (mhy - nd->y) / double(nd->dy);
 		tly = mly;
 		thy = mhy;
 
@@ -268,13 +273,77 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
 	fl_line(sx, sy, ex, ey);
 }
 
-void W_Grid::draw_node(const node_c *nd, int foo)
+void W_Grid::draw_all_partitions()
 {
-	for (int side = 0; side < 2; side++)
+	node_c * nodes[4];
+
+	nodes[0] = nodes[1] = nodes[2] = NULL;
+	nodes[3] = lev_nodes.Get(lev_nodes.num - 1);
+
+	for (int rt_idx = 0; rt_idx < route_len; rt_idx++)
 	{
-		const child_t *ch = (side == 0) ? &nd->r  : &nd->l;
-		
-		draw_child(ch, (foo == -1) ? side : foo);
+		node_c *cur = nodes[3];
+
+		nodes[0] = nodes[1];
+		nodes[1] = nodes[2];
+		nodes[2] = nodes[3];
+
+		nodes[3] = (visit_route[rt_idx] == RT_LEFT) ? cur->l.node : cur->r.node;
+
+		// should never reach a subsector
+		SYS_NULL_CHECK(nodes[3]);
+	}
+
+	for (int n_idx = 1; n_idx < 4; n_idx++)
+	{
+		if (nodes[n_idx])
+			draw_partition(nodes[n_idx], (n_idx == 3) ? 4 : n_idx);
+	}
+}
+
+void W_Grid::draw_node(const node_c *nd, int pos, bool shade)
+{
+	if (pos < route_len)
+	{
+		// get drawing order correct, draw shaded side FIRST.
+
+		if (visit_route[pos] == RT_RIGHT)
+		{
+			draw_child(&nd->l, pos, true);
+			draw_child(&nd->r, pos, shade);
+		}
+		else
+		{
+			draw_child(&nd->r, pos, true);
+			draw_child(&nd->l, pos, shade);
+		}
+	}
+	else
+	{
+		draw_child(&nd->l, pos, shade);
+		draw_child(&nd->r, pos, shade);
+	}
+}
+
+void W_Grid::draw_child(const child_t *ch, int pos, bool shade)
+{
+	//!!! FIXME: bbox check
+
+	if (ch->node)
+	{
+		draw_node(ch->node, pos + 1, shade);
+	}
+	else  /* Subsector */
+	{
+		subsec_c *sub = ch->subsec;
+
+		for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
+		{
+			if (! set_seg_color(seg, !shade))
+				continue;
+
+			draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
+		}
 	}
 }
 
@@ -328,31 +397,6 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 
 	fl_color(FL_GRAY_RAMP + (on ? 14 : 6));  // everything else
 	return true;
-}
-
-void W_Grid::draw_child(const child_t *ch, int foo)
-{
-	//!!! FIXME: bbox check
-
-	if (ch->node)
-	{
-		draw_node(ch->node, foo);
-		return;
-	}
-
-	subsec_c *sub = ch->subsec;
-
-	for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
-	{
-///---		// skip left sides (for efficiency)
-///---		if (seg->side)  // DISABLED: may cause highlight glitches
-///---			continue;
-
-		if (! set_seg_color(seg, foo == 0))
-			continue;
-
-		draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-	}
 }
 
 void W_Grid::draw_line(double x1, double y1, double x2, double y2)
@@ -484,7 +528,7 @@ int W_Grid::handle(int event)
 			return 1;
 
 		case FL_PUSH:
-			//...
+			descend_by_mouse(Fl::event_x(), Fl::event_y());
 			redraw();
 			return 1;
 
@@ -546,6 +590,22 @@ int W_Grid::handle_key(int key)
 			redraw();
 			return 1;
 
+		case 'u': case 'U':
+			if (route_len > 0)
+				route_len--;
+			redraw();
+			return 1;
+
+		case '[':
+			if (descend_tree(RT_LEFT))
+				redraw();
+			return 1;
+
+		case ']':
+			if (descend_tree(RT_RIGHT))
+				redraw();
+			return 1;
+
 		case 'x':
 			DialogShowAndGetChoice(ALERT_TXT, 0, "Please foo the joo.");
 			return 1;
@@ -557,3 +617,49 @@ int W_Grid::handle_key(int key)
 	return 0;  // unused
 }
 
+bool W_Grid::descend_by_mouse(int wx, int wy)
+{
+	node_c *cur_nd = lowest_node();
+
+	double mx, my;
+	WinToMap(wx, wy, &mx, &my);
+
+	// transpose coords to the origin, check side
+	double ox = mx - cur_nd->x;
+	double oy = my - cur_nd->y;
+
+	if (oy * cur_nd->dx < ox * cur_nd->dy)
+		return descend_tree(RT_RIGHT);
+	else
+		return descend_tree(RT_LEFT);
+}
+
+bool W_Grid::descend_tree(char side)
+{
+	if (route_len >= MAX_ROUTE)
+		return false;
+
+	node_c *cur_nd = lowest_node();
+
+	// would it be a subsector ??
+	if (((side == RT_LEFT) ? cur_nd->l.node : cur_nd->r.node) == NULL)
+		return false;
+
+	visit_route[route_len++] = side;
+	return true;
+}
+
+node_c *W_Grid::lowest_node()
+{
+	node_c *cur = lev_nodes.Get(lev_nodes.num - 1);
+
+	for (int rt_idx = 0; rt_idx < route_len; rt_idx++)
+	{
+		cur = (visit_route[rt_idx] == RT_LEFT) ? cur->l.node : cur->r.node;
+
+		// should never reach a subsector
+		SYS_NULL_CHECK(cur);
+	}
+
+	return cur;
+}
