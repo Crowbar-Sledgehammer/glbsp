@@ -48,16 +48,15 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2004 Andrew Apted.  ***\n"
-    "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
+    "*** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ***\n\n"
   );
 }
 
 static void ShowInfo(void)
 {
   TextPrintMsg(
-    "This GL node builder is based on BSP 2.3, which was created\n"
-    "from the basic theory stated in DEU5 (OBJECTS.C)\n"
+    "This GL node builder was originally based on BSP 2.3, which was\n"
+    "created from the basic theory stated in DEU5 (OBJECTS.C)\n"
     "\n"
     "Credits should go to :-\n"
     "  Janis Legzdinsh            for fixing up Hexen support\n"
@@ -98,7 +97,6 @@ static void ShowOptions(void)
     "  -nogl            Don't compute the GL-friendly nodes\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
-    "  -keepdummy       Keep dummy sectors in the BSP tree\n"
     "  -keepsect        Don't remove unused sectors\n"
     "  -noprune         Don't remove anything which is unused\n"
     "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"

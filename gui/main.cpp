@@ -81,16 +81,15 @@ static void ShowTitle(void)
 {
   GUI_PrintMsg(
     "\n"
-    "*** GL BSP Node Builder.  " GLBSP_VER " (C) 2004 Andrew Apted.  ***\n"
-    "*** Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough ***\n\n"
+    "*** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ***\n\n"
   );
 }
 
 static void ShowInfo(void)
 {
   GUI_PrintMsg(
-    "This GL node builder is based on BSP 2.3, which was created\n"
-    "from the basic theory stated in DEU5 (OBJECTS.C)\n"
+    "This GL node builder was originally based on BSP 2.3, which was\n"
+    "created from the basic theory stated in DEU5 (OBJECTS.C)\n"
     "\n"
     "Credits should go to :-\n"
     "  Andy Baker & Marc Pullen   for their invaluable help\n"
