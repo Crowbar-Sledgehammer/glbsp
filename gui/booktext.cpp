@@ -24,14 +24,14 @@
 static const char * contents_text[];
 static const char * intro_text[];
 static const char * using_text[];
-static const char * option_text[];
+static const char * dialog_text[];
 static const char * note_tc_text[];
 static const char * howwork_text[];
 static const char * diff_text[];
 static const char * contact_text[];
 static const char * acknow_text[];
 
-#define GRN  "@C59"   // 60 is better, but selection looks bad
+#define GRN  "@C61"   // selection looks bad, oh well
 
 
 const book_page_t book_pages[] =
@@ -39,7 +39,7 @@ const book_page_t book_pages[] =
   { contents_text },   // #00
   { intro_text },      // #01
   { using_text },      // #02
-  { option_text },     // #03
+  { dialog_text },     // #03
   { note_tc_text },    // #04
   { howwork_text },    // #05
   { diff_text },       // #06
@@ -65,9 +65,9 @@ static const char *contents_text[] =
   "",
   "#L01@c" GRN " 1. Introduction",
   "#L02@c" GRN " 2. Using glbspX",
-  "#L03@c" GRN " 3. Options and Menus",
+  "#L03@c" GRN " 3. Dialogs and Menus",
   "#L04@c" GRN " 4. Notes for TC authors",
-  "#L05@c" GRN " 5. How glBSP works",
+  "#L05@c" GRN " 5. How glBSP Works",
   "#L06@c" GRN " 6. Differences to BSP 2.3",
   "#L07@c" GRN " 7. Contact and Links",
   "#L08@c" GRN " 8. Acknowledgements",
@@ -96,6 +96,46 @@ static const char *intro_text[] =
   "creates, including: EDGE, the Doomsday engine (JDOOM), Doom3D, PrBoom,",
   "and Vavoom.#- See the Contact and Links page.",
   "",
+  "#P00",
+  "glbspX is the GUI (graphical user interface) version, which runs",
+  "in a window. There is also a command-line version called simply",
+  "`glbsp', which is designed to be run from a DOS box (Windows)",
+  "or a text console / CLI (Linux etc). ",
+  "glbspX lets you perform all the usual node-building jobs,",
+  "though the command-line version supports some more (rarely-useful)",
+  "options.",
+  "",
+  "@m Status:",
+  "",
+  "#P00",
+  "The current version is 1.95. It has been tested and",
+  "known to work on numerous large wads, including DOOM I, DOOM II,",
+  "TeamTNT's Eternal III, Fanatic's QDOOM, and many others.",
+  "",
+  "@b NOTE:",
+  "#P10",
+  "Version 1.91 introduced support for \"V2 GL Nodes\".  This allows",
+  "the BSP information to be stored with greater precision,",
+  "preventing problems like \"slime trails\".  It may take a while",
+  "before all DOOM ports are updated to",
+  "read the new format, for example EDGE 1.24 does not support it. ",
+  "Enable the `V1 GL Nodes' option (in the Misc Option box)",
+  "to generate the old format if needed.",
+  "",
+  "@m Legal stuff:",
+  "",
+  " glBSP (and glbspX) is Copyright (C) 2000-2001 Andrew Apted.",
+  "#P00",
+  "It is based on `BSP 2.3' (C) Colin Reed and Lee Killough,",
+  "which was created from the basic theory stated in DEU5 (OBJECTS.C)",
+  "by Raphael Quinet.",
+  "",
+  "#P00",
+  "glBSP (and glbspX) is under the GNU General Public License",
+  "(GPL). Click on the the Help > License menu to see the full text.",
+  "",
+  " All trademarks are the propriety of their owners.",
+  "",
   NULL
 };
 
@@ -105,9 +145,120 @@ static const char *intro_text[] =
 static const char *using_text[] =
 {
   "",
-  "@c@l 2. Using glbspX",
+  "@c@l 2. Using glbspX ",
   "",
   "@-",
+  "",
+  "#P00",
+  "The way glBSP operates is pretty simple: it will load the input",
+  "wad file, build the nodes for the levels that it finds, and then",
+  "save to the output file.  All this is triggered when you press",
+  "on the big `Build Nodes' button in the main window. ",
+  "The `Files' box let you specify the Input and Output filenames,",
+  "and the other boxes let you control various aspects about the way",
+  "nodes are built.",
+  "",
+  "#P00",
+  "On the bottom of the main window is the text output box, which",
+  "shows various messages during node building (stuff that the",
+  "command-line version normally prints in the terminal or DOS box). ",
+  "Watch out for warning messages, which appear in a red font, they",
+  "can indicate serious problems that were found in your levels.",
+  "",
+  
+  "@m  Build Modes",
+  "",
+  "#P00",
+  "There are five different build modes in glbspX, which can be",
+  "selected in the upper left box in the main window.",
+  "Here is a description of them:",
+  "",
+  "@t   GWA Mode",
+  "#P20",
+  "Use this mode for general use, e.g you've downloaded a normal",
+  "DOOM wad and wish to play it with an OpenGL DOOM engine",
+  "(one which is GLBSP-aware, of course). ",
+  "This mode will put all the GL Nodes into a separate file with",
+  "the \".gwa\" extension.  The engine should notice the GWA file",
+  "and load it automatically.",
+  "",
+  "#P20",
+  "The rest of the modes below create a new self-contained WAD file,",
+  "which will contain any GL Nodes that are built.",
+  "",
+  "@t   GL, Normal if missing",
+  "#P20",
+  "This mode builds the GL nodes, and will detect if the Normal nodes",
+  "are missing and build them too when absent. Hence it will keep any",
+  "pre-existing Normal nodes, so less work to do, plus the normal",
+  "nodes may be better optimised for non-GLBSP-aware DOOM ports.",
+  "",
+  "@t   GL and Normal nodes",
+  "#P20",
+  "This mode builds both the GL nodes and the Normal nodes.",
+  "",
+  "@t   GL nodes only",
+  "#P20",
+  "This mode builds only the GL nodes, completely ignoring any",
+  "pre-existing Normal nodes (even if absent).  This mode is",
+  "probably not very useful.",
+  "",
+  "@t   Normal nodes only",
+  "#P20",
+  "This mode builds just the Normal nodes.  The GL nodes are not",
+  "built, and any pre-existing GL nodes are removed.  You can use",
+  "glBSP as a regular node builder with this mode, since glBSP",
+  "does a pretty decent job building the normal nodes as well.",
+  "",
+
+  "@m Factor",
+  "",
+  "#P00",
+  "The factor value has a box of its own, just above the text output",
+  "box. It specifies the cost assigned to seg splits. ",
+  "Larger values make seg splits more costly (and thus glBSP tries",
+  "harder to avoid them), but smaller values produce better BSP",
+  "trees.  See the section `How glBSP Works' for more info. ",
+  "The default factor is known to be a good compromise.",
+  "",
+
+  "@m Misc Options",
+  "",
+  "#P00",
+  "The upper right box in the main window contain a set of",
+  "miscellaneous options. Some of them only appear when certain",
+  "build modes are enabled, because in other modes they would",
+  "be ignored.  The full set of misc options are:",
+  "",
+  "@t   Extra Warnings",
+  "#P20",
+  "Shows extra warning messages, which detail various",
+  "non-serious problems that glBSP discovers while building the",
+  "nodes.  Often these warnings show a real",
+  "problem in the level (e.g a non-closed sector or",
+  "invalid sidedef), so they are worth checking now and then.",
+  "",
+  "@t   V1 GL Nodes",
+  "#P20",
+  "The nodes will be created in the old (Version 1) format. ",
+  "When disabled, the new and improved (Version 2) format nodes",
+  "are generated.  Set this option for DOOM ports that don't yet",
+  "understand the new format (like EDGE 1.24).",
+  "",
+  "@t   Don't clobber REJECT",
+  "#P20",
+  "Normally glBSP will create an simple REJECT map for",
+  "each level.  This options prevents any existing",
+  "REJECT map from being clobbered, such as one built by a",
+  "dedicated reject building tool (RMB, etc).",
+  "",
+  "@t   Pack Sidedefs",
+  "#P20",
+  "Pack sidedefs, by detecting which sidedefs are",
+  "identical and removing the duplicates, producing a",
+  "smaller PWAD.  Note: this may make your level a lot",
+  "harder to edit !  Therefore this option is most useful",
+  "when producing a final WAD for public release.",
   "",
   NULL
 };
@@ -115,102 +266,13 @@ static const char *using_text[] =
 
 //------------------------------------------------------------------------
 
-static const char *option_text[] =
+static const char *dialog_text[] =
 {
   "",
-  "@c@l 3. Options and Menus",
+  "@c@l 3. Dialogs and Menus ",
   "",
   "@-",
   "",
-  "@m@b  Build Modes",
-  "",
-  "#P00",
-  "There are five different build modes in glbspX, which can be",
-  "selected in the upper left box in the main window.",
-  "Here is a description of them:",
-  "",
-  "@t    GWA Mode",
-  "#P30",
-  "this blah blah blas can fo ofoo tororooro and pdfsd qewrqwer",
-  "adf qwerqwer adf aag asg asg foo asdf qr far asdfadsf pooh bar",
-  "tribbly doo quad.",
-  "",
-  "@t    GL, Normal if missing",
-  "#P30",
-  "Blah.",
-  "",
-  "@t    GL and Normal nodes",
-  "#P30",
-  "Blah.",
-  "",
-  "@t    GL nodes only",
-  "#P30",
-  "Blah.",
-  "",
-  "@t    Normal nodes only",
-  "#P30",
-  "Blah.",
-  
-//The following options are recognised:
-//
-//  -factor <num> 
-//               Changes the cost assigned to seg splits.  Factor can
-//               be any number greater than 0, larger values make seg
-//               splits more costly (and thus glBSP tries harder to
-//               avoid them), but smaller values produce better BSP
-//               trees.  See the section below for more info.  The
-//               default value (5) is known to be a good compromise.
-//
-//  -noreject    Normally glBSP will create an simple REJECT map for
-//               each level.  This options prevents any existing
-//               REJECT map from being clobbered.
-//
-//  -noprog      Does not show the progress indicator.
-//
-//  -warn        Shows extra warning messages, which detail various
-//               non-serious problems that glBSP has while analysing the
-//               level structure.  Often these warnings show a real
-//               problem in the level (e.g. a non-closed sector or
-//               invalid sidedef), so they are worth checking now and
-//               then.
-//
-//  -packsides   Pack sidedefs, by detecting which sidedefs are
-//               identical and removing the duplicates, producing a
-//               smaller PWAD.  Note: this may make your level a lot
-//               harder to edit !  Therefore this option is most useful
-//               when producing a final WAD for public release.
-// 
-//  -v1          Backwards compatibility.  The current version of the
-//               "GL Nodes" spec (V2.0) introduces a new format for the
-//               GL_VERT lump designed to prevent slime trails.  Some
-//               engines may not support this at first, so use this
-//               option to produce the old (V1.0) format.
-//
-//These next set of options normally don't need to be used, but they are
-//provided to allow complete control or for special circumstances:
-//
-//  -loadall     glBSP will normally try to copy lumps from the input
-//               WAD file to the output file instead of loading them
-//               into memory.  This allows you to run glBSP on very
-//               large WADS (e.g. 15 MB for DOOM II) on a low memory
-//               machine.
-//
-//               This option causes everything from the input file to be
-//               loaded into memory.  This allows you to run glBSP using
-//               the same file for both input and output, but I strongly
-//               recommend _against_ it: you could lose your original
-//               WAD if something goes wrong (and you know Murphy...).
-//
-//  -nogl        Forces glBSP to not create the GL node info.
-//
-//  -nonormal    Forces glBSP to not create the normal node information
-//               when it detects that it is absent.
-// 
-//  -forcenormal
-//               glBSP will normally detect if the normal node info (i.e. 
-//               the non-GL variety) is present, and leave it untouched
-//               when it is, otherwise create it.  This option forces
-//               glBSP to recreate the normal node info.
   NULL
 };
 
@@ -234,7 +296,7 @@ static const char *note_tc_text[] =
   "the following process to properly compile everything:",
   "",
   "#P14",
-  "1. For your final compile of your maps (e.g. you are completely done",
+  "1. For your final compile of your maps (e.g you are completely done",
   "   making your maps), compile them using glbsp and use the `Normal Nodes",
   "   only' build mode to *not* build the GL nodes.",
   "",
@@ -254,7 +316,7 @@ static const char *note_tc_text[] =
   "",
   "#P14",
   "5) Recompile the maps in your main WAD with the GL nodes.  Be sure",
-  "   to use the `No Clobber REJECT' misc option, which prevents the",
+  "   to set the `Don't Clobber REJECT' option, which prevents the",
   "   reject entries created by rmb from being overwritten.",
   "",
   "#P00",
@@ -285,7 +347,7 @@ static const char *note_tc_text[] =
 static const char *howwork_text[] =
 {
   "",
-  "@c@l 5. How glBSP works",
+  "@c@l 5. How glBSP Works",
   "",
   "@-",
   "",
@@ -315,7 +377,7 @@ static const char *howwork_text[] =
   "#P00",
   "Another thing: having a good BSP tree is also important, and helps for",
   "faster rendering & smaller files.  Thus the node builder also tries to",
-  "make the BSP tree good (by making it balanced, and keeping it small).",
+  "make the BSP tree good (by making it balanced, and keeping it small). ",
   "If the Factor value is too high, it will care too much about the",
   "splits, and probably make a bad BSP tree.  How good the BSP tree is",
   "can be gauged by the output line that reads:",
@@ -349,8 +411,8 @@ static const char *diff_text[] =
   "",
   "#P13",
   "+ When the output file is not specified (i.e. no -o option), then",
-  "  the default output file will be a GWA file with the same name.",
-  "  Under BSP 2.3, the default output file would be \"tmp.wad\".",
+  "  the default output file will be a GWA file with the same name. ",
+  "  Under BSP 2.3, the default output file would be \"tmp.wad\". ",
   "  (This only applies to the command-line version).",
   "",
   "#P13",
@@ -421,37 +483,49 @@ static const char *acknow_text[] =
   "",
   "@-",
   "",
-  "  Andy Baker, for making binaries, writing code and other help.",
+  "#P10",
+  "Andy Baker, for making binaries, writing code and other help.",
   "",
-  "  Marc A. Pullen, for testing and helping with the documentation.",
+  "#P10",
+  "Marc A. Pullen, for testing and helping with the documentation.",
   "",
-  "  Lee Killough and André Majorel, for giving their permission to put",
-  "  glBSP under the GNU GPL.",
+  "#P10",
+  "Lee Killough and André Majorel, for giving their permission to put",
+  "glBSP under the GNU GPL.",
   "",
-  "  Janis Legzdinsh for fixing many problems with Hexen wads.",
+  "#P10",
+  "Janis Legzdinsh for fixing many problems with Hexen wads.",
   "",
-  "  Jaakko Keränen, who gave some useful feedback on the GL-Friendly",
-  "  Nodes specification.",
+  "#P10",
+  "Jaakko Keränen, who gave some useful feedback on the GL-Friendly",
+  "Nodes specification.",
   "",
-  "  The authors of FLTK (Fast Light Tool Kit), for a nice LGPL C++ GUI",
-  "  toolkit that even I can get working on both Linux and Win32.",
+  "#P10",
+  "The authors of FLTK (Fast Light Tool Kit), for a nice LGPL C++ GUI",
+  "toolkit that even I can get working on both Linux and Win32.",
   "",
-  "  Marc Rousseau (author of ZenNode 1.0), Robert Fenske Jr (author of",
-  "  Warm 1.6), L.M. Witek (author of Reject 1.1), and others, for",
-  "  releasing the source code to their WAD utilities, and giving me lots",
-  "  of ideas to \"borrow\" :), like blockmap packing.",
+  "#P10",
+  "Marc Rousseau (author of ZenNode 1.0), Robert Fenske Jr (author of",
+  "Warm 1.6), L.M. Witek (author of Reject 1.1), and others, for",
+  "releasing the source code to their WAD utilities, and giving me lots",
+  "of ideas to \"borrow\" :), like blockmap packing.",
   "",
-  "  Colin Reed and Lee Killough (and others), who wrote the original BSP",
-  "  2.3 which glBSP is based on.",
+  "#P10",
+  "Colin Reed and Lee Killough (and others), who wrote the original BSP",
+  "2.3 which glBSP is based on.",
   "",
-  "  Matt Fell, for the Doom Specs v1.666.",
+  "#P10",
+  "Matt Fell, for the Doom Specs v1.666.",
   "",
-  "  Raphael Quinet, for DEU and the original idea.",
+  "#P10",
+  "Raphael Quinet, for DEU and the original idea.",
   "",
-  "  id Software, for not only creating such an irresistable game, but",
-  "  releasing the source code for so much of their stuff.",
+  "#P10",
+  "id Software, for not only creating such an irresistable game, but",
+  "releasing the source code for so much of their stuff.",
   "",
-  "  . . . and everyone else who deserves it ! ",
+  "#P10",
+  ". . . and everyone else who deserves it ! ",
   "",
   NULL
 };

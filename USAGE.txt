@@ -2,15 +2,16 @@
 USING glBSP
 ===========
 
-by Andrew Apted.  28th June 2001.
+by Andrew Apted.  20th July 2001.
 
 
 Running glBSP
 -------------
 
 glBSP is a command line tool.  Under Windows this means it must be run
-from the DOS box.  (Later on I hope to have a fully-featured GUI
-version, but it's gonna take a lot more work).
+from the DOS box.  There is also a fully-featured GUI version
+available called `glbspX' -- check the download page on the glBSP
+website.
 
 There are two main ways of using glBSP:
 
@@ -72,7 +73,7 @@ The following options are recognised:
                splits more costly (and thus glBSP tries harder to
                avoid them), but smaller values produce better BSP
                trees.  See the section below for more info.  The
-               default value (5) is known to be a good compromise.
+               default value is known to be a good compromise.
 
   -noreject    Normally glBSP will create an simple REJECT map for
                each level.  This options prevents any existing
