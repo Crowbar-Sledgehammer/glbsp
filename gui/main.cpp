@@ -57,14 +57,14 @@ const guix_preferences_t default_guiprefs =
 #else
   40,  50,
 #endif
-  560, 450,    // win_w, win_h;
+  550, 520,    // win_w, win_h;
 
   120, 200,    // progress_x, progress_y
   90, 200,     // dialog_x, dialog_y
   80, 100,     // other_x, other_y
 
-  20, 0,       // manual_x, manual_y
-  610, 400,    // manual_w, manual_h
+  20, 50,      // manual_x, manual_y
+  610, 520,    // manual_w, manual_h
   0,           // manual_page
 
   TRUE,        // overwrite_warn
