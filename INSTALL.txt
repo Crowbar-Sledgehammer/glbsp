@@ -47,8 +47,10 @@ The plugin version of glBSP is a special version that can be used
 within other programs, e.g. a DOOM engine.  The result of the build 
 is a library file: libglbsp.a (libglbsp.lib for VC++ under Win32).
 
-Unix/Linux: make -f Plugin.mak
+Unix/Linux: make -f Plugin_unx.mak
 MacOS X:    make -f Plugin_osx.mak
+
+Windows with MinGW: make -f Plugin_w32.mak
 
 Windows with Dev-C++:  open the Plugin.dev project file.
 Windows with MSVC.NET: open the Plugin.vcproj project file.
@@ -66,7 +68,7 @@ glBSPX is the GUI version of glBSP, written in C++ and requires the
 FLTK toolkit, version 1.1.4.  FLTK needs to be built before trying
 to build glBSPX: see the next section for some guidelines.
 
-Unix/Linux: make -f GUI.mak
+Unix/Linux: make -f GUI_unx.mak
 MacOS X:    make -f GUI_osx.mak
 
 Windows with Dev-C++: open the GUI.dev project file.
