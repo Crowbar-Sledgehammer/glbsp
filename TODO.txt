@@ -1,0 +1,13 @@
+
+TODO
+====
+
+-  make loading/saving progress into percentage.
+
+-  un-recursivify AddSegToSuper() and co.
+
+-  rotate subsectors if the first seg has a different sector from the
+   second and third.
+
++  implement REJECT building code.
+
