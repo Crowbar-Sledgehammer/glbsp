@@ -2,7 +2,7 @@
 Compiling glBSP
 ===============
 
-by Andrew Apted.  10th August 2002.
+by Andrew Apted.  29th September 2003.
 
 
 glBSP has been written with portability in mind.  It is purely ANSI C,
@@ -24,6 +24,8 @@ glBSP has been known to compile and work on the following platforms:
 
    +  Win32, with MinGW 1.0.
 
+   +  MacOS X (10.2.4) with GCC 3.1.
+
    +  IRIX 6.5.
    
    +  Digital Unix 4.0.
@@ -32,10 +34,13 @@ glBSP has been known to compile and work on the following platforms:
 Linux and other Unices
 ----------------------
 
-CD into the cmdline directory.  The "makefile" makefile is the correct
-one for Linux and other UN*X type OSes.  Simply typing `make' should
-create the `glbsp' executable.  Currently there is no automatic
-installation, just copy the glbsp executable to where you want it.
+CD into the cmdline directory.  The "makefile.unx" makefile is the
+correct one for Linux and other UN*X type OSes.  Simply typing
+`make -f makefile.unx' should create the `glbsp' executable.
+Currently there is no automatic installation, just copy the glbsp
+executable to where you want it.
+
+For MacOS X: use "make -f makefile.osx".
 
 
 MSDOS
@@ -83,11 +88,20 @@ directory (in glbsp sources).
 
 For Linux: 
 
-    Just running "make" should do the trick.
+    Just running "make -f makefile.unx" should do the trick.
 
 For Win32 with MinGW: 
 
     First edit the "makeming.bat" file and set the the FLTK and
     MINGW variables (at the top) to the correct directories.  Then
     just run the "makeming.bat" batch file.
+
+For MacOS X:
+
+    You'll need to be running FINK <http://fink.sourceforge.net>,
+    and also have Apple's development tools installed.  Also, you'll
+    need to compile FLTK with the Fl_Sys_Menu_Bar class in the build
+    (edit src/Makefile after configuration).
+    
+    Then run "make -f makefile.osx" to build.
 

@@ -2,5 +2,10 @@
 TODO
 ====
 
+*  WIN32 + FLTK: have a proper makefile.
+
 -  glBSPX: Fix modal windows not having close buttons in Win32.
+   Look for WS_SYSMENU in src/FL_win32.cxx
+
+TOO COMPLEX:  -modify option: directly modifies the input wad.
 
