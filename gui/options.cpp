@@ -2,7 +2,7 @@
 // Options : Unix/FLTK Option boxes
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -22,13 +22,8 @@
 #include "local.h"
 
 
-#ifdef WIN32
 #define BM_BUTTONTYPE  FL_ROUND_DOWN_BOX
-#define BM_BUTTONSIZE  26
-#else
-#define BM_BUTTONTYPE  FL_DIAMOND_DOWN_BOX
-#define BM_BUTTONSIZE  28
-#endif
+#define BM_BUTTONSIZE  30
 
 
 static void build_mode_radio_CB(Fl_Widget *w, void *data)

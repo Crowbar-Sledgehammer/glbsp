@@ -2,7 +2,7 @@
 // MAIN : Unix/FLTK Main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -64,7 +64,8 @@ const guix_preferences_t default_guiprefs =
   0,           // manual_page
 
   TRUE,        // overwrite_warn
-  TRUE         // same_file_warn
+  TRUE,        // same_file_warn
+  NULL         // save_log_file
 };
 
 
@@ -98,7 +99,7 @@ static void ShowInfo(void)
     "Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
     "accompanying documentation for more details.\n"
     "\n"
-    "Note: glbspX is the GUI (graphical user interface) version.\n"
+    "Note: glBSPX is the GUI (graphical user interface) version.\n"
     "Try plain \"glbsp\" if you want the command-line version.\n"
   );
 }
@@ -115,6 +116,9 @@ void MainSetDefaults(void)
 
   memcpy((guix_preferences_t *) &guix_prefs, &default_guiprefs,
       sizeof(guix_prefs));
+
+  // set default filename for saving the log
+  guix_prefs.save_log_file = GlbspStrDup("glbsp.log");
 }
 
 
@@ -144,7 +148,7 @@ int main(int argc, char **argv)
 
   // handle drag and drop: a single non-option argument
   //
-  // NOTE: there is no support for giving options to glbspX via the
+  // NOTE: there is no support for giving options to glBSPX via the
   // command line.  Plain `glbsp' should be used if this is desired.
   // The difficult here lies in possible conflicts between given
   // options and those already set from within the GUI.  Plus we may
@@ -169,6 +173,10 @@ int main(int argc, char **argv)
   }
   else if (argc > 1)
     unused_args = TRUE;
+
+
+  // load icons for file chooser
+  Fl_File_Icon::load_system_icons();
 
 
   guix_win = new Guix_MainWin(MY_TITLE);
@@ -196,7 +204,7 @@ int main(int argc, char **argv)
 
   if (unused_args)
     guix_win->text_box->AddMsg(
-        "** Warning: Ignoring extra arguments to glbspX **\n", FL_RED, TRUE);
+        "** Warning: Ignoring extra arguments to glBSPX **\n", FL_RED, TRUE);
 
   // run the GUI until the user quits
   while (! guix_win->want_quit)

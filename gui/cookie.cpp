@@ -2,7 +2,7 @@
 // COOKIE : Unix/FLTK Persistence (INI/RC files)
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -158,6 +158,10 @@ static boolean_g CookieSetPrefVar(const char *name, const char *value)
   // same file warning
   if (strcasecmp(name, "same_file_warn") == 0)
     return SetBooleanVar(guix_prefs.same_file_warn, value);
+
+  // save log filename
+  if (strcasecmp(name, "save_log_file") == 0)
+    return SetStringVar(guix_prefs.save_log_file, value);
 
 
   // Unknown preference variable !
@@ -496,6 +500,9 @@ static void CookieWritePrefs(FILE *fp)
   
   fprintf(fp, "overwrite_warn = %d\n", guix_prefs.overwrite_warn);
   fprintf(fp, "same_file_warn = %d\n", guix_prefs.same_file_warn);
+  
+  fprintf(fp, "save_log_file = \"%s\"\n", guix_prefs.save_log_file ?
+      guix_prefs.save_log_file : "");
 
   fprintf(fp, "\n");
   fflush(fp);

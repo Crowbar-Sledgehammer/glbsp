@@ -2,7 +2,7 @@
 // PROGRESS : Unix/FLTK Progress display
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -223,9 +223,6 @@ void GUI_DisplaySetTitle(const char *str)
   // copy the string
   GlbspFree(guix_win->progress->title_str);
   guix_win->progress->title_str = GlbspStrDup(str);
-
-///  progress_window->label(progress_window->title_str);
-///  progress_window->redraw();
 }
 
 //

@@ -2,7 +2,7 @@
 // FILES : Unix/FLTK File boxes
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -23,9 +23,6 @@
 
 #include <unistd.h>
 
-
-#define ALERT_TXT  "glBSP Alert"
-#define MISSING_COMMS  "(Not Specified)"
 
 #define MY_GWA_COLOR  \
     fl_color_cube((FL_NUM_RED-1)*3/4, 0, 0)
@@ -487,8 +484,8 @@ static boolean_g BuildValidateOptions(void)
     
     guix_info.load_all = TRUE; 
   }
-  else if (HelperFileExists(guix_info.output_file) &&
-      guix_prefs.overwrite_warn)
+  else if (guix_prefs.overwrite_warn &&
+      HelperFileExists(guix_info.output_file))
   {
     sprintf(buffer,
         "Warning: the chosen Output file already exists:\n"
