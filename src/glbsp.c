@@ -113,7 +113,7 @@ static void AddExtraFile(nodebuildinfo_t *info, const char *str)
 
   if (space == 0)
   {
-    info->extra_files = (const char **) UtilRealloc(info->extra_files,
+    info->extra_files = (const char **) UtilRealloc((void *)info->extra_files,
         (count + 1 + EXTRA_BLOCK) * sizeof(const char *));
   }
 
