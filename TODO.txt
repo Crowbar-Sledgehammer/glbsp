@@ -2,17 +2,15 @@
 TODO
 ====
 
-Test, test, test, ..., Release !
-
 
 LATER / IDEAS
 =============
 
-*  make into C++.
++  simplify callback interface.
 
 +  pull makefiles / project files into top-level directory.
 
-+  simplify callback interface.
++  convert into C++.
 
 -  put Changelog on GLBSP page.
 
