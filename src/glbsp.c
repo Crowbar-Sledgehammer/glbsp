@@ -58,7 +58,7 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // no_reject
   FALSE,   // no_progress
   FALSE,   // mini_warnings
-  FALSE,   // hexen_mode
+  FALSE,   // force_hexen
   FALSE,   // pack_sides
   FALSE,   // v1_vert
 
@@ -85,6 +85,13 @@ const nodebuildcomms_t default_buildcomms =
 
 /* ----- option parsing ----------------------------- */
 
+static void SetMessage(const char *str)
+{
+  GlbspFree(cur_comms->message);
+
+  cur_comms->message = GlbspStrDup(str);
+}
+
 #define HANDLE_BOOLEAN(name, field)  \
     if (StrCaseCmp(opt_str, name) == 0)  \
     {  \
@@ -98,8 +105,10 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     const char ** argv, int argc)
 {
   const char *opt_str;
-
   int num_files = 0;
+
+  cur_comms = comms;
+  SetMessage(NULL);
 
   while (argc > 0)
   {
@@ -109,11 +118,13 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
 
       if (num_files >= 1)
       {
-        comms->message = "Too many filenames.  Use the -o option";
+        SetMessage("Too many filenames.  Use the -o option");
+        cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
-      info->input_file = argv[0];
+      GlbspFree(info->input_file);
+      info->input_file = GlbspStrDup(argv[0]);
       num_files++;
 
       argv++; argc--;
@@ -132,11 +143,13 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       if (argc < 2)
       {
-        comms->message = "Missing filename for the -o option";
+        SetMessage("Missing filename for the -o option");
+        cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
-      info->output_file = argv[1];
+      GlbspFree(info->output_file);
+      info->output_file = GlbspStrDup(argv[1]);
 
       argv += 2; argc -= 2;
       continue;
@@ -146,7 +159,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       if (argc < 2)
       {
-        comms->message = "Missing factor value";
+        SetMessage("Missing factor value");
+        cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
@@ -160,7 +174,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       if (argc < 2)
       {
-        comms->message = "Missing maxblock value";
+        SetMessage("Missing maxblock value");
+        cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
@@ -173,7 +188,6 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("noreject",    no_reject)
     HANDLE_BOOLEAN("noprog",      no_progress)
     HANDLE_BOOLEAN("warn",        mini_warnings)
-    HANDLE_BOOLEAN("hexen",       hexen_mode)
     HANDLE_BOOLEAN("packsides",   pack_sides)
     HANDLE_BOOLEAN("v1",          v1_vert)
 
@@ -185,30 +199,41 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("keepsect",    keep_sect)
     HANDLE_BOOLEAN("noprune",     no_prune)
 
+    // The -hexen option is only kept for backwards compat.
+    HANDLE_BOOLEAN("hexen",       force_hexen)
+
     sprintf(glbsp_message_buf, "Unknown option: %s", argv[0]);
-    comms->message = (const char *) glbsp_message_buf;
+    SetMessage(glbsp_message_buf);
+
+    cur_comms = NULL;
     return GLBSP_E_BadArgs;
   }
 
+  cur_comms = NULL;
   return GLBSP_E_OK;
 }
 
 glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     volatile nodebuildcomms_t *comms)
 {
-  glbsp_ret_e retval = GLBSP_E_OK;
+  cur_comms = comms;
+  SetMessage(NULL);
 
-  comms->message = NULL;
+  info->same_filenames = FALSE;
+  info->missing_output = FALSE;
 
-  if (!info->input_file)
+  if (!info->input_file || info->input_file[0] == 0)
   {
-    comms->message = "Missing input filename !";
+    SetMessage("Missing input filename !");
     return GLBSP_E_BadArgs;
   }
 
-  if (!info->output_file)
+  if (!info->output_file || info->output_file[0] == 0)
   {
-    info->output_file = ReplaceExtension(info->input_file, "gwa");
+    GlbspFree(info->output_file);
+    info->output_file = GlbspStrDup(ReplaceExtension(
+          info->input_file, "gwa"));
+
     info->gwa_mode = 1;
     info->missing_output = TRUE;
   }
@@ -217,7 +242,7 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     info->gwa_mode = 1;
   }
 
-  if (strcmp(info->input_file, info->output_file) == 0)
+  if (StrCaseCmp(info->input_file, info->output_file) == 0)
   {
     info->load_all = 1;
     info->same_filenames = TRUE;
@@ -226,46 +251,65 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
   if (info->no_prune && info->pack_sides)
   {
     info->pack_sides = FALSE;
-    comms->message = "-noprune and -packsides cannot be used together";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("-noprune and -packsides cannot be used together");
+    return GLBSP_E_BadInfoFixed;
   }
 
   if (info->gwa_mode && info->no_gl)
   {
     info->no_gl = FALSE;
-    comms->message = "-nogl with GWA file: nothing to do !";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("-nogl with GWA file: nothing to do !");
+    return GLBSP_E_BadInfoFixed;
   }
  
   if (info->gwa_mode && info->force_normal)
   {
     info->force_normal = FALSE;
-    comms->message = "-forcenormal used, but GWA files don't have normal nodes";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("-forcenormal used, but GWA files don't have normal nodes");
+    return GLBSP_E_BadInfoFixed;
   }
  
   if (info->no_normal && info->force_normal)
   {
     info->force_normal = FALSE;
-    comms->message = "-forcenormal and -nonormal cannot be used together";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("-forcenormal and -nonormal cannot be used together");
+    return GLBSP_E_BadInfoFixed;
   }
   
   if (info->factor <= 0)
   {
     info->factor = DEFAULT_FACTOR;
-    comms->message = "Bad factor value !";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("Bad factor value !");
+    return GLBSP_E_BadInfoFixed;
   }
 
   if (info->block_limit < 1000 || info->block_limit > 64000)
   {
     info->block_limit = DEFAULT_BLOCK_LIMIT;
-    comms->message = "Bad blocklimit value !";
-    retval = GLBSP_E_BadArgs;
+    SetMessage("Bad blocklimit value !");
+    return GLBSP_E_BadInfoFixed;
   }
 
-  return retval;
+  return GLBSP_E_OK;
+}
+
+
+/* ----- memory functions --------------------------- */
+
+const char *GlbspStrDup(const char *str)
+{
+  if (! str)
+    return NULL;
+
+  return UtilStrDup(str);
+}
+
+void GlbspFree(const char *str)
+{
+  if (! str)
+    return;
+
+  UtilFree((char *) str);
 }
 
 
@@ -335,16 +379,20 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
 
   total_big_warn = total_small_warn = 0;
 
+  // clear cancelled flag
+  comms->cancelled = FALSE;
+
   // sanity check
-  if (!cur_info->input_file || !cur_info->output_file)
+  if (!cur_info->input_file  || cur_info->input_file[0] == 0 ||
+      !cur_info->output_file || cur_info->output_file[0] == 0)
   {
-    comms->message = "INTERNAL ERROR: Missing in/out filename !";
+    SetMessage("INTERNAL ERROR: Missing in/out filename !");
     return GLBSP_E_BadArgs;
   }
 
   if (cur_info->no_normal && cur_info->no_gl)
   {
-    comms->message = "-nonormal and -nogl specified: nothing to do !";
+    SetMessage("-nonormal and -nogl specified: nothing to do !");
     return GLBSP_E_BadArgs;
   }
 
@@ -357,26 +405,32 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     PrintMsg("* Output file is same as input file. Using -loadall\n\n");
 
   // opens and reads directory from the input wad
-  ReadWadFile(cur_info->input_file);
+  ret = ReadWadFile(cur_info->input_file);
+
+  if (ret != GLBSP_E_OK)
+  {
+    TermDebug();
+    return ret;
+  }
 
   if (CountLevels() <= 0)
   {
     CloseWads();
     TermDebug();
 
-    comms->message = "No levels found in wad!";
+    SetMessage("No levels found in wad!");
     return GLBSP_E_Unknown;
   }
    
   PrintMsg("\nCreating nodes using tunable factor of %d\n", info->factor);
 
   DisplayOpen(DIS_BUILDPROGRESS);
-  DisplaySetTitle("glBSP Progress");
+  DisplaySetTitle("glBSP Build Progress");
 
   sprintf(strbuf, "File: %s", cur_info->input_file);
-  
+ 
   DisplaySetBarText(2, strbuf);
-  DisplaySetBarLimit(2, CountLevels());
+  DisplaySetBarLimit(2, CountLevels() * 10);
   DisplaySetBar(2, 0);
 
   cur_file_pos = 0;
@@ -389,7 +443,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     if (ret != GLBSP_E_OK)
       break;
 
-    cur_file_pos++;
+    cur_file_pos += 10;
     DisplaySetBar(2, cur_file_pos);
   }
 
@@ -397,7 +451,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
 
   // writes all the lumps to the output wad
   if (ret == GLBSP_E_OK)
-    WriteWadFile(cur_info->output_file);
+    ret = WriteWadFile(cur_info->output_file);
 
   // close wads and free memory
   CloseWads();
@@ -406,6 +460,10 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   PrintMsg("Total minor warnings: %d\n", total_small_warn);
 
   TermDebug();
+
+  cur_info  = NULL;
+  cur_comms = NULL;
+  cur_funcs = NULL;
 
   return ret;
 }

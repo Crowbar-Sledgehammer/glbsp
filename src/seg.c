@@ -643,6 +643,7 @@ static boolean_g PickNodeWorker(superblock_t *part_list,
     {
       cur_build_pos++;
       DisplaySetBar(1, cur_build_pos);
+      DisplaySetBar(2, cur_file_pos + cur_build_pos / 10);
     }
 
     DisplayTicker();
@@ -708,6 +709,7 @@ seg_t *PickNode(superblock_t *seg_list, int depth)
     {
       cur_build_pos += want - total / prog_step;
       DisplaySetBar(1, cur_build_pos);
+      DisplaySetBar(2, cur_file_pos + cur_build_pos / 10);
     }
   }
  

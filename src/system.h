@@ -68,7 +68,6 @@ void PrintDebug(const char *str, ...);
 // macros for the display stuff
 #define DisplayOpen        (* cur_funcs->display_open)
 #define DisplaySetTitle    (* cur_funcs->display_setTitle)
-#define DisplaySetText     (* cur_funcs->display_setText)
 #define DisplaySetBar      (* cur_funcs->display_setBar)
 #define DisplaySetBarLimit (* cur_funcs->display_setBarLimit)
 #define DisplaySetBarText  (* cur_funcs->display_setBarText)

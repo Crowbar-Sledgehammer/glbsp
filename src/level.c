@@ -43,16 +43,17 @@
 #define DEBUG_BSP       0
 #define DEBUG_SORTER    0
 #define DEBUG_WALLTIPS  0
-#define DEBUG_POLYOBJ   0
+#define DEBUG_POLYOBJ   1
 
 #define ALLOC_BLKNUM  1024
 
 
 // per-level variables
 
-static int normal_exists;
-static int doing_normal;
-static int doing_gl;
+static boolean_g normal_exists;
+static boolean_g doing_normal;
+static boolean_g doing_gl;
+static boolean_g doing_hexen;
 
 
 #define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
@@ -191,14 +192,14 @@ node_t *LookupNode(int index)
 //
 // CheckForNormalNodes
 //
-int CheckForNormalNodes(void)
+boolean_g CheckForNormalNodes(void)
 {
   lump_t *lump;
   
   // Note: an empty NODES lump can be valid.
   if (FindLevelLump("NODES") == NULL)
     return FALSE;
-  
+ 
   lump = FindLevelLump("SEGS");
   
   if (! lump || lump->length == 0 || CheckLevelLumpZero(lump))
@@ -470,6 +471,20 @@ void GetLinedefsHexen(void)
     line->left  = (SINT16(raw->sidedef2) < 0) ? NULL :
         LookupSidedef(SINT16(raw->sidedef2));
 
+    // -JL- Added missing sidedef handling that caused all sidedefs to be
+    //      pruned.
+    if (line->right)
+    {
+      line->right->ref_count++;
+      line->right->on_special |= (line->type > 0) ? 1 : 0;
+    }
+
+    if (line->left)
+    {
+      line->left->ref_count++;
+      line->left->on_special |= (line->type > 0) ? 1 : 0;
+    }
+
     line->index = i;
 
     // handle polyobj lines
@@ -482,6 +497,141 @@ void GetLinedefsHexen(void)
     {
       line->polyobj = 1;
     }
+  }
+}
+
+static void MarkPolyobjSector(float_g x, float_g y)
+{
+  int i;
+  
+  float_g best_dist = 999999;
+  linedef_t *best_match = NULL;
+  sector_t *sector = NULL;
+
+  // -AJA- Algorithm is just like in DEU: we cast a line horizontally
+  // from the given (x,y) position and find all linedefs that
+  // intersect it, choosing the one with the closest distance.
+  //
+  // We ignore linedefs that lie along the line, since we can't tell
+  // what side we're on.  Since we assume sectors are closed, there
+  // should exist at least one non-horizontal intersecting linedef.
+  // (If the sector ain't closed: tough cookies).
+
+  for (i = 0; i < num_linedefs; i++)
+  {
+    linedef_t *L = linedefs[i];
+
+    float_g x1 = L->start->x;
+    float_g y1 = L->start->y;
+    float_g x2 = L->end->x;
+    float_g y2 = L->end->y;
+
+    float_g x_cut;
+
+    // check vertical range
+    if ((y > y1 && y > y2) || (y < y1 && y < y2))
+      continue;
+
+    if (fabs(y - y1) < DIST_EPSILON && fabs(y - y2) < DIST_EPSILON)
+      continue;
+
+    x_cut = x1 + (x2 - x1) * (y - y1) / (y2 - y1);
+
+    if (x_cut < DIST_EPSILON)
+      continue;
+
+    if (x_cut < best_dist)
+    {
+      // found a closer linedef
+
+      best_match = L;
+      best_dist = x_cut;
+    }
+  }
+
+  #if DEBUG_POLYOBJ
+  PrintDebug("  Closest line was %d (dist=%1.1f)\n", best_match ?
+      best_match->index : -1, best_match ? best_dist - x : -1);
+  #endif
+
+  if (! best_match)
+  {
+    PrintWarn("Invalid polyobj thing at (%1.0f,%1.0f).\n", x, y);
+    return;
+  }
+
+  if (best_match->start->y > best_match->end->y)
+    sector = best_match->right ? best_match->right->sector : NULL;
+  else
+    sector = best_match->left ? best_match->left->sector : NULL;
+
+  #if DEBUG_POLYOBJ
+  PrintDebug("  Sector %d contains the polyobj.\n", 
+      sector ? sector->index : -1);
+  #endif
+
+  if (! sector)
+  {
+    PrintWarn("Invalid polyobj thing at (%1.0f,%1.0f).\n", x, y);
+    return;
+  }
+
+  // mark all lines of this sector as precious, to prevent the sector
+  // from being split.
+ 
+  sector->polyobj = TRUE;
+
+  for (i = 0; i < num_linedefs; i++)
+  {
+    linedef_t *L = linedefs[i];
+
+    if ((L->right && L->right->sector == sector) ||
+        (L->left && L->left->sector == sector))
+    {
+      L->is_precious = TRUE;
+    }
+  }
+}
+
+//
+// FindPolyobjSectors
+//
+// Based on code courtesy of Janis Legzdinsh.
+//
+void FindPolyobjSectors(void)
+{
+  int i, count=-1;
+  raw_hexen_thing_t *raw;
+  lump_t *lump = FindLevelLump("THINGS");
+
+  if (lump)
+    count = lump->length / sizeof(raw_hexen_thing_t);
+
+  // Note: no error if no things exist, even though technically a map
+  // will be unplayable without the player starts.
+
+  if (!lump || count==0)
+    return;
+
+  raw = (raw_hexen_thing_t*) lump->data;
+
+  for (i = 0; i < count; i++, raw++)
+  {
+    float_g x = (float_g) SINT16(raw->x);
+    float_g y = (float_g) SINT16(raw->y);
+
+    int type = UINT16(raw->type);
+
+    // not a polyobj start spot
+    if (type != PO_SPAWN_TYPE && type != PO_SPAWNCRUSH_TYPE)
+      continue;
+
+    #if DEBUG_POLYOBJ
+    PrintDebug("Thing %d at (%1.0f,%1.0f) is a polyobj spawner.\n",
+        i, x, y);
+    #endif
+    
+    MarkPolyobjSector(x, y);
   }
 }
 
@@ -1051,7 +1201,7 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
       *left_sec  = tip->left;
       *right_sec = tip->right;
 
-      return 0;
+      return FALSE;
     }
   }
 
@@ -1081,7 +1231,7 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
   }
   
   InternalError("Vertex %d has no tips !", vert->index);
-  return 0;
+  return FALSE;
 }
 
 static void GroupPolyobjLinedefs(void)
@@ -1573,11 +1723,20 @@ void LoadLevel(void)
   DisplaySetBarText(1, message);
   PrintMsg("\n\n%s\n\n", message);
 
+  doing_hexen = cur_info->force_hexen;
+
+  // -JL- Identify Hexen mode by presence of BEHAVIOR lump
+  if (!doing_hexen && FindLevelLump("BEHAVIOR") != NULL)
+  {
+    PrintMsg("Hexen level detected.\n");
+    doing_hexen = TRUE;
+  }
+  
   GetVertices();
   GetSectors();
   GetSidedefs();
 
-  if (cur_info->hexen_mode)
+  if (doing_hexen)
     GetLinedefsHexen();
   else
     GetLinedefs();
@@ -1600,9 +1759,14 @@ void LoadLevel(void)
       PruneSectors();
   }
 
-  if (cur_info->hexen_mode)
+  if (doing_hexen)
+  {
     GroupPolyobjLinedefs();
 
+    // -JL- Find sectors containing polyobjs
+    FindPolyobjSectors();
+  }
+  
   CalculateWallTips();
 }
 
@@ -1639,6 +1803,9 @@ void SaveLevel(node_t *root_node)
     PutGLSegs();
     PutSubsecs("GL_SSECT", TRUE);
     PutNodes("GL_NODES", TRUE, root_node);
+    
+    // -JL- Add empty PVS lump
+    CreateGLLump("GL_PVS");
   }
 
   if (doing_normal)
@@ -1652,7 +1819,7 @@ void SaveLevel(node_t *root_node)
     PutSectors();
     PutSidedefs();
 
-    if (cur_info->hexen_mode)
+    if (doing_hexen)
       PutLinedefsHexen();
     else
       PutLinedefs();

@@ -55,19 +55,21 @@ static wad_t wad;
 /* ---------------------------------------------------------------- */
 
 
-#define NUM_LEVEL_LUMPS  11
-#define NUM_GL_LUMPS     4
+#define NUM_LEVEL_LUMPS  12
+#define NUM_GL_LUMPS     5
 
 static const char *level_lumps[NUM_LEVEL_LUMPS]=
 {
   "THINGS", "LINEDEFS", "SIDEDEFS", "VERTEXES", "SEGS", 
   "SSECTORS", "NODES", "SECTORS", "REJECT", "BLOCKMAP",
-  "BEHAVIOR"  // <-- hexen support
+  "BEHAVIOR",  // <-- hexen support
+  "SCRIPTS"  // -JL- Lump with script sources
 };
 
 static const char *gl_lumps[NUM_GL_LUMPS]=
 {
-  "GL_VERT", "GL_SEGS", "GL_SSECT", "GL_NODES"
+  "GL_VERT", "GL_SEGS", "GL_SSECT", "GL_NODES",
+  "GL_PVS"  // -JL- PVS (Potentially Visible Set) lump
 };
 
 
@@ -153,7 +155,7 @@ static int CheckGLLumpName(const char *name)
   int i;
 
   if (name[0] != 'G' || name[1] != 'L' || name[2] != '_')
-    return 0;
+    return FALSE;
 
   for (i=0; i < NUM_GL_LUMPS; i++)
   {
@@ -162,6 +164,22 @@ static int CheckGLLumpName(const char *name)
   }
   
   return CheckLevelName(name+3);
+}
+
+
+//
+// CheckGLExtName
+//
+// Tests for 3rd party extension info (GX_*).
+//
+static int CheckGLExtName(const char *name)
+{
+#if 0
+  return (name[0] == 'G' && name[1] == 'X' && 
+          name[2] == '_' && isalpha(name[3]));
+#else
+  return FALSE;
+#endif
 }
 
 
@@ -233,19 +251,38 @@ static void FreeLump(lump_t *lump)
 //
 // ReadHeader
 //
-static void ReadHeader(const char *filename)
+// Returns TRUE if successful, or FALSE if there was a problem (in
+// which case the error message as been setup).
+//
+static boolean_g ReadHeader(const char *filename)
 {
   int len;
   raw_wad_header_t header;
+  char strbuf[1024];
 
   len = fread(&header, sizeof(header), 1, in_file);
 
   if (len != 1)
-    FatalError("Trouble reading wad header for %s : %s", 
+  {
+    sprintf(strbuf, "Trouble reading wad header for %s : %s", 
       filename, strerror(errno));
 
+    GlbspFree(cur_comms->message);
+    cur_comms->message = GlbspStrDup(strbuf);
+    
+    return FALSE;
+  }
+
   if (! CheckMagic(header.type))
-    FatalError("%s does not appear to be a wad file -- bad magic", filename);
+  {
+    sprintf(strbuf, "%s does not appear to be a wad file : bad magic", 
+        filename);
+
+    GlbspFree(cur_comms->message);
+    cur_comms->message = GlbspStrDup(strbuf);
+    
+    return FALSE;
+  }
 
   wad.kind = (header.type[0] == 'I') ? IWAD : PWAD;
   
@@ -256,6 +293,8 @@ static void ReadHeader(const char *filename)
   wad.dir_head = NULL;
   wad.dir_tail = NULL;
   wad.current_level = NULL;
+
+  return TRUE;
 }
 
 
@@ -281,7 +320,7 @@ static void ReadDirEntry(void)
   lump->length = UINT32(entry.length);
 
   // ignore previous GL lump info
-  if (CheckGLLumpName(lump->name))
+  if (CheckGLLumpName(lump->name) || CheckGLExtName(lump->name))
   {
     #if DEBUG_DIR
     PrintDebug("Discarding previous GL info: %s\n", lump->name);
@@ -888,10 +927,10 @@ int CheckExtension(const char *filename, const char *ext)
   for (; B >= 0; B--, A--)
   {
     if (A < 0)
-      return 0;
+      return FALSE;
     
     if (toupper(filename[A]) != toupper(ext[B]))
-      return 0;
+      return FALSE;
   }
 
   return (A >= 1) && (filename[A] == '.');
@@ -911,6 +950,8 @@ char *ReplaceExtension(const char *filename, const char *ext)
 
   if (dot_pos)
     dot_pos[1] = 0;
+  else
+    strcat(buffer, ".");
   
   strcat(buffer, ext);
 
@@ -1128,18 +1169,30 @@ int CheckLevelLumpZero(lump_t *lump)
 //
 // ReadWadFile
 //
-void ReadWadFile(const char *filename)
+glbsp_ret_e ReadWadFile(const char *filename)
 {
   int check;
-  char strbuf[256];
+  char strbuf[1024];
 
   // open input wad file & read header
   in_file = fopen(filename, "rb");
 
   if (! in_file)
-    FatalError("Cannot open WAD file %s : %s", filename, strerror(errno));
-
-  ReadHeader(filename);
+  {
+    sprintf(strbuf, "Cannot open WAD file %s : %s", filename, 
+        strerror(errno));
+    
+    GlbspFree(cur_comms->message);
+    cur_comms->message = GlbspStrDup(strbuf);
+    
+    return GLBSP_E_ReadError;
+  }
+  
+  if (! ReadHeader(filename))
+  {
+    fclose(in_file);
+    return GLBSP_E_ReadError;
+  }
 
   PrintMsg("Opened %cWAD file : %s\n", (wad.kind == IWAD) ? 'I' : 'P', 
       filename); 
@@ -1150,7 +1203,7 @@ void ReadWadFile(const char *filename)
   ReadDirectory();
 
   DisplayOpen(DIS_FILEPROGRESS);
-  DisplaySetTitle("Reading wad file");
+  DisplaySetTitle("glBSP Reading Wad");
   
   sprintf(strbuf, "Reading: %s", filename);
 
@@ -1170,16 +1223,18 @@ void ReadWadFile(const char *filename)
   wad.current_level = NULL;
 
   DisplayClose();
+
+  return GLBSP_E_OK;
 }
 
 
 //
 // WriteWadFile
 //
-void WriteWadFile(const char *filename)
+glbsp_ret_e WriteWadFile(const char *filename)
 {
   int check1, check2;
-  char strbuf[256];
+  char strbuf[1024];
 
   PrintMsg("\nSaving WAD as %s\n", filename);
 
@@ -1189,12 +1244,19 @@ void WriteWadFile(const char *filename)
   out_file = fopen(filename, "wb");
 
   if (! out_file)
-    FatalError("Could not open output WAD file: %s", strerror(errno));
+  {
+    sprintf(strbuf, "Cannot open output WAD file: %s", strerror(errno));
+    
+    GlbspFree(cur_comms->message);
+    cur_comms->message = GlbspStrDup(strbuf);
+    
+    return GLBSP_E_WriteError;
+  }
 
   WriteHeader();
 
   DisplayOpen(DIS_FILEPROGRESS);
-  DisplaySetTitle("Writing wad file");
+  DisplaySetTitle("glBSP Writing Wad");
   
   sprintf(strbuf, "Writing: %s", filename);
 
@@ -1215,6 +1277,8 @@ void WriteWadFile(const char *filename)
   if (check1 != wad.num_entries || check2 != wad.num_entries)
     PrintWarn("Write directory count consistency failure (%d,%d,%d\n",
       check1, check2, wad.num_entries);
+
+  return GLBSP_E_OK;
 }
 
 

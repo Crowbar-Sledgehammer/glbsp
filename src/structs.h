@@ -134,6 +134,37 @@ typedef struct raw_sector_s
 raw_sector_t;
 
 
+typedef struct raw_thing_s
+{
+  sint16_g x, y;      // position of thing
+  sint16_g angle;     // angle thing faces (degrees)
+  uint16_g type;      // type of thing
+  uint16_g options;   // when appears, deaf, etc..
+}
+raw_thing_t;
+
+
+// -JL- Hexen thing definition
+typedef struct raw_hexen_thing_s
+{
+  sint16_g tid;       // thing tag id (for scripts/specials)
+  sint16_g x, y;      // position
+  sint16_g height;    // start height above floor
+  sint16_g angle;     // angle thing faces
+  uint16_g type;      // type of thing
+  uint16_g options;   // when appears, deaf, dormant, etc..
+
+  uint8_g special;    // special type
+  uint8_g arg[5];     // special arguments
+} 
+raw_hexen_thing_t;
+
+// -JL- polyobj thing types
+#define PO_ANCHOR_TYPE      3000
+#define PO_SPAWN_TYPE       3001
+#define PO_SPAWNCRUSH_TYPE  3002
+
+
 /* ----- The BSP tree structures ----------------------- */
 
 typedef struct raw_seg_s

@@ -115,13 +115,21 @@ char *ReplaceExtension(const char *filename, const char *ext);
 // `load_all' is false, lumps other than level info will be marked as
 // copyable instead of loaded.
 //
-void ReadWadFile(const char *filename);
+// Returns GLBSP_E_OK if all went well, otherwise an error code (in
+// which case cur_comms->message has been set and all files/memory
+// have been freed).
+//
+glbsp_ret_e ReadWadFile(const char *filename);
 
 // open the output wad file and write the contents.  Any lumps marked
 // as copyable will be copied from the input file instead of from
 // memory.  Lumps marked as ignorable will be skipped.
 //
-void WriteWadFile(const char *filename);
+// Returns GLBSP_E_OK if all went well, otherwise an error code (in
+// which case cur_comms->message has been set -- but no files/memory
+// are freed).
+//
+glbsp_ret_e WriteWadFile(const char *filename);
 
 // close all wad files and free any memory.
 void CloseWads(void);

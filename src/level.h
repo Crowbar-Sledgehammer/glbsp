@@ -106,6 +106,9 @@ typedef struct sector_s
   int special;
   int tag;
 
+  // -JL- non-zero if this sector contains a polyobj.
+  int polyobj;
+
   // used when building REJECT table.  Each set of sectors that are
   // isolated from other sectors will have a different group number.
   // Thus: on every 2-sided linedef, the sectors on both sides will be
@@ -178,9 +181,9 @@ typedef struct linedef_s
   // Hexen support
   int specials[5];
 
-  // part of a hexen polyobj (ignored for building nodes)
+  // part of a hexen polyobj
   int polyobj;
-  
+ 
   // linedef index.  Always valid after loading & pruning of zero
   // length lines has occurred.
   int index;
