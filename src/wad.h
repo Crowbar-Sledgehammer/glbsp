@@ -176,27 +176,14 @@ void AppendLevelLump(lump_t *lump, void *data, int length);
 /* ----- conversion macros ----------------------- */
 
 
-// -AJA- I wanted this to simply be `BIG_ENDIAN', but some
-//       system header already defines it.  Grrrr !
-#ifdef CPU_BIG_ENDIAN
-
-#define UINT16(x)  \
-  ( ((uint16_g)(x) >> 8) | ((uint16_g)(x) << 8) )
-
-#define UINT32(x)  \
-  ( ((uint32_g)(x) >> 24) | (((uint32_g)(x) >> 8) & 0xff00) |  \
-    (((uint32_g)(x) << 8) & 0xff0000) | ((uint32_g)(x) << 24) )
-
-#else
-#define UINT16(x)  ((uint16_g) (x))
-#define UINT32(x)  ((uint32_g) (x))
-#endif
-
 #define UINT8(x)   ((uint8_g) (x))
 #define SINT8(x)   ((sint8_g) (x))
 
-#define SINT16(x)  ((sint16_g) UINT16(x))
-#define SINT32(x)  ((sint32_g) UINT32(x))
+#define UINT16(x)  Endian_U16(x)
+#define UINT32(x)  Endian_U32(x)
+
+#define SINT16(x)  ((sint16_g) Endian_U16((uint16_g) (x)))
+#define SINT32(x)  ((sint32_g) Endian_U32((uint32_g) (x)))
 
 
 #endif /* __GLBSP_WAD_H__ */

@@ -397,7 +397,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   }
 
   InitDebug();
-  
+  InitEndian();
+ 
   if (info->missing_output)
     PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
   
