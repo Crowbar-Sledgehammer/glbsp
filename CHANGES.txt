@@ -30,6 +30,11 @@ Changes in V2.05  (Unreleased)
 
  - renamed GUI version to glBSPX (was: glbspX).
 
+ - split level.c into two files, new file is analyze.c.
+
+ - reduced the amount of global symbols, and renamed some things for
+   more consistency (e.g. UtilStrCaseCmp).
+
 
 Changes in V2.00  (25th September 2002)
 ---------------------------------------
