@@ -68,7 +68,6 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // force_normal
   FALSE,   // gwa_mode
   FALSE,   // keep_sect
-  FALSE,   // keep_dummy
   FALSE,   // no_prune
 
   DEFAULT_BLOCK_LIMIT,   // block_limit
@@ -261,7 +260,6 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("nonormal",    no_normal)
     HANDLE_BOOLEAN("forcegwa",    gwa_mode)
     HANDLE_BOOLEAN("keepsect",    keep_sect)
-    HANDLE_BOOLEAN("keepdummy",   keep_dummy)
     HANDLE_BOOLEAN("noprune",     no_prune)
 
     // to err is human...
@@ -271,8 +269,9 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("keepsec",     keep_sect)
     HANDLE_BOOLEAN("keepsectors", keep_sect)
 
-    // ignore -fresh for backwards compatibility
-    if (UtilStrCaseCmp(opt_str, "fresh") == 0)
+    // ignore -fresh and -keepdummy for backwards compatibility
+    if (UtilStrCaseCmp(opt_str, "fresh") == 0 ||
+        UtilStrCaseCmp(opt_str, "keepdummy") == 0)
     {
       argv++; argc--;
       continue;
