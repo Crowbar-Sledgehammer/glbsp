@@ -2,7 +2,7 @@
 // MAIN : Main program for glBSP
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -52,11 +52,13 @@ const nodebuildinfo_t default_buildinfo =
 {
   NULL,    // input_file
   NULL,    // output_file
+  NULL,    // extra_files
 
   DEFAULT_FACTOR,  // factor
 
   FALSE,   // no_reject
   FALSE,   // no_progress
+  FALSE,   // quiet
   FALSE,   // mini_warnings
   FALSE,   // force_hexen
   FALSE,   // pack_sides
@@ -86,11 +88,37 @@ const nodebuildcomms_t default_buildcomms =
 
 /* ----- option parsing ----------------------------- */
 
-static void SetMessage(const char *str)
-{
-  GlbspFree(cur_comms->message);
+#define EXTRA_BLOCK  10  /* includes terminating NULL */
 
-  cur_comms->message = GlbspStrDup(str);
+static void AddExtraFile(nodebuildinfo_t *info, const char *str)
+{
+  int count = 0;
+  int space;
+
+  if (! info->extra_files)
+  {
+    info->extra_files = (const char **)
+        UtilCalloc(EXTRA_BLOCK * sizeof(const char *));
+
+    info->extra_files[0] = str;
+    info->extra_files[1] = NULL;
+
+    return;
+  }
+
+  while (info->extra_files[count])
+    count++;
+
+  space = EXTRA_BLOCK - 1 - (count % EXTRA_BLOCK);
+
+  if (space == 0)
+  {
+    info->extra_files = (const char **) UtilRealloc(info->extra_files,
+        (count + 1 + EXTRA_BLOCK) * sizeof(const char *));
+  }
+
+  info->extra_files[count]   = str;
+  info->extra_files[count+1] = NULL;
 }
 
 #define HANDLE_BOOLEAN(name, field)  \
@@ -107,9 +135,10 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
 {
   const char *opt_str;
   int num_files = 0;
+  int got_output = FALSE;
 
   cur_comms = comms;
-  SetMessage(NULL);
+  SetErrorMsg(NULL);
 
   while (argc > 0)
   {
@@ -117,15 +146,30 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       // --- ORDINARY FILENAME ---
 
-      if (num_files >= 1)
+      if (got_output)
       {
-        SetMessage("Too many filenames.  Use the -o option");
+        SetErrorMsg("Input filenames must precede the -o option");
         cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
-      GlbspFree(info->input_file);
-      info->input_file = GlbspStrDup(argv[0]);
+      if (CheckExtension(argv[0], "gwa"))
+      {
+        SetErrorMsg("Input file cannot be GWA (contains nothing to build)");
+        cur_comms = NULL;
+        return GLBSP_E_BadArgs;
+      }
+
+      if (num_files >= 1)
+      {
+        AddExtraFile(info, GlbspStrDup(argv[0]));
+      }
+      else
+      {
+        GlbspFree(info->input_file);
+        info->input_file = GlbspStrDup(argv[0]);
+      }
+
       num_files++;
 
       argv++; argc--;
@@ -142,15 +186,31 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
 
     if (StrCaseCmp(opt_str, "o") == 0)
     {
-      if (argc < 2)
+      if (got_output)
       {
-        SetMessage("Missing filename for the -o option");
+        SetErrorMsg("The -o option cannot be used more than once");
+        cur_comms = NULL;
+        return GLBSP_E_BadArgs;
+      }
+
+      if (num_files >= 2)
+      {
+        SetErrorMsg("Cannot use -o with multiple input files.");
+        cur_comms = NULL;
+        return GLBSP_E_BadArgs;
+      }
+
+      if (argc < 2 || argv[1][0] == '-')
+      {
+        SetErrorMsg("Missing filename for the -o option");
         cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
 
       GlbspFree(info->output_file);
       info->output_file = GlbspStrDup(argv[1]);
+
+      got_output = TRUE;
 
       argv += 2; argc -= 2;
       continue;
@@ -160,7 +220,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       if (argc < 2)
       {
-        SetMessage("Missing factor value");
+        SetErrorMsg("Missing factor value");
         cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
@@ -175,7 +235,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     {
       if (argc < 2)
       {
-        SetMessage("Missing maxblock value");
+        SetErrorMsg("Missing maxblock value");
         cur_comms = NULL;
         return GLBSP_E_BadArgs;
       }
@@ -186,20 +246,28 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
+    HANDLE_BOOLEAN("quiet",       quiet)
+    HANDLE_BOOLEAN("fresh",       choose_fresh)
     HANDLE_BOOLEAN("noreject",    no_reject)
     HANDLE_BOOLEAN("noprog",      no_progress)
     HANDLE_BOOLEAN("warn",        mini_warnings)
     HANDLE_BOOLEAN("packsides",   pack_sides)
-    HANDLE_BOOLEAN("v1",          v1_vert)
-    HANDLE_BOOLEAN("fresh",       choose_fresh)
     HANDLE_BOOLEAN("normal",      force_normal)
 
+    HANDLE_BOOLEAN("v1",          v1_vert)
     HANDLE_BOOLEAN("loadall",     load_all)
     HANDLE_BOOLEAN("nogl",        no_gl)
     HANDLE_BOOLEAN("nonormal",    no_normal)
     HANDLE_BOOLEAN("forcegwa",    gwa_mode)
     HANDLE_BOOLEAN("keepsect",    keep_sect)
     HANDLE_BOOLEAN("noprune",     no_prune)
+
+    // to err is human...
+    HANDLE_BOOLEAN("noprogress",  no_progress)
+    HANDLE_BOOLEAN("q",           quiet)
+    HANDLE_BOOLEAN("pack",        pack_sides)
+    HANDLE_BOOLEAN("keep",        keep_sect)
+    HANDLE_BOOLEAN("keepsectors", keep_sect)
 
     // backwards compatibility
     HANDLE_BOOLEAN("forcenormal", force_normal)
@@ -208,7 +276,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("hexen",       force_hexen)
 
     sprintf(glbsp_message_buf, "Unknown option: %s", argv[0]);
-    SetMessage(glbsp_message_buf);
+    SetErrorMsg(glbsp_message_buf);
 
     cur_comms = NULL;
     return GLBSP_E_BadArgs;
@@ -222,14 +290,20 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     volatile nodebuildcomms_t *comms)
 {
   cur_comms = comms;
-  SetMessage(NULL);
+  SetErrorMsg(NULL);
 
   info->same_filenames = FALSE;
   info->missing_output = FALSE;
 
   if (!info->input_file || info->input_file[0] == 0)
   {
-    SetMessage("Missing input filename !");
+    SetErrorMsg("Missing input filename !");
+    return GLBSP_E_BadArgs;
+  }
+
+  if (CheckExtension(info->input_file, "gwa"))
+  {
+    SetErrorMsg("Input file cannot be GWA (contains nothing to build)");
     return GLBSP_E_BadArgs;
   }
 
@@ -239,59 +313,60 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     info->output_file = GlbspStrDup(ReplaceExtension(
           info->input_file, "gwa"));
 
-    info->gwa_mode = 1;
+    info->gwa_mode = TRUE;
     info->missing_output = TRUE;
   }
-  else if (CheckExtension(info->output_file, "gwa"))
+  else  /* has output filename */
   {
-    info->gwa_mode = 1;
+    if (CheckExtension(info->output_file, "gwa"))
+      info->gwa_mode = TRUE;
   }
 
   if (StrCaseCmp(info->input_file, info->output_file) == 0)
   {
-    info->load_all = 1;
+    info->load_all = TRUE;
     info->same_filenames = TRUE;
   }
 
   if (info->no_prune && info->pack_sides)
   {
     info->pack_sides = FALSE;
-    SetMessage("-noprune and -packsides cannot be used together");
+    SetErrorMsg("-noprune and -packsides cannot be used together");
     return GLBSP_E_BadInfoFixed;
   }
 
   if (info->gwa_mode && info->no_gl)
   {
     info->no_gl = FALSE;
-    SetMessage("-nogl with GWA file: nothing to do !");
+    SetErrorMsg("-nogl with GWA file: nothing to do !");
     return GLBSP_E_BadInfoFixed;
   }
  
   if (info->gwa_mode && info->force_normal)
   {
     info->force_normal = FALSE;
-    SetMessage("-forcenormal used, but GWA files don't have normal nodes");
+    SetErrorMsg("-forcenormal used, but GWA files don't have normal nodes");
     return GLBSP_E_BadInfoFixed;
   }
  
   if (info->no_normal && info->force_normal)
   {
     info->force_normal = FALSE;
-    SetMessage("-forcenormal and -nonormal cannot be used together");
+    SetErrorMsg("-forcenormal and -nonormal cannot be used together");
     return GLBSP_E_BadInfoFixed;
   }
  
   if (info->factor <= 0 || info->factor > 32)
   {
     info->factor = DEFAULT_FACTOR;
-    SetMessage("Bad factor value !");
+    SetErrorMsg("Bad factor value !");
     return GLBSP_E_BadInfoFixed;
   }
 
   if (info->block_limit < 1000 || info->block_limit > 64000)
   {
     info->block_limit = DEFAULT_BLOCK_LIMIT;
-    SetMessage("Bad blocklimit value !");
+    SetErrorMsg("Bad blocklimit value !");
     return GLBSP_E_BadInfoFixed;
   }
 
@@ -355,11 +430,11 @@ static glbsp_ret_e HandleLevel(void)
   {
     ClockwiseBspTree(root_node);
 
-    PrintMsg("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
+    PrintVerbose("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
         num_nodes, num_subsecs, num_segs, num_normal_vert + num_gl_vert);
 
     if (root_node)
-      PrintMsg("Heights of left and right subtrees = (%d,%d)\n",
+      PrintVerbose("Heights of left and right subtrees = (%d,%d)\n",
           ComputeHeight(root_node->r.node), ComputeHeight(root_node->l.node));
 
     SaveLevel(root_node);
@@ -395,13 +470,13 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   if (!cur_info->input_file  || cur_info->input_file[0] == 0 ||
       !cur_info->output_file || cur_info->output_file[0] == 0)
   {
-    SetMessage("INTERNAL ERROR: Missing in/out filename !");
+    SetErrorMsg("INTERNAL ERROR: Missing in/out filename !");
     return GLBSP_E_BadArgs;
   }
 
   if (cur_info->no_normal && cur_info->no_gl)
   {
-    SetMessage("-nonormal and -nogl specified: nothing to do !");
+    SetErrorMsg("-nonormal and -nogl specified: nothing to do !");
     return GLBSP_E_BadArgs;
   }
 
@@ -410,8 +485,7 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
  
   if (info->missing_output)
     PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
-  
-  if (info->same_filenames)
+  else if (info->same_filenames)
     PrintMsg("* Output file is same as input file. Using -loadall\n\n");
 
   // opens and reads directory from the input wad
@@ -428,12 +502,12 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
     CloseWads();
     TermDebug();
 
-    SetMessage("No levels found in wad !");
+    SetErrorMsg("No levels found in wad !");
     return GLBSP_E_Unknown;
   }
    
   PrintMsg("\n");
-  PrintMsg("Creating nodes using tunable factor of %d\n", info->factor);
+  PrintVerbose("Creating nodes using tunable factor of %d\n", info->factor);
 
   DisplayOpen(DIS_BUILDPROGRESS);
   DisplaySetTitle("glBSP Build Progress");
@@ -464,6 +538,10 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
   if (ret == GLBSP_E_OK)
   {
     ret = WriteWadFile(cur_info->output_file);
+
+    // when modifying the original wad, any GWA companion must be deleted
+    if (ret == GLBSP_E_OK && cur_info->same_filenames)
+      DeleteGwaFile(cur_info->output_file);
 
     PrintMsg("\n");
     PrintMsg("Total serious warnings: %d\n", total_big_warn);
