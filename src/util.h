@@ -55,12 +55,27 @@ char *UtilStrNDup(const char *str, int size);
 void UtilFree(void *data);
 
 // compare two strings case insensitively.
-int StrCaseCmp(const char *A, const char *B);
+int UtilStrCaseCmp(const char *A, const char *B);
 
 // round a positive value up to the nearest power of two.
-int RoundPOW2(int x);
+int UtilRoundPOW2(int x);
+
+// compute angle & distance from (0,0) to (dx,dy)
+angle_g UtilComputeAngle(float_g dx, float_g dy);
+#define UtilComputeDist(dx,dy)  sqrt((dx) * (dx) + (dy) * (dy))
+
+// compute the parallel and perpendicular distances from a partition
+// line to a point.
+//
+#define UtilParallelDist(part,x,y)  \
+    (((x) * (part)->pdx + (y) * (part)->pdy + (part)->p_para)  \
+     / (part)->p_length)
+
+#define UtilPerpDist(part,x,y)  \
+    (((x) * (part)->pdy - (y) * (part)->pdx + (part)->p_perp)  \
+     / (part)->p_length)
 
 // check if the file exists.
-int FileExists(const char *filename);
+int UtilFileExists(const char *filename);
 
 #endif /* __GLBSP_UTIL_H__ */
