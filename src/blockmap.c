@@ -2,7 +2,7 @@
 // BLOCKMAP : Generate the blockmap
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -169,7 +169,7 @@ static void BlockAdd(int blk_num, int line_index)
   // compute new checksum
   cur[BK_XOR] = ((cur[BK_XOR] << 4) | (cur[BK_XOR] >> 12)) ^ line_index;
 
-  cur[BK_FIRST + cur[BK_NUM]] = line_index;
+  cur[BK_FIRST + cur[BK_NUM]] = UINT16(line_index);
   cur[BK_NUM]++;
 }
 
@@ -531,7 +531,7 @@ void InitBlockmap(void)
   /* find limits of linedefs, and store as map limits */
   FindBlockmapLimits(&map_bbox);
 
-  PrintMsg("Map goes from (%d,%d) to (%d,%d)\n",
+  PrintVerbose("Map goes from (%d,%d) to (%d,%d)\n",
       map_bbox.minx, map_bbox.miny, map_bbox.maxx, map_bbox.maxy);
 
   block_x = map_bbox.minx - (map_bbox.minx & 0x7);
@@ -570,7 +570,7 @@ void PutBlockmap(void)
 
   WriteBlockmap();
 
-  PrintMsg("Completed blockmap building (compression: %d%%)\n",
+  PrintVerbose("Completed blockmap building (compression: %d%%)\n",
       block_compression);
 
   FreeBlockmap();
