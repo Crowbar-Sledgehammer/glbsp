@@ -2,7 +2,7 @@
 // SYSTEM : System specific code
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2001 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -30,7 +30,7 @@
 #include <assert.h>
 
 
-#define DEBUG_ENABLED   0
+#define DEBUG_ENABLED   1
 
 #define DEBUGGING_FILE  "gb_debug.txt"
 
@@ -86,6 +86,10 @@ void PrintMsg(const char *str, ...)
   va_end(args);
 
   (* cur_funcs->print_msg)("%s", message_buf);
+
+#if DEBUG_ENABLED
+  PrintDebug(">>> %s", message_buf);
+#endif
 }
 
 //
@@ -102,6 +106,10 @@ void PrintWarn(const char *str, ...)
   (* cur_funcs->print_msg)("Warning: %s", message_buf);
 
   total_big_warn++;
+
+#if DEBUG_ENABLED
+  PrintDebug("Warning: %s", message_buf);
+#endif
 }
 
 //
@@ -109,10 +117,10 @@ void PrintWarn(const char *str, ...)
 //
 void PrintMiniWarn(const char *str, ...)
 {
+  va_list args;
+
   if (cur_info->mini_warnings)
   {
-    va_list args;
-
     va_start(args, str);
     vsprintf(message_buf, str, args);
     va_end(args);
@@ -121,6 +129,14 @@ void PrintMiniWarn(const char *str, ...)
   }
 
   total_small_warn++;
+
+#if DEBUG_ENABLED
+  va_start(args, str);
+  vsprintf(message_buf, str, args);
+  va_end(args);
+
+  PrintDebug("MiniWarn: %s", message_buf);
+#endif
 }
 
 
