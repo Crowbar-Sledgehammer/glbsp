@@ -370,3 +370,88 @@ void Guix_Book::ParaAddLine(const char *line)
   }
 }
 
+
+//------------------------------------------------------------------------
+
+
+Guix_License *guix_lic_win;
+
+static void license_quit_CB(Fl_Widget *w, void *data)
+{
+  if (guix_lic_win)
+    guix_lic_win->want_quit = TRUE;
+}
+
+//
+// License Constructor
+//
+Guix_License::Guix_License() : Fl_Window(guix_prefs.manual_w,
+    guix_prefs.manual_h, "glBSP License")
+{
+  // cancel the automatic `begin' in Fl_Group constructor
+  end();
+ 
+  size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);
+  position(guix_prefs.manual_x, guix_prefs.manual_y);
+ 
+  // allow manual closing of window
+  callback((Fl_Callback *) license_quit_CB);
+  
+  want_quit = FALSE;
+
+  // create quit button in top row
+
+  group = new Fl_Group(0, 0, w(), 34);
+  group->resizable(0);
+  add(group);
+  
+  quit = new Fl_Button(4, 4, 96, 26, "&Quit");
+  quit->box(FL_THIN_UP_BOX);
+  quit->callback((Fl_Callback *) license_quit_CB);
+  group->add(quit);
+
+  // create the browser
+
+  int i;
+
+  browser = new Fl_Browser(0, 34, w(), h() - 34);
+ 
+  for (i=0; license_text[i]; i++)
+    browser->add(license_text[i]);
+
+  browser->position(0);
+
+  add(browser);
+  resizable(browser);
+
+  // show the window
+  set_modal();
+  show();
+
+  // read initial pos (same logic as in Guix_MainWin)
+  WindowSmallDelay();
+  
+  init_x = x(); init_y = y();
+  init_w = w(); init_h = h();
+}
+
+
+//
+// License Destructor
+//
+Guix_License::~Guix_License()
+{
+  // update preferences if user moved the window
+  if (x() != init_x || y() != init_y)
+  {
+    guix_prefs.manual_x = x();
+    guix_prefs.manual_y = y();
+  }
+
+  if (w() != init_w || h() != init_h)
+  {
+    guix_prefs.manual_w = w();
+    guix_prefs.manual_h = h();
+  }
+}
+

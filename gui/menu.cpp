@@ -164,55 +164,15 @@ static void menu_do_manual(Fl_Widget *w, void * data)
 
 static void menu_do_license(Fl_Widget *w, void * data)
 {
-  menu_want_to_quit = FALSE;
+  guix_lic_win = new Guix_License();
 
-  Fl_Window *lic_win = new Fl_Window(guix_prefs.manual_w, 
-      guix_prefs.manual_h, "glBSP License");
-
-  lic_win->end();
-  lic_win->size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);
-  lic_win->position(guix_prefs.manual_x, guix_prefs.manual_y);
-  lic_win->callback((Fl_Callback *) menu_quit_CB);
- 
-  Fl_Browser *browser = new Fl_Browser(0, 0, lic_win->w(), lic_win->h());
- 
-  int i;
-
-  for (i=0; license_text[i]; i++)
-    browser->add(license_text[i]);
-
-  browser->position(0);
-
-  lic_win->add(browser);
-  lic_win->resizable(browser);
-  lic_win->set_modal();
-  lic_win->show();
-
-  // capture initial size
-  WindowSmallDelay();
-  int init_x = lic_win->x();
-  int init_y = lic_win->y();
-  int init_w = lic_win->w();
-  int init_h = lic_win->h();
-  
   // run the GUI until the user closes
-  while (! menu_want_to_quit)
+  while (! guix_lic_win->want_quit)
+  {
     Fl::wait();
+  }
 
-  // check if the user moved/resized the window
-  if (lic_win->x() != init_x || lic_win->y() != init_y)
-  {
-    guix_prefs.manual_x = lic_win->x();
-    guix_prefs.manual_y = lic_win->y();
-  }
- 
-  if (lic_win->w() != init_w || lic_win->h() != init_h)
-  {
-    guix_prefs.manual_w = lic_win->w();
-    guix_prefs.manual_h = lic_win->h();
-  }
- 
-  delete lic_win;
+  delete guix_lic_win;
 }
 
 
