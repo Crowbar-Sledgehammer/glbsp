@@ -249,6 +249,8 @@ static void CreateBlockmap(void)
 
   block_lines = UtilCalloc(block_count * sizeof(uint16_g *));
 
+  DisplayTicker();
+
   for (i=0; i < num_linedefs; i++)
   {
     linedef_t *L = LookupLinedef(i);
@@ -258,9 +260,6 @@ static void CreateBlockmap(void)
       continue;
 
     BlockAddLine(L);
-
-    if ((i % 100) == 0)
-      DisplayTicker();
   }
 }
 
@@ -321,13 +320,12 @@ static void CompressBlockmap(void)
   orig_size = 4 + block_count;
   new_size  = cur_offset;
 
+  DisplayTicker();
+
   for (i=0; i < block_count; i++)
   {
     int blk_num = block_dups[i];
     int count;
-
-    if ((i % 100) == 0)
-      DisplayTicker();
 
     // empty block ?
     if (block_lines[blk_num] == NULL)
