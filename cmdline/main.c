@@ -82,7 +82,7 @@ static void ShowOptions(void)
     "Usage: glbsp [options] input.wad ... [ -o output.wad ]\n"
     "\n"
     "General Options:\n"
-    "  -quiet           Quieter output, no level statistics\n"
+    "  -q               Quieter output, no level statistics\n"
     "  -fast            Reuse original nodes to build faster\n"
     "  -factor  <nnn>   Changes the cost assigned to SEG splits\n"
     "  -noreject        Don't clobber the reject map\n"
