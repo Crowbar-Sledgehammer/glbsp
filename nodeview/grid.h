@@ -54,7 +54,7 @@ private:
 	// FLTK virtual method for drawing.
 
 	void draw_grid(int spacing);
-	void draw_partition(const node_c *nd);
+	void draw_partition(const node_c *nd, int ity);
 	void draw_node(const node_c *nd, int foo);
 	void draw_child(const child_t *ch, int foo);
 
@@ -82,8 +82,8 @@ private:
 	double mid_y;
 
 	bool grid_MODE;
-	bool partition_MODE;
-	int  miniseg_MODE;
+	int partition_MODE;
+	int miniseg_MODE;
 
 	static inline int GRID_FIND(double x, double y)
 	{

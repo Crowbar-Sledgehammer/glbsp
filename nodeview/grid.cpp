@@ -32,7 +32,7 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
         Fl_Widget(X, Y, W, H, label),
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
         mid_x(0), mid_y(0),
-		grid_MODE(true), partition_MODE(true), miniseg_MODE(2)
+		grid_MODE(true), partition_MODE(1), miniseg_MODE(2)
 {
 }
 
@@ -147,14 +147,19 @@ void W_Grid::draw()
 
 	if (true)
 	{
-		fl_color(fl_color_cube(0, 0, 3));
+		fl_color(fl_color_cube(0, 0, (zoom >= 6) ? 3 : 2));
 		draw_grid(512);
 	}
 
 	node_c *root = lev_nodes.Get(lev_nodes.num - 1);
 
-	draw_partition(root);
+	if (partition_MODE == 1)
+		draw_partition(root, 3);
+
 	draw_node(root, -1);
+
+	if (partition_MODE == 2)
+		draw_partition(root, 3);
 
 	fl_pop_clip();
 }
@@ -217,61 +222,50 @@ void W_Grid::draw_grid(int spacing)
 	}
 }
 
-void W_Grid::draw_partition(const node_c *nd)
+void W_Grid::draw_partition(const node_c *nd, int ity)
 {
-	if (! partition_MODE)
-		return;
-
 	double mlx = mid_x - w() * 0.5 / zoom_mul;
 	double mly = mid_y - h() * 0.5 / zoom_mul;
 	double mhx = mid_x + w() * 0.5 / zoom_mul;
 	double mhy = mid_y + h() * 0.5 / zoom_mul;
 
-	int x1 = x();
-	int y1 = y();
+	int nx1 = nd->x;
+	int ny1 = nd->y;
+	int nx2 = nx1 + nd->dx;
+	int ny2 = ny1 + nd->dy;
 
-	int x2 = x() + w();
-	int y2 = y() + h();
+	double tlx, tly;
+	double thx, thy;
 
-	int mx1 = nd->x;
-	int my1 = nd->y;
-	int mx2 = mx1 + nd->dx;
-	int my2 = my1 + nd->dy;
-
-	int nx1, ny1;
-	int nx2, ny2;
-
-	for (;;)
+	if (ABS(nd->dx) > ABS(nd->dy))
 	{
-		MapToWin(mx1, my1, &nx1, &ny1);
-		MapToWin(mx2, my2, &nx2, &ny2);
-	
-		if (MAX(nx1, nx2) < x1 || MIN(nx1, nx2) > x2)
+		tlx = mlx;
+		thx = mhx;
+		tly = nd->y + nd->dy * (mlx - nx1) / double(nd->dx);
+		thy = nd->y + nd->dy * (mhx - nx1) / double(nd->dx);
+
+		if (MAX(tly, thy) < mly || MIN(tly, thy) > mhy)
 			return;
+	}
+	else
+	{
+		tlx = nd->x + nd->dx * (mly - ny1) / double(nd->dy);
+		thx = nd->x + nd->dx * (mhy - ny1) / double(nd->dy);
+		tly = mly;
+		thy = mhy;
 
-		if (MAX(ny1, ny2) < y1 || MIN(ny1, ny2) > y2)
+		if (MAX(tlx, thx) < mlx || MIN(tlx, thx) > mhx)
 			return;
-
-		bool in_1 = (x1 < nx1 && nx1 < x2) && (y1 < ny1 && ny1 < y2);
-		bool in_2 = (x1 < nx2 && nx2 < x2) && (y1 < ny2 && ny2 < y2);
-
-		if (in_1 || in_2)
-		{
-			int mdx = mx2 - mx1;
-			int mdy = my2 - my1;
-
-			mx1 -= mdx; my1 -= mdy;
-			mx2 += mdx; my2 += mdy;
-
-			continue;
-		}
-
-		break;
 	}
 
-	fl_color(fl_color_cube(3,0,3));
+	int sx, sy;
+	int ex, ey;
 
-	fl_line(nx1, ny1, nx2, ny2);
+	MapToWin(tlx, tly, &sx, &sy);
+	MapToWin(thx, thy, &ex, &ey);
+
+	fl_color(fl_color_cube(ity, 0, ity));
+	fl_line(sx, sy, ex, ey);
 }
 
 void W_Grid::draw_node(const node_c *nd, int foo)
@@ -350,9 +344,9 @@ void W_Grid::draw_child(const child_t *ch, int foo)
 
 	for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
 	{
-		// skip left sides (for efficiency)
-		if (seg->side)
-			continue;
+///---		// skip left sides (for efficiency)
+///---		if (seg->side)  // DISABLED: may cause highlight glitches
+///---			continue;
 
 		if (! set_seg_color(seg, foo == 0))
 			continue;
@@ -543,7 +537,7 @@ int W_Grid::handle_key(int key)
 			return 1;
 
 		case 'p': case 'P':
-			partition_MODE = ! partition_MODE;
+			partition_MODE = (partition_MODE + 1) % 3;
 			redraw();
 			return 1;
 
