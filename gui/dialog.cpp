@@ -2,7 +2,7 @@
 // DIALOG : Unix/FLTK Pop-up dialogs
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2002 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2003 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -48,24 +48,10 @@ static void UncompressAboutImage(unsigned char *& rgb)
   while (dest < (rgb + rgb_size))
   {
     int val = *src++;
-    int num = 1;
 
-    if (val >= 0xF8)
-    {
-      static int num_set[8] = { 3,4,5,6, 8,10,12,16 };
-
-      num = num_set[val - 0xF8];
-      val = *src++;
-
-      assert(val < 0xF8);
-    }
-
-    for (; num > 0; num--)
-    {
-      *dest++ = about_image_pal[val*3 + 2];  // red
-      *dest++ = about_image_pal[val*3 + 1];  // green
-      *dest++ = about_image_pal[val*3 + 0];  // blue
-    }
+    *dest++ = about_image_pal[val*3 + 0];  // red
+    *dest++ = about_image_pal[val*3 + 1];  // green
+    *dest++ = about_image_pal[val*3 + 2];  // blue
   }
 }
 
@@ -193,8 +179,9 @@ static void DialogRun()
 // left) or -1 if escape was pressed or window manually closed.
 // 
 int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic, 
-    const char *message, const char *left = "OK", 
-    const char *middle = NULL, const char *right = NULL)
+    const char *message, const char *left, // = "OK", 
+    const char *middle, // = NULL,
+    const char *right)  // = NULL)
 {
   cur_diag_result = -1;
   cur_diag_done = FALSE;
