@@ -2,7 +2,7 @@
 README for glBSP
 ================
 
-by Andrew Apted.  4th June 2002.
+by Andrew Apted. 30th August 2002.
 
 
 Introduction
@@ -22,7 +22,7 @@ and Vavoom.  See the links below.
 Status
 ------
 
-The current version of glBSP is 1.97.  It has been tested and known to
+The current version of glBSP is 2.00.  It has been tested and known to
 work on numerous large wads, including DOOM I shareware, DOOM II,
 TeamTNT's Eternal III, Fanatic's QDOOM, and many others.
 

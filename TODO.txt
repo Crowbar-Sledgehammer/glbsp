@@ -2,5 +2,7 @@
 TODO
 ====
 
++  document new "fresh" option (cmdline & GUI versions).
+
 -  glBSPX: Fix modal windows not having close buttons in Win32.
 
