@@ -352,7 +352,8 @@ static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
   {
     PrintWarn("Bad sidedef on linedef #%d (Z_CheckHeap error)\n",
         line->index);
-    MarkLevelFailed();
+
+    MarkSoftFailure(LIMIT_BAD_SIDE);
   }
  
   seg->start   = start;
@@ -703,7 +704,7 @@ static void SanityCheckHasRealSeg(subsec_t *sub)
       return;
   }
 
-  InternalError("Subsector #%d near (%1.1f,%1.1f) has no real seg !\n",
+  InternalError("Subsector #%d near (%1.1f,%1.1f) has no real seg !",
       sub->index, sub->mid_x, sub->mid_y);
 }
 

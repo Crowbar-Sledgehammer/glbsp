@@ -981,9 +981,9 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   vert->ref_count = seg->partner ? 4 : 2;
 
-  if (lev_doing_gl && (!cur_info->v1_vert || !lev_doing_normal))
+  if (lev_doing_gl && !(cur_info->v1_vert && lev_doing_normal))
   {
-    vert->index = num_gl_vert | 0x8000;
+    vert->index = num_gl_vert | IS_GL_VERTEX;
     num_gl_vert++;
   }
   else
@@ -1038,7 +1038,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
   }
   else
   {
-    vert->index = num_gl_vert | 0x8000;
+    vert->index = num_gl_vert | IS_GL_VERTEX;
     num_gl_vert++;
   }
 

@@ -52,6 +52,9 @@ boolean_g lev_doing_normal;
 boolean_g lev_doing_gl;
 boolean_g lev_doing_hexen;
 
+static boolean_g lev_v3_segs;
+static boolean_g lev_v3_subsecs;
+
 
 #define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
     TYPE ** BASEVAR = NULL;  \
@@ -445,7 +448,7 @@ void GetSidedefs(void)
   }
 }
 
-static sidedef_t *SafeLookupSidedef(uint16_g num)
+static INLINE_G sidedef_t *SafeLookupSidedef(uint16_g num)
 {
   if (num == 0xFFFF)
     return NULL;
@@ -696,6 +699,9 @@ static int SegCompare(const void *p1, const void *p2)
 
 /* ----- writing routines ------------------------------ */
 
+static uint8_g lev_v2_magic[4] = "gNd2";
+static uint8_g lev_v3_magic[4] = "gNd3";
+
 void PutVertices(char *name, int do_gl)
 {
   int count, i;
@@ -713,8 +719,7 @@ void PutVertices(char *name, int do_gl)
     raw_vertex_t raw;
     vertex_t *vert = lev_vertices[i];
 
-    if ((do_gl && !(vert->index & 0x8000)) ||
-        (!do_gl && (vert->index & 0x8000)))
+    if ((do_gl ? 1 : 0) != ((vert->index & IS_GL_VERTEX) ? 1 : 0))
     {
       continue;
     }
@@ -727,16 +732,14 @@ void PutVertices(char *name, int do_gl)
     count++;
   }
 
-  if (count >= 32768)
-  {
-    PrintWarn("Number of %svertices (%d) has OVERFLOWED the "
-        "normal limit!\n", do_gl ? "GL " : "", count);
-    MarkLevelFailed();
-  }
-
   if (count != (do_gl ? num_gl_vert : num_normal_vert))
     InternalError("PutVertices miscounted (%d != %d)", count,
       do_gl ? num_gl_vert : num_normal_vert);
+
+  if (lev_doing_normal && ! do_gl && count > 65534)
+    MarkHardFailure(LIMIT_VERTEXES);
+  else if (count > 32767)
+    MarkSoftFailure(do_gl ? LIMIT_GL_VERT : LIMIT_VERTEXES);
 }
 
 void PutV2Vertices(void)
@@ -744,20 +747,18 @@ void PutV2Vertices(void)
   int count, i;
   lump_t *lump;
 
-  static uint8_g v2_magic[4] = "gNd2";
- 
   DisplayTicker();
 
   lump = CreateGLLump("GL_VERT");
 
-  AppendLevelLump(lump, v2_magic, 4);
+  AppendLevelLump(lump, lev_v2_magic, 4);
 
   for (i=0, count=0; i < num_vertices; i++)
   {
     raw_v2_vertex_t raw;
     vertex_t *vert = lev_vertices[i];
 
-    if (! (vert->index & 0x8000))
+    if (! (vert->index & IS_GL_VERTEX))
       continue;
 
     raw.x = SINT32((int)(vert->x * 65536.0));
@@ -768,16 +769,12 @@ void PutV2Vertices(void)
     count++;
   }
 
-  if (count >= 32768)
-  {
-    PrintWarn("Number of GL vertices (%d) has OVERFLOWED the "
-        "normal limit!\n", count);
-    MarkLevelFailed();
-  }
-
   if (count != num_gl_vert)
     InternalError("PutV2Vertices miscounted (%d != %d)", count,
       num_gl_vert);
+
+  if (count > 32767)
+    MarkSoftFailure(LIMIT_GL_VERT);
 }
 
 void PutSectors(void)
@@ -805,12 +802,10 @@ void PutSectors(void)
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
 
-  if (num_sectors >= 32768)
-  {
-    PrintWarn("Number of sectors (%d) has OVERFLOWED the "
-        "normal limit!\n", num_sectors);
-    MarkLevelFailed();
-  }
+  if (num_sectors > 65534)
+    MarkHardFailure(LIMIT_SECTORS);
+  else if (num_sectors > 32767)
+    MarkSoftFailure(LIMIT_SECTORS);
 }
 
 void PutSidedefs(void)
@@ -838,12 +833,10 @@ void PutSidedefs(void)
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
 
-  if (num_sidedefs >= 32768)
-  {
-    PrintWarn("Number of sidedefs (%d) has OVERFLOWED the "
-        "normal limit!\n", num_sidedefs);
-    MarkLevelFailed();
-  }
+  if (num_sidedefs > 65534)
+    MarkHardFailure(LIMIT_SIDEDEFS);
+  else if (num_sidedefs > 32767)
+    MarkSoftFailure(LIMIT_SIDEDEFS);
 }
 
 void PutLinedefs(void)
@@ -871,12 +864,10 @@ void PutLinedefs(void)
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
 
-  if (num_linedefs >= 32768)
-  {
-    PrintWarn("Number of linedefs (%d) has OVERFLOWED the "
-        "normal limit!\n", num_linedefs);
-    MarkLevelFailed();
-  }
+  if (num_linedefs > 65534)
+    MarkHardFailure(LIMIT_LINEDEFS);
+  else if (num_linedefs > 32767)
+    MarkSoftFailure(LIMIT_LINEDEFS);
 }
 
 void PutLinedefsHexen(void)
@@ -907,12 +898,18 @@ void PutLinedefsHexen(void)
     AppendLevelLump(lump, &raw, sizeof(raw));
   }
 
-  if (num_linedefs >= 32768)
-  {
-    PrintWarn("Number of linedefs (%d) has OVERFLOWED the "
-        "normal limit!\n", num_linedefs);
-    MarkLevelFailed();
-  }
+  if (num_linedefs > 65534)
+    MarkHardFailure(LIMIT_LINEDEFS);
+  else if (num_linedefs > 32767)
+    MarkSoftFailure(LIMIT_LINEDEFS);
+}
+
+static INLINE_G uint16_g VertexIndex16Bit(const vertex_t *v)
+{
+  if (v->index & IS_GL_VERTEX)
+    return (uint16_g) ((v->index & ~IS_GL_VERTEX) | 0x8000);
+
+  return (uint16_g) v->index;
 }
 
 void PutSegs(void)
@@ -934,8 +931,8 @@ void PutSegs(void)
     if (! seg->linedef || seg->degenerate)
       continue;
 
-    raw.start   = UINT16(seg->start->index);
-    raw.end     = UINT16(seg->end->index);
+    raw.start   = UINT16(VertexIndex16Bit(seg->start));
+    raw.end     = UINT16(VertexIndex16Bit(seg->end));
     raw.angle   = UINT16(TransformAngle(seg->p_angle));
     raw.linedef = UINT16(seg->linedef->index);
     raw.flip    = UINT16(seg->side);
@@ -954,16 +951,14 @@ void PutSegs(void)
 #   endif
   }
 
-  if (count >= 32768)
-  {
-    PrintWarn("Number of segs (%d) has OVERFLOWED the "
-        "normal limit!\n", count);
-    MarkLevelFailed();
-  }
-
   if (count != num_complete_seg)
     InternalError("PutSegs miscounted (%d != %d)", count,
       num_complete_seg);
+
+  if (count > 65534)
+    MarkHardFailure(LIMIT_SEGS);
+  else if (count > 32767)
+    MarkSoftFailure(LIMIT_SEGS);
 }
 
 void PutGLSegs(void)
@@ -985,8 +980,8 @@ void PutGLSegs(void)
     if (seg->degenerate)
       continue;
 
-    raw.start = UINT16(seg->start->index);
-    raw.end   = UINT16(seg->end->index);
+    raw.start = UINT16(VertexIndex16Bit(seg->start));
+    raw.end   = UINT16(VertexIndex16Bit(seg->end));
     raw.side  = UINT16(seg->side);
 
     if (seg->linedef)
@@ -1011,11 +1006,63 @@ void PutGLSegs(void)
 #   endif
   }
 
-  if (count >= 32768)
+  if (count != num_complete_seg)
+    InternalError("PutGLSegs miscounted (%d != %d)", count,
+      num_complete_seg);
+
+  if (count > 65534)
+    InternalError("PutGLSegs with %d (> 65534) segs", count);
+  else if (count > 32767)
+    MarkSoftFailure(LIMIT_GL_SEGS);
+}
+
+void PutV3Segs(void)
+{
+  int i, count;
+  lump_t *lump = CreateGLLump("GL_SEGS");
+
+  AppendLevelLump(lump, lev_v3_magic, 4);
+
+  DisplayTicker();
+
+  // sort segs into ascending index
+  qsort(segs, num_segs, sizeof(seg_t *), SegCompare);
+
+  for (i=0, count=0; i < num_segs; i++)
   {
-    PrintWarn("Number of GL segs (%d) has OVERFLOWED the "
-        "normal limit!\n", count);
-    MarkLevelFailed();
+    raw_v3_seg_t raw;
+    seg_t *seg = segs[i];
+
+    // ignore degenerate segs
+    if (seg->degenerate)
+      continue;
+
+    int flags = (seg->side == 1) ? V3SEG_F_LEFT : 0;
+
+    raw.start = UINT32(seg->start->index);
+    raw.end   = UINT32(seg->end->index);
+    raw.flags = UINT16(flags);
+
+    if (seg->linedef)
+      raw.linedef = UINT16(seg->linedef->index);
+    else
+      raw.linedef = UINT16(0xFFFF);
+
+    if (seg->partner)
+      raw.partner = UINT32(seg->partner->index);
+    else
+      raw.partner = UINT32(0xFFFFFFFF);
+
+    AppendLevelLump(lump, &raw, sizeof(raw));
+
+    count++;
+
+#   if DEBUG_BSP
+    PrintDebug("PUT V3 SEG: %06X  Line %04X %s  Partner %06X  "
+      "(%1.1f,%1.1f) -> (%1.1f,%1.1f)\n", seg->index, UINT16(raw.linedef), 
+      seg->side ? "L" : "R", UINT32(raw.partner),
+      seg->start->x, seg->start->y, seg->end->x, seg->end->y);
+#   endif
   }
 
   if (count != num_complete_seg)
@@ -1051,12 +1098,39 @@ void PutSubsecs(char *name, int do_gl)
 #   endif
   }
 
-  if (num_subsecs >= 32768)
+  if (num_subsecs > 32767)
+    MarkHardFailure(do_gl ? LIMIT_GL_SSECT : LIMIT_SSECTORS);
+}
+
+void PutV3Subsecs(void)
+{
+  int i;
+  lump_t *lump;
+
+  DisplayTicker();
+
+  lump = CreateGLLump("GL_SSECT");
+
+  AppendLevelLump(lump, lev_v3_magic, 4);
+
+  for (i=0; i < num_subsecs; i++)
   {
-    PrintWarn("Number of %ssubsectors (%d) has OVERFLOWED the "
-        "normal limit!\n", do_gl ? "GL " : "", num_subsecs);
-    MarkLevelFailed();
+    raw_v3_subsec_t raw;
+    subsec_t *sub = subsecs[i];
+
+    raw.first = UINT32(sub->seg_list->index);
+    raw.num   = UINT32(sub->seg_count);
+
+    AppendLevelLump(lump, &raw, sizeof(raw));
+
+#   if DEBUG_BSP
+    PrintDebug("PUT V3 SUBSEC %06X  First %06X  Num %06X\n",
+      sub->index, UINT32(raw.first), UINT32(raw.num));
+#   endif
   }
+
+  if (num_subsecs > 32767)
+    MarkHardFailure(LIMIT_GL_SSECT);
 }
 
 static int node_cur_index;
@@ -1128,16 +1202,12 @@ void PutNodes(char *name, int do_gl, node_t *root)
   if (root)
     PutOneNode(root, lump);
   
-  if (node_cur_index >= 32768)
-  {
-    PrintWarn("Number of %snodes (%d) has OVERFLOWED the "
-        "normal limit!\n", do_gl ? "GL " : "", node_cur_index);
-    MarkLevelFailed();
-  }
-
   if (node_cur_index != num_nodes)
     InternalError("PutNodes miscounted (%d != %d)",
       node_cur_index, num_nodes);
+
+  if (node_cur_index > 32767)
+    MarkHardFailure(LIMIT_NODES);
 }
 
 
@@ -1161,6 +1231,8 @@ void LoadLevel(void)
 
   // -JL- Identify Hexen mode by presence of BEHAVIOR lump
   lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
+
+  lev_v3_segs = lev_v3_subsecs = FALSE;
 
   if (lev_doing_normal && lev_doing_gl)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
@@ -1255,20 +1327,43 @@ void FreeLevel(void)
 //
 void SaveLevel(node_t *root_node)
 {
+  // Note: RoundOffBspTree will covert the GL vertices in segs to their
+  // normal counterparts (pointer change: use normal_dup).
+
   if (cur_info->v1_vert)
     RoundOffBspTree(root_node);
- 
+
   if (lev_doing_gl)
   {
+    if (num_normal_vert > 32767 || num_gl_vert > 32767)
+    {
+      lev_v3_segs = TRUE;
+      MarkV3Switch(LIMIT_VERTEXES | LIMIT_GL_SEGS);
+    }
+
+    if (num_segs > 65534)
+    {
+      lev_v3_subsecs = lev_v3_segs = TRUE;
+      MarkV3Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
+    }
+
     if (cur_info->v1_vert)
       PutVertices("GL_VERT", TRUE);
     else
       PutV2Vertices();
 
-    PutGLSegs();
-    PutSubsecs("GL_SSECT", TRUE);
+    if (lev_v3_segs)
+      PutV3Segs();
+    else
+      PutGLSegs();
+
+    if (lev_v3_subsecs)
+      PutV3Subsecs();
+    else
+      PutSubsecs("GL_SSECT", TRUE);
+
     PutNodes("GL_NODES", TRUE, root_node);
-    
+
     // -JL- Add empty PVS lump
     CreateGLLump("GL_PVS");
   }

@@ -55,7 +55,7 @@ typedef struct vertex_s
   float_g x, y;
 
   // vertex index.  Always valid after loading and pruning of unused
-  // vertices has occurred.  For GL vertices, bit 15 will be set.
+  // vertices has occurred.  For GL vertices, bit 30 will be set.
   int index;
 
   // reference count.  When building normal node info, unused vertices
@@ -76,6 +76,8 @@ typedef struct vertex_s
   struct vertex_s *normal_dup;
 }
 vertex_t;
+
+#define IS_GL_VERTEX  (1 << 30)
 
 
 typedef struct sector_s
