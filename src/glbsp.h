@@ -22,7 +22,7 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "2.05"
+#define GLBSP_VER  "2.10"
 
 
 // certain GCC attributes can be useful
@@ -89,7 +89,7 @@ typedef struct nodebuildinfo_s
   boolean_g force_hexen;
   boolean_g pack_sides;
   boolean_g v1_vert;
-  boolean_g choose_fresh;
+  boolean_g fast;
 
   boolean_g load_all;
   boolean_g no_gl;

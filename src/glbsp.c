@@ -60,7 +60,7 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // force_hexen
   FALSE,   // pack_sides
   FALSE,   // v1_vert
-  FALSE,   // choose_fresh
+  FALSE,   // fast
 
   FALSE,   // load_all
   FALSE,   // no_gl
@@ -248,7 +248,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     }
 
     HANDLE_BOOLEAN("quiet",       quiet)
-    HANDLE_BOOLEAN("fresh",       choose_fresh)
+    HANDLE_BOOLEAN("fast",        fast)
     HANDLE_BOOLEAN("noreject",    no_reject)
     HANDLE_BOOLEAN("noprog",      no_progress)
     HANDLE_BOOLEAN("warn",        mini_warnings)
@@ -270,6 +270,13 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("pack",        pack_sides)
     HANDLE_BOOLEAN("keepsec",     keep_sect)
     HANDLE_BOOLEAN("keepsectors", keep_sect)
+
+    // ignore -fresh for backwards compatibility
+    if (UtilStrCaseCmp(opt_str, "fresh") == 0)
+    {
+      argv++; argc--;
+      continue;
+    }
 
     // backwards compatibility
     HANDLE_BOOLEAN("forcenormal", force_normal)

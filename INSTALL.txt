@@ -113,9 +113,9 @@ Unix / Linux:
 MacOS X:
 
     Similar, but should use "./configure --prefix=$HOME" (that's where the
-    makefile expects to find it.  Edit fltk/makefile.osx if it has been
+    makefile expects to find it).  Edit fltk/makefile.osx if it has been
     installed somewhere else.  Also I've only tested the static library.
-    After configuring FLTK you must apply the glbsp patch in
+    After configuring FLTK you must apply the glBSP patch in
     patches/FLTK_MACOSX.diff (to get the Fl_Sys_Menu_Bar class built).
 
 Windows with Dev-C++:
@@ -134,7 +134,7 @@ Windows with Dev-C++:
 Success Stories
 ---------------
 
-The command line version of glbsp is known to work on these platforms:
+The command line version of glBSP is known to work on these platforms:
 
    +  Linux 2.1.126, libc5, GCC 2.7.2.1.
    +  Linux 2.2.18, glibc 2.2, GCC 2.95.2.

@@ -2,17 +2,17 @@
 README for glBSP
 ================
 
-by Andrew Apted.  8th January 2004.
+by Andrew Apted.  17th April 2004.
 
 
 Introduction
 ------------
 
-glBSP is a node builder specially designed to be used with OpenGL
-ports of the DOOM game engine. It adheres to the "GL-Friendly Nodes"
-specification, which means it adds some new special nodes to a WAD
-file that makes it very easy (and fast !) for an OpenGL DOOM engine to
-compute the polygons needed for drawing the levels.
+glBSP is a nodes builder specially designed to be used with OpenGL-based
+DOOM game engines. It adheres to the "GL-Friendly Nodes" specification,
+which means it adds some new special nodes to a WAD file that makes it
+very easy for an OpenGL DOOM engine to compute the polygons needed for
+drawing the levels.
 
 There are many DOOM ports that understand the GL Nodes which glBSP
 creates, including: EDGE, the Doomsday engine (JDOOM), Doom3D, PrBoom,
@@ -22,7 +22,7 @@ and Vavoom.  See the links below.
 Status
 ------
 
-The current version of glBSP is 2.05.  It has been tested and known to
+The current version of glBSP is 2.10.  It has been tested and known to
 work on numerous large wads, including DOOM I, DOOM II, TeamTNT's Eternal III,
 Fanatic's QDOOM, and many others.
 

@@ -2,6 +2,18 @@
 CHANGELOG
 =========
 
+Changes in V2.10  (Unreleased)
+------------------------------
+
+ - choose first seg in a subsector better, avoid self-referenced lines.
+
+ - removed -fresh option (now the default), and added a -fast option.
+
+ - glBSP now detects overlapping linedefs (used to make higher mid-maskers)
+   and ignores them (produces no segs from the second and subsequent ones).
+   It's now up to the engine's detect this old trick and emulate it.
+
+
 Changes in V2.05  (31st December 2003)
 --------------------------------------
 
