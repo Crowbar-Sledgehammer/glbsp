@@ -373,21 +373,18 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 	sector_c *front = seg->linedef->right->sector;
 	sector_c *back  = seg->linedef->left->sector;
 
+	int floor_min = MIN(front->floor_h, back->floor_h);
 	int floor_max = MAX(front->floor_h, back->floor_h);
-	int ceil_min = MIN(front->ceil_h, back->ceil_h);
 
-	// closed door ?
-	if (front->ceil_h <= back->floor_h || back->ceil_h <= front->floor_h)
+	int ceil_min = MIN(front->ceil_h, back->ceil_h);
+//  int ceil_max = MAX(front->ceil_h, back->ceil_h);
+
+	if (ceil_min <= floor_max)  // closed door ?
 	{
 		fl_color(on ? FL_RED : fl_color_cube(2,0,0));
 		return true;
 	}
-	if (ABS(front->floor_h - back->floor_h) > 24)  // unclimbable dropoff ?
-	{
-		fl_color(on ? FL_GREEN : fl_color_cube(0,3,0));
-		return true;
-	}
-	if (ceil_min > floor_max && ceil_min < floor_max+56)  // narrow gap ?
+	if (ceil_min - floor_max < 56)  // narrow vertical gap ?
 	{
 		fl_color(on ? fl_color_cube(4,4,0) : fl_color_cube(2,2,0));
 		return true;
@@ -397,7 +394,12 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 		fl_color(on ? FL_YELLOW : fl_color_cube(2,2,0));
 		return true;
 	}
-	
+	if (floor_max - floor_min > 24)  // unclimbable dropoff ?
+	{
+		fl_color(on ? FL_GREEN : fl_color_cube(0,3,0));
+		return true;
+	}
+
 	if (miniseg_MODE < 1)
 		return false;
 
@@ -606,7 +608,7 @@ int W_Grid::handle_key(int key)
 				route_len--;
 			redraw();
 			return 1;
-
+#if 0
 		case '[':
 			if (descend_tree(RT_LEFT))
 				redraw();
@@ -616,7 +618,7 @@ int W_Grid::handle_key(int key)
 			if (descend_tree(RT_RIGHT))
 				redraw();
 			return 1;
-
+#endif
 		case 'x':
 			DialogShowAndGetChoice(ALERT_TXT, 0, "Please foo the joo.");
 			return 1;
