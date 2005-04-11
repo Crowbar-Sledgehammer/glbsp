@@ -48,19 +48,6 @@ public:
 	// 
 	void WritePrefs();
 
-	// this routine is useful if the nodebuildinfo has changed.  It
-	// causes all the widgets to update themselves using the new
-	// parameters.
-	// 
-	void ReadAllInfo();
-
-	// routine to capture all of the nodebuildinfo state from the
-	// various widgets.  Note: don't need to call this before
-	// destructing everything -- the widget destructors will do it
-	// automatically.
-	// 
-	void WriteAllInfo();
-
 protected:
   
 	// initial window size, read after the window manager has had a
