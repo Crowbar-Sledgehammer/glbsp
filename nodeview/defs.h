@@ -19,6 +19,8 @@
 #ifndef __NODEVIEW_DEFS_H__
 #define __NODEVIEW_DEFS_H__
 
+#define PROG_NAME  "GL-Node Viewer"
+
 //
 //  SYSTEM INCLUDES
 //

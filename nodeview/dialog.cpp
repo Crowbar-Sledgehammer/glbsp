@@ -258,7 +258,7 @@ int DialogQueryFilename(const char *message,
 	height += 60 + 50 + 16;  // 
 
 	// create window
-	cur_diag = new Fl_Window(0, 0, width, height, "GL-Node Viewer Query");
+	cur_diag = new Fl_Window(0, 0, width, height, PROG_NAME " Query");
 	cur_diag->end();
 	cur_diag->size_range(width, height, width, height);
 	cur_diag->callback((Fl_Callback *) dialog_closed_CB);
@@ -374,10 +374,10 @@ void GUI_FatalError(const char *str, ...)
 			"\n"
 			"      %s\n"
 			"\n"
-			"GL-Node Viewer will now shut down.",
+			PROG_NAME " will now shut down.",
 			m_ptr);
 
-	DialogShowAndGetChoice("GL-Node Viewer Fatal Error", 0, buffer);
+	DialogShowAndGetChoice(PROG_NAME " Fatal Error", 0, buffer);
 
 	// Q/ save cookies ?  
 	// A/ no, we save them before each build begins.

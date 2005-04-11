@@ -31,7 +31,7 @@ int DialogQueryFilename(const char *message,
 
 void GUI_FatalError(const char *str, ...);
 
-#define ALERT_TXT  "GL-Node Viewer Alert"
+#define ALERT_TXT  (PROG_NAME "Alert")
 #define MISSING_COMMS  "(Not Specified)"
 
 #endif /* __NODEVIEW_DIALOG_H__ */

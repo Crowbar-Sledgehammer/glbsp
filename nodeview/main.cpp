@@ -20,8 +20,6 @@
 #include "defs.h"
 
 
-#define MY_TITLE  ("GL-Node Viewer ")
-
 #define GUI_PrintMsg  printf
 
 
@@ -34,7 +32,7 @@ static void ShowTitle(void)
 {
 	GUI_PrintMsg(
 		"\n"
-		"**** GL-Node Viewer " " (C) 2005 Andrew Apted ****\n\n"
+		"**** " PROG_NAME "  (C) 2005 Andrew Apted ****\n\n"
 	);
 }
 
@@ -164,7 +162,7 @@ int main(int argc, char **argv)
 
 		LoadLevel(level_name);
 
-		guix_win = new Guix_MainWin(MY_TITLE);
+		guix_win = new Guix_MainWin(PROG_NAME);
 
 		if (path)
 			guix_win->grid->SetPath(path);

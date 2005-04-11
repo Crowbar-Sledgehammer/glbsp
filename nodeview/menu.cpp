@@ -57,7 +57,7 @@ static void menu_do_about(Fl_Widget *w, void * data)
 #if 0
   menu_want_to_quit = false;
 
-  Fl_Window *ab_win = new Fl_Window(600, 340, "About GL-Node Viewer");
+  Fl_Window *ab_win = new Fl_Window(600, 340, "About " PROG_NAME);
   ab_win->end();
 
   // non-resizable
