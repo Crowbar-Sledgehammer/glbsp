@@ -1308,7 +1308,7 @@ void PutZVertices(void)
 
   for (i=0, count=0; i < num_vertices; i++)
   {
-    raw_vertex_t raw;
+    raw_v2_vertex_t raw;
     vertex_t *vert = lev_vertices[i];
 
     if (! (vert->index & IS_GL_VERTEX))
@@ -1323,7 +1323,8 @@ void PutZVertices(void)
   }
 
   if (count != num_gl_vert)
-    InternalError("PutZVertices miscounted (%d != %d)", count, num_gl_vert);
+    InternalError("PutZVertices miscounted (%d != %d)",
+        count, num_gl_vert);
 }
 
 void PutZSubsecs(void)
@@ -1355,22 +1356,26 @@ void PutZSubsecs(void)
         continue;
 
       if (cur_seg_index != seg->index)
-        InternalError("PutZSubsecs: seg index mismatch (%d != %d)\n",
+        InternalError("PutZSubsecs: seg index mismatch in sub %d (%d != %d)\n",
             i, cur_seg_index, seg->index);
       
       count++;
     }
 
     if (count != sub->seg_count)
-      InternalError("PutZSubsecs: miscounted segs (%d != %d)\n",
-          count, sub->seg_count);
+      InternalError("PutZSubsecs: miscounted segs in sub %d (%d != %d)\n",
+          i, count, sub->seg_count);
   }
+
+  if (cur_seg_index != num_complete_seg)
+    InternalError("PutZSubsecs miscounted segs (%d != %d)",
+        cur_seg_index, num_complete_seg);
 }
 
 void PutZSegs(void)
 {
   int i, count;
-  uint32_g raw_num = UINT32(num_segs);
+  uint32_g raw_num = UINT32(num_complete_seg);
 
   ZLibAppendLump(&raw_num, 4);
   DisplayTicker();
@@ -1403,8 +1408,9 @@ void PutZSegs(void)
     count++;
   }
 
-  if (count != num_segs)
-    InternalError("PutZSubsecs miscounted (%d != %d)", count, num_gl_vert);
+  if (count != num_complete_seg)
+    InternalError("PutZSegs miscounted (%d != %d)",
+        count, num_complete_seg);
 }
 
 static void PutOneZNode(node_t *node)
@@ -1656,7 +1662,7 @@ void SaveLevel(node_t *root_node)
     else
       PutGLSegs();
 
-    if (lev_force_v3 || lev_force_v3)
+    if (lev_force_v3 || lev_force_v5)
       PutV3Subsecs(lev_force_v5);
     else
       PutSubsecs("GL_SSECT", TRUE);
