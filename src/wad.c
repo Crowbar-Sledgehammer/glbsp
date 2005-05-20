@@ -1371,9 +1371,9 @@ static z_stream zout_stream;
 static Bytef    zout_buffer[1024];
 
 //
-// ZLibBegin
+// ZLibBeginLump
 //
-void ZLibBegin(lump_t *lump)
+void ZLibBeginLump(lump_t *lump)
 {
   zout_lump = lump;
 
@@ -1389,9 +1389,9 @@ void ZLibBegin(lump_t *lump)
 }
 
 //
-// ZLibAppend
+// ZLibAppendLump
 //
-void ZLibAppend(const void *data, int length)
+void ZLibAppendLump(const void *data, int length)
 {
   // ASSERT(zout_lump)
   // ASSERT(length > 0)
@@ -1417,9 +1417,9 @@ void ZLibAppend(const void *data, int length)
 }
 
 //
-// ZLibFinish
+// ZLibFinishLump
 //
-void ZLibFinish(void)
+void ZLibFinishLump(void)
 {
   // ASSERT(zout_stream.avail_out > 0)
 

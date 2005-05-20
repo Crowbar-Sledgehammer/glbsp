@@ -216,9 +216,9 @@ lump_t *CreateGLLump(const char *name);
 void AppendLevelLump(lump_t *lump, const void *data, int length);
 
 // Zlib compression support
-void ZLibBegin(lump_t *lump);
-void ZLibAppend(const void *data, int length);
-void ZLibFinish(void);
+void ZLibBeginLump(lump_t *lump);
+void ZLibAppendLump(const void *data, int length);
+void ZLibFinishLump(void);
 
 // mark the fact that this level failed to build.
 void MarkSoftFailure(int soft);
