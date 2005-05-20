@@ -54,6 +54,7 @@ static uint16_g *block_ptrs;
 static uint16_g *block_dups;
 
 static int block_compression;
+static int block_overflowed;
 
 #define DUMMY_DUP  0xFFFF
 
@@ -385,7 +386,9 @@ static void CompressBlockmap(void)
 
   if (cur_offset > 65535)
   {
-    MarkHardFailure(LIMIT_BLOCKMAP);
+    MarkSoftFailure(LIMIT_BLOCKMAP);
+    block_overflowed = TRUE;
+    return;
   }
 
 # if DEBUG_BLOCKMAP
@@ -408,6 +411,10 @@ static void WriteBlockmap(void)
   raw_blockmap_header_t header;
 
   lump_t *lump = CreateLevelLump("BLOCKMAP");
+
+  // leave empty if the blockmap overflowed
+  if (block_overflowed)
+    return;
 
   uint16_g null_block[2] = { 0x0000, 0xFFFF };
   uint16_g m_zero = 0x0000;
@@ -577,6 +584,8 @@ void InitBlockmap(void)
 //
 void PutBlockmap(void)
 {
+  block_overflowed = FALSE;
+
   // truncate blockmap if too large.  We're limiting the number of
   // blocks to around 44000 (user changeable), this leaves about 20K
   // of shorts for the actual line lists.
@@ -599,8 +608,11 @@ void PutBlockmap(void)
 
   WriteBlockmap();
 
-  PrintVerbose("Completed blockmap building (compression: %d%%)\n",
-      block_compression);
+  if (block_overflowed)
+    PrintVerbose("Blockmap overflowed (lump will be empty)\n");
+  else
+    PrintVerbose("Completed blockmap building (compression: %d%%)\n",
+        block_compression);
 
   FreeBlockmap();
 }
