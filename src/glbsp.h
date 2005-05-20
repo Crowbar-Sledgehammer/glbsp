@@ -22,8 +22,8 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "2.10"
-#define GLBSP_VER_HEX  0x210
+#define GLBSP_VER  "2.15-ALPHA"
+#define GLBSP_VER_HEX  0x215
 
 
 // certain GCC attributes can be useful
@@ -91,7 +91,7 @@ typedef struct nodebuildinfo_s
   boolean_g pack_sides;
   boolean_g fast;
 
-  int spec_version;  // 1, 2 or 3
+  int spec_version;  // 1, 2, 3 or 5
 
   boolean_g load_all;
   boolean_g no_normal;

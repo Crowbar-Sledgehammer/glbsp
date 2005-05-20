@@ -1378,9 +1378,9 @@ void MarkHardFailure(int hard)
   wad.current_level->lev_info->hard_limit |= hard;
 }
 
-void MarkV3Switch(int v3)
+void MarkV5Switch(int v5)
 {
-  wad.current_level->lev_info->v3_switch |= v3;
+  wad.current_level->lev_info->v5_switch |= v5;
 }
 
 
@@ -1463,15 +1463,15 @@ void ReportOverflows(boolean_g hard)
 }
 
 //
-// ReportV3Switches
+// ReportV5Switches
 //
-void ReportV3Switches(void)
+void ReportV5Switches(void)
 {
   lump_t *cur;
 
   PrintMsg(
-    "V3 FORMAT UPGRADES.  The following levels require a Doom port\n"
-    "which supports V3 GL-Nodes, otherwise they will fail (or crash).\n\n"
+    "V5 FORMAT UPGRADES.  The following levels require a Doom port\n"
+    "which supports V5 GL-Nodes, otherwise they will fail (or crash).\n\n"
   );
 
   for (cur=wad.dir_head; cur; cur=cur->next)
@@ -1481,15 +1481,15 @@ void ReportV3Switches(void)
     if (! (lev && ! (lev->flags & LEVEL_IS_GL)))
       continue;
 
-    if (lev->v3_switch == 0)
+    if (lev->v5_switch == 0)
       continue;
 
-    if (lev->v3_switch & LIMIT_VERTEXES)
+    if (lev->v5_switch & LIMIT_VERTEXES)
     {
       PrintMsg("%-6s : Number of vertices overflowed the limit.\n", cur->name);
     }
 
-    if (lev->v3_switch & LIMIT_GL_SSECT)
+    if (lev->v5_switch & LIMIT_GL_SSECT)
     {
       PrintMsg("%-6s : Number of GL segs overflowed the limit.\n", cur->name);
     }
@@ -1506,7 +1506,7 @@ void ReportFailedLevels(void)
 
   int fail_soft = 0;
   int fail_hard = 0;
-  int fail_v3   = 0;
+  int fail_v5   = 0;
 
   boolean_g need_spacer = FALSE;
  
@@ -1519,12 +1519,12 @@ void ReportFailedLevels(void)
 
     if (cur->lev_info->soft_limit != 0) fail_soft++;
     if (cur->lev_info->hard_limit != 0) fail_hard++;
-    if (cur->lev_info->v3_switch  != 0) fail_v3++;
+    if (cur->lev_info->v5_switch  != 0) fail_v5++;
   }
 
   PrintMsg("\n");
 
-  if (fail_soft + fail_hard + fail_v3 == 0)
+  if (fail_soft + fail_hard + fail_v5 == 0)
   {
     PrintMsg("All levels were built successfully.\n");
     return;
@@ -1538,12 +1538,12 @@ void ReportFailedLevels(void)
     need_spacer = TRUE;
   }
 
-  if (fail_v3 > 0)
+  if (fail_v5 > 0)
   {
     if (need_spacer)
       PrintMsg("\n");
 
-    ReportV3Switches();
+    ReportV5Switches();
     need_spacer = TRUE;
   }
 

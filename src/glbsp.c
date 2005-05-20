@@ -370,10 +370,16 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     return GLBSP_E_BadInfoFixed;
   }
 
-  if (info->spec_version <= 0 || info->spec_version > 3)
+  if (info->spec_version <= 0 || info->spec_version > 5)
   {
     info->spec_version = 2;
     SetErrorMsg("Bad GL-Nodes version number !");
+    return GLBSP_E_BadInfoFixed;
+  }
+  else if (info->spec_version == 4)
+  {
+    info->spec_version = 5;
+    SetErrorMsg("V4 GL-Nodes is not supported");
     return GLBSP_E_BadInfoFixed;
   }
 

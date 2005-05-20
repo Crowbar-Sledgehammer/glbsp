@@ -172,6 +172,9 @@ typedef struct linedef_s
   // zero length (line should be totally ignored)
   char zero_len;
 
+  // one-sided linedef used for a special effect (windows)
+  char window_effect;
+
   int flags;
   int type;
   int tag;

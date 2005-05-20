@@ -51,8 +51,8 @@
 boolean_g lev_doing_normal;
 boolean_g lev_doing_hexen;
 
-static boolean_g lev_v3_segs;
-static boolean_g lev_v3_subsecs;
+static boolean_g lev_force_v3;
+static boolean_g lev_force_v5;
 
 
 #define LEVELARRAY(TYPE, BASEVAR, NUMVAR)  \
@@ -645,12 +645,12 @@ void GetStaleNodes(void)
     
     /* Note: we ignore the subsector references */
      
-    if ((UINT16(raw->right) & 0x8000) == 0)
+    if ((UINT16(raw->right) & 0x8000U) == 0)
     {
       nd->r.node = LookupStaleNode(UINT16(raw->right));
     }
 
-    if ((UINT16(raw->left) & 0x8000) == 0)
+    if ((UINT16(raw->left) & 0x8000U) == 0)
     {
       nd->l.node = LookupStaleNode(UINT16(raw->left));
     }
@@ -658,7 +658,6 @@ void GetStaleNodes(void)
     /* we also ignore the bounding boxes -- not needed */
   }
 }
-
 
 
 static INLINE_G int TransformSegDist(const seg_t *seg)
@@ -700,6 +699,7 @@ static int SegCompare(const void *p1, const void *p2)
 
 static const uint8_g *lev_v2_magic = (uint8_g *) "gNd2";
 static const uint8_g *lev_v3_magic = (uint8_g *) "gNd3";
+static const uint8_g *lev_v5_magic = (uint8_g *) "gNd5";
 
 void PutVertices(char *name, int do_gl)
 {
@@ -741,7 +741,7 @@ void PutVertices(char *name, int do_gl)
     MarkSoftFailure(do_gl ? LIMIT_GL_VERT : LIMIT_VERTEXES);
 }
 
-void PutV2Vertices(void)
+void PutV2Vertices(int do_v5)
 {
   int count, i;
   lump_t *lump;
@@ -750,7 +750,10 @@ void PutV2Vertices(void)
 
   lump = CreateGLLump("GL_VERT");
 
-  AppendLevelLump(lump, lev_v2_magic, 4);
+  if (do_v5)
+      AppendLevelLump(lump, lev_v5_magic, 4);
+  else
+      AppendLevelLump(lump, lev_v2_magic, 4);
 
   for (i=0, count=0; i < num_vertices; i++)
   {
@@ -906,9 +909,17 @@ void PutLinedefsHexen(void)
 static INLINE_G uint16_g VertexIndex16Bit(const vertex_t *v)
 {
   if (v->index & IS_GL_VERTEX)
-    return (uint16_g) ((v->index & ~IS_GL_VERTEX) | 0x8000);
+    return (uint16_g) ((v->index & ~IS_GL_VERTEX) | 0x8000U);
 
   return (uint16_g) v->index;
+}
+
+static INLINE_G uint32_g VertexIndex32BitV5(const vertex_t *v)
+{
+  if (v->index & IS_GL_VERTEX)
+    return (uint32_g) ((v->index & ~IS_GL_VERTEX) | 0x80000000U);
+
+  return (uint32_g) v->index;
 }
 
 void PutSegs(void)
@@ -1015,12 +1026,13 @@ void PutGLSegs(void)
     MarkSoftFailure(LIMIT_GL_SEGS);
 }
 
-void PutV3Segs(void)
+void PutV3Segs(int do_v5)
 {
   int i, count;
   lump_t *lump = CreateGLLump("GL_SEGS");
 
-  AppendLevelLump(lump, lev_v3_magic, 4);
+  if (! do_v5)
+      AppendLevelLump(lump, lev_v3_magic, 4);
 
   DisplayTicker();
 
@@ -1032,15 +1044,22 @@ void PutV3Segs(void)
     raw_v3_seg_t raw;
     seg_t *seg = segs[i];
 
-    int flags = (seg->side == 1) ? V3SEG_F_LEFT : 0;
-
     // ignore degenerate segs
     if (seg->degenerate)
       continue;
 
-    raw.start = UINT32(seg->start->index);
-    raw.end   = UINT32(seg->end->index);
-    raw.flags = UINT16(flags);
+    if (do_v5)
+    {
+      raw.start = UINT32(VertexIndex32BitV5(seg->start));
+      raw.end   = UINT32(VertexIndex32BitV5(seg->end));
+    }
+    else
+    {
+      raw.start = UINT32(seg->start->index);
+      raw.end   = UINT32(seg->end->index);
+    }
+
+    raw.side  = UINT16(seg->side);
 
     if (seg->linedef)
       raw.linedef = UINT16(seg->linedef->index);
@@ -1101,7 +1120,7 @@ void PutSubsecs(char *name, int do_gl)
     MarkHardFailure(do_gl ? LIMIT_GL_SSECT : LIMIT_SSECTORS);
 }
 
-void PutV3Subsecs(void)
+void PutV3Subsecs(int do_v5)
 {
   int i;
   lump_t *lump;
@@ -1110,7 +1129,8 @@ void PutV3Subsecs(void)
 
   lump = CreateGLLump("GL_SSECT");
 
-  AppendLevelLump(lump, lev_v3_magic, 4);
+  if (! do_v5)
+      AppendLevelLump(lump, lev_v3_magic, 4);
 
   for (i=0; i < num_subsecs; i++)
   {
@@ -1128,7 +1148,7 @@ void PutV3Subsecs(void)
 #   endif
   }
 
-  if (num_subsecs > 32767)
+  if (!do_v5 && num_subsecs > 32767)
     MarkHardFailure(LIMIT_GL_SSECT);
 }
 
@@ -1185,7 +1205,58 @@ static void PutOneNode(node_t *node, lump_t *lump)
 # endif
 }
 
-void PutNodes(char *name, int do_gl, node_t *root)
+static void PutV5Node(node_t *node, lump_t *lump)
+{
+  raw_v5_node_t raw;
+
+  if (node->r.node)
+    PutV5Node(node->r.node, lump);
+
+  if (node->l.node)
+    PutV5Node(node->l.node, lump);
+
+  node->index = node_cur_index++;
+
+  raw.x  = SINT16(node->x);
+  raw.y  = SINT16(node->y);
+  raw.dx = SINT16(node->dx / (node->too_long ? 2 : 1));
+  raw.dy = SINT16(node->dy / (node->too_long ? 2 : 1));
+
+  raw.b1.minx = SINT16(node->r.bounds.minx);
+  raw.b1.miny = SINT16(node->r.bounds.miny);
+  raw.b1.maxx = SINT16(node->r.bounds.maxx);
+  raw.b1.maxy = SINT16(node->r.bounds.maxy);
+
+  raw.b2.minx = SINT16(node->l.bounds.minx);
+  raw.b2.miny = SINT16(node->l.bounds.miny);
+  raw.b2.maxx = SINT16(node->l.bounds.maxx);
+  raw.b2.maxy = SINT16(node->l.bounds.maxy);
+
+  if (node->r.node)
+    raw.right = UINT32(node->r.node->index);
+  else if (node->r.subsec)
+    raw.right = UINT32(node->r.subsec->index | 0x80000000U);
+  else
+    InternalError("Bad right child in V5 node %d", node->index);
+
+  if (node->l.node)
+    raw.left = UINT32(node->l.node->index);
+  else if (node->l.subsec)
+    raw.left = UINT32(node->l.subsec->index | 0x80000000U);
+  else
+    InternalError("Bad left child in V5 node %d", node->index);
+
+  AppendLevelLump(lump, &raw, sizeof(raw));
+
+# if DEBUG_BSP
+  PrintDebug("PUT V5 NODE %08X  Left %08X  Right %08X  "
+    "(%d,%d) -> (%d,%d)\n", node->index, UINT32(raw.left),
+    UINT32(raw.right), node->x, node->y,
+    node->x + node->dx, node->y + node->dy);
+# endif
+}
+
+void PutNodes(char *name, int do_gl, int do_v5, node_t *root)
 {
   lump_t *lump;
 
@@ -1199,13 +1270,18 @@ void PutNodes(char *name, int do_gl, node_t *root)
   node_cur_index = 0;
 
   if (root)
-    PutOneNode(root, lump);
-  
+  {
+    if (do_v5)
+      PutV5Node(root, lump);
+    else
+      PutOneNode(root, lump);
+  }
+
   if (node_cur_index != num_nodes)
     InternalError("PutNodes miscounted (%d != %d)",
       node_cur_index, num_nodes);
 
-  if (node_cur_index > 32767)
+  if (!do_v5 && node_cur_index > 32767)
     MarkHardFailure(LIMIT_NODES);
 }
 
@@ -1229,9 +1305,9 @@ void LoadLevel(void)
   // -JL- Identify Hexen mode by presence of BEHAVIOR lump
   lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
-  lev_v3_segs = (cur_info->spec_version == 3) ? TRUE : FALSE;
-  lev_v3_subsecs = lev_v3_segs;
-
+  lev_force_v3 = (cur_info->spec_version == 3) ? TRUE : FALSE;
+  lev_force_v5 = (cur_info->spec_version == 5) ? TRUE : FALSE;
+  
   if (lev_doing_normal)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
   else
@@ -1321,7 +1397,7 @@ void FreeLevel(void)
 //
 void SaveLevel(node_t *root_node)
 {
-  // Note: RoundOffBspTree will covert the GL vertices in segs to their
+  // Note: RoundOffBspTree will convert the GL vertices in segs to their
   // normal counterparts (pointer change: use normal_dup).
 
   if (cur_info->spec_version == 1)
@@ -1331,32 +1407,42 @@ void SaveLevel(node_t *root_node)
   {
     if (num_normal_vert > 32767 || num_gl_vert > 32767)
     {
-      lev_v3_segs = TRUE;
-      MarkV3Switch(LIMIT_VERTEXES | LIMIT_GL_SEGS);
+      if (cur_info->spec_version < 3)
+        lev_force_v5 = TRUE;
+
+      MarkV5Switch(LIMIT_VERTEXES | LIMIT_GL_SEGS);
     }
 
     if (num_segs > 65534)
     {
-      lev_v3_subsecs = lev_v3_segs = TRUE;
-      MarkV3Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
+      if (cur_info->spec_version < 3)
+        lev_force_v5 = TRUE;
+
+      MarkV5Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
+    }
+
+    if (num_nodes > 32767)
+    {
+      lev_force_v5 = TRUE;
+      MarkV5Switch(LIMIT_GL_NODES);
     }
 
     if (cur_info->spec_version == 1)
       PutVertices("GL_VERT", TRUE);
     else
-      PutV2Vertices();
+      PutV2Vertices(lev_force_v5);
 
-    if (lev_v3_segs)
-      PutV3Segs();
+    if (lev_force_v3 || lev_force_v5)
+      PutV3Segs(lev_force_v5);
     else
       PutGLSegs();
 
-    if (lev_v3_subsecs)
-      PutV3Subsecs();
+    if (lev_force_v3 || lev_force_v3)
+      PutV3Subsecs(lev_force_v5);
     else
       PutSubsecs("GL_SSECT", TRUE);
 
-    PutNodes("GL_NODES", TRUE, root_node);
+    PutNodes("GL_NODES", TRUE, lev_force_v5, root_node);
 
     // -JL- Add empty PVS lump
     CreateGLLump("GL_PVS");
@@ -1378,9 +1464,16 @@ void SaveLevel(node_t *root_node)
     else
       PutLinedefs();
  
-    PutSegs();
-    PutSubsecs("SSECTORS", FALSE);
-    PutNodes("NODES", FALSE, root_node);
+    if (FALSE) //!!!! (lev_force_v5)
+    {
+//!!!!      PutZNodes();
+    }
+    else
+    {
+      PutSegs();
+      PutSubsecs("SSECTORS", FALSE);
+      PutNodes("NODES", FALSE, FALSE, root_node);
+    }
 
     // -JL- Don't touch blockmap and reject if not doing normal nodes
     PutBlockmap();

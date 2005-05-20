@@ -2,7 +2,7 @@
 // MAIN : Command-line version main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2004 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -48,7 +48,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "**** GL BSP Node Builder " GLBSP_VER " (C) 2004 Andrew Apted ****\n\n"
+    "**** GL BSP Node Builder " GLBSP_VER " (C) 2005 Andrew Apted ****\n\n"
   );
 }
 
@@ -92,7 +92,7 @@ static void ShowOptions(void)
     "  -normal          Forces the normal nodes to be recomputed\n"
     "\n"
     "Rarely Useful:\n"
-    "  -v1 .. -v3       Version of GL-Nodes to use (1, 2 or 3)\n"
+    "  -v1 .. -v5       Version of GL-Nodes to use (1,2,3 or 5)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"

@@ -71,7 +71,7 @@ typedef struct level_s
   // information on overflow
   int soft_limit;
   int hard_limit;
-  int v3_switch;
+  int v5_switch;
 }
 level_t;
 
@@ -218,7 +218,7 @@ void AppendLevelLump(lump_t *lump, const void *data, int length);
 // mark the fact that this level failed to build.
 void MarkSoftFailure(int soft);
 void MarkHardFailure(int hard);
-void MarkV3Switch(int v3);
+void MarkV5Switch(int v5);
 
 // alert the user if any levels failed to build properly.
 void ReportFailedLevels(void);
