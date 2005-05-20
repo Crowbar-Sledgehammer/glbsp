@@ -17,6 +17,10 @@
 //  GNU General Public License for more details.
 //
 //------------------------------------------------------------------------
+//
+//  ZDBSP format support based on code (C) 2002,2003 Randy Heit
+// 
+//------------------------------------------------------------------------
 
 #include "system.h"
 
@@ -1205,15 +1209,15 @@ static void PutOneNode(node_t *node, lump_t *lump)
 # endif
 }
 
-static void PutV5Node(node_t *node, lump_t *lump)
+static void PutOneV5Node(node_t *node, lump_t *lump)
 {
   raw_v5_node_t raw;
 
   if (node->r.node)
-    PutV5Node(node->r.node, lump);
+    PutOneV5Node(node->r.node, lump);
 
   if (node->l.node)
-    PutV5Node(node->l.node, lump);
+    PutOneV5Node(node->l.node, lump);
 
   node->index = node_cur_index++;
 
@@ -1272,7 +1276,7 @@ void PutNodes(char *name, int do_gl, int do_v5, node_t *root)
   if (root)
   {
     if (do_v5)
-      PutV5Node(root, lump);
+      PutOneV5Node(root, lump);
     else
       PutOneNode(root, lump);
   }
@@ -1283,6 +1287,221 @@ void PutNodes(char *name, int do_gl, int do_v5, node_t *root)
 
   if (!do_v5 && node_cur_index > 32767)
     MarkHardFailure(LIMIT_NODES);
+}
+
+
+/* ----- ZDBSP format writing --------------------------- */
+
+static const uint8_g *lev_ZD_magic = (uint8_g *) "ZNOD";
+
+void PutZVertices(void)
+{
+  int count, i;
+
+  uint32_g orgverts = UINT32(num_normal_vert);
+  uint32_g newverts = UINT32(num_gl_vert);
+
+  ZLibAppendLump(&orgverts, 4);
+  ZLibAppendLump(&newverts, 4);
+
+  DisplayTicker();
+
+  for (i=0, count=0; i < num_vertices; i++)
+  {
+    raw_vertex_t raw;
+    vertex_t *vert = lev_vertices[i];
+
+    if (! (vert->index & IS_GL_VERTEX))
+      continue;
+
+    raw.x = SINT32((int)(vert->x * 65536.0));
+    raw.y = SINT32((int)(vert->y * 65536.0));
+
+    ZLibAppendLump(&raw, sizeof(raw));
+
+    count++;
+  }
+
+  if (count != num_gl_vert)
+    InternalError("PutZVertices miscounted (%d != %d)", count, num_gl_vert);
+}
+
+void PutZSubsecs(void)
+{
+  int i;
+  int count;
+  uint32_g raw_num = UINT32(num_subsecs);
+
+  ZLibAppendLump(&raw_num, 4);
+  DisplayTicker();
+
+  int cur_seg_index = 0;
+
+  for (i=0; i < num_subsecs; i++)
+  {
+    subsec_t *sub = subsecs[i];
+    seg_t *seg;
+
+    raw_num = UINT32(sub->seg_count);
+
+    ZLibAppendLump(&raw_num, 4);
+
+    // sanity check the seg index values
+    count = 0;
+    for (seg = sub->seg_list; seg; seg = seg->next, cur_seg_index++)
+    {
+      // ignore minisegs and degenerate segs
+      if (! seg->linedef || seg->degenerate)
+        continue;
+
+      if (cur_seg_index != seg->index)
+        InternalError("PutZSubsecs: seg index mismatch (%d != %d)\n",
+            i, cur_seg_index, seg->index);
+      
+      count++;
+    }
+
+    if (count != sub->seg_count)
+      InternalError("PutZSubsecs: miscounted segs (%d != %d)\n",
+          count, sub->seg_count);
+  }
+}
+
+void PutZSegs(void)
+{
+  int i, count;
+  uint32_g raw_num = UINT32(num_segs);
+
+  ZLibAppendLump(&raw_num, 4);
+  DisplayTicker();
+
+  for (i=0, count=0; i < num_segs; i++)
+  {
+    seg_t *seg = segs[i];
+
+    // ignore minisegs and degenerate segs
+    if (! seg->linedef || seg->degenerate)
+      continue;
+
+    if (count != seg->index)
+      InternalError("PutZSegs: seg index mismatch (%d != %d)\n",
+          count, seg->index);
+
+    {
+      uint32_g v1 = UINT32(VertexIndex32BitV5(seg->start));
+      uint32_g v2 = UINT32(VertexIndex32BitV5(seg->end));
+
+      uint16_g line = UINT16(seg->linedef->index);
+      uint8_g  side = seg->side;
+
+      ZLibAppendLump(&v1,   4);
+      ZLibAppendLump(&v2,   4);
+      ZLibAppendLump(&line, 2);
+      ZLibAppendLump(&side, 1);
+    }
+
+    count++;
+  }
+
+  if (count != num_segs)
+    InternalError("PutZSubsecs miscounted (%d != %d)", count, num_gl_vert);
+}
+
+static void PutOneZNode(node_t *node)
+{
+  raw_v5_node_t raw;
+
+  if (node->r.node)
+    PutOneZNode(node->r.node);
+
+  if (node->l.node)
+    PutOneZNode(node->l.node);
+
+  node->index = node_cur_index++;
+
+  raw.x  = SINT16(node->x);
+  raw.y  = SINT16(node->y);
+  raw.dx = SINT16(node->dx / (node->too_long ? 2 : 1));
+  raw.dy = SINT16(node->dy / (node->too_long ? 2 : 1));
+
+  ZLibAppendLump(&raw.x,  2);
+  ZLibAppendLump(&raw.y,  2);
+  ZLibAppendLump(&raw.dx, 2);
+  ZLibAppendLump(&raw.dy, 2);
+
+  raw.b1.minx = SINT16(node->r.bounds.minx);
+  raw.b1.miny = SINT16(node->r.bounds.miny);
+  raw.b1.maxx = SINT16(node->r.bounds.maxx);
+  raw.b1.maxy = SINT16(node->r.bounds.maxy);
+
+  raw.b2.minx = SINT16(node->l.bounds.minx);
+  raw.b2.miny = SINT16(node->l.bounds.miny);
+  raw.b2.maxx = SINT16(node->l.bounds.maxx);
+  raw.b2.maxy = SINT16(node->l.bounds.maxy);
+
+  ZLibAppendLump(&raw.b1, sizeof(raw.b1));
+  ZLibAppendLump(&raw.b2, sizeof(raw.b2));
+
+  if (node->r.node)
+    raw.right = UINT32(node->r.node->index);
+  else if (node->r.subsec)
+    raw.right = UINT32(node->r.subsec->index | 0x80000000U);
+  else
+    InternalError("Bad right child in V5 node %d", node->index);
+
+  if (node->l.node)
+    raw.left = UINT32(node->l.node->index);
+  else if (node->l.subsec)
+    raw.left = UINT32(node->l.subsec->index | 0x80000000U);
+  else
+    InternalError("Bad left child in V5 node %d", node->index);
+
+  ZLibAppendLump(&raw.right, 4);
+  ZLibAppendLump(&raw.left,  4);
+
+# if DEBUG_BSP
+  PrintDebug("PUT Z NODE %08X  Left %08X  Right %08X  "
+    "(%d,%d) -> (%d,%d)\n", node->index, UINT32(raw.left),
+    UINT32(raw.right), node->x, node->y,
+    node->x + node->dx, node->y + node->dy);
+# endif
+}
+
+void PutZNodes(node_t *root)
+{
+  uint32_g raw_num = UINT32(num_nodes);
+
+  ZLibAppendLump(&raw_num, 4);
+  DisplayTicker();
+
+  node_cur_index = 0;
+
+  if (root)
+    PutOneZNode(root);
+
+  if (node_cur_index != num_nodes)
+    InternalError("PutZNodes miscounted (%d != %d)",
+      node_cur_index, num_nodes);
+}
+
+void SaveZDFormat(node_t *root_node)
+{
+  // leave SEGS and SSECTORS empty
+  CreateLevelLump("SEGS");
+  CreateLevelLump("SSECTORS");
+
+  lump_t *lump = CreateLevelLump("NODES");
+ 
+  AppendLevelLump(lump, lev_ZD_magic, 4);
+
+  ZLibBeginLump(lump);
+
+  PutZVertices();
+  PutZSubsecs();
+  PutZSegs();
+  PutZNodes(root_node);
+
+  ZLibFinishLump();
 }
 
 
@@ -1464,9 +1683,9 @@ void SaveLevel(node_t *root_node)
     else
       PutLinedefs();
  
-    if (FALSE) //!!!! (lev_force_v5)
+    if (lev_force_v5)
     {
-//!!!!      PutZNodes();
+      SaveZDFormat(root_node);
     }
     else
     {
