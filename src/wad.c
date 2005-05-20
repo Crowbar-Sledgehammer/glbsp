@@ -29,6 +29,8 @@
 #include <limits.h>
 #include <errno.h>
 
+#include <zlib.h>
+
 #include "blockmap.h"
 #include "level.h"
 #include "node.h"
@@ -1359,6 +1361,97 @@ void CloseWads(void)
     UtilFree((void *)wad.level_names);
     wad.level_names = NULL;
   }
+}
+
+
+/* ---------------------------------------------------------------- */
+
+static lump_t  *zout_lump;
+static z_stream zout_stream;
+static Bytef    zout_buffer[1024];
+
+//
+// ZLibBegin
+//
+void ZLibBegin(lump_t *lump)
+{
+  zout_lump = lump;
+
+  zout_stream.zalloc = (alloc_func)0;
+  zout_stream.zfree  = (free_func)0;
+  zout_stream.opaque = (voidpf)0;
+
+  if (Z_OK != deflateInit(&zout_stream, Z_DEFAULT_COMPRESSION))
+    FatalError("Trouble setting up zlib compression");
+
+  zout_stream.next_out  = zout_buffer;
+  zout_stream.avail_out = sizeof(zout_buffer);
+}
+
+//
+// ZLibAppend
+//
+void ZLibAppend(const void *data, int length)
+{
+  // ASSERT(zout_lump)
+  // ASSERT(length > 0)
+
+  zout_stream.next_in  = (Bytef*)data;   // const override
+  zout_stream.avail_in = length;
+
+  while (zout_stream.avail_in > 0)
+  {
+    int err = deflate(&zout_stream, Z_NO_FLUSH);
+
+    if (err != Z_OK)
+      FatalError("Trouble compressing %d bytes (zlib)\n", length);
+
+    if (zout_stream.avail_out == 0) 
+    {
+      AppendLevelLump(zout_lump, zout_buffer, sizeof(zout_buffer));
+
+      zout_stream.next_out  = zout_buffer;
+      zout_stream.avail_out = sizeof(zout_buffer);
+    }
+  }
+}
+
+//
+// ZLibFinish
+//
+void ZLibFinish(void)
+{
+  // ASSERT(zout_stream.avail_out > 0)
+
+  zout_stream.next_in  = Z_NULL;
+  zout_stream.avail_in = 0;
+
+  for (;;)
+  {
+    int err = deflate(&zout_stream, Z_FINISH);
+
+    if (err == Z_STREAM_END)
+      break;
+
+    if (err != Z_OK)
+      FatalError("Trouble finishing compression (zlib)\n");
+
+    if (zout_stream.avail_out == 0) 
+    {
+      AppendLevelLump(zout_lump, zout_buffer, sizeof(zout_buffer));
+
+      zout_stream.next_out  = zout_buffer;
+      zout_stream.avail_out = sizeof(zout_buffer);
+    }
+  }
+
+  int left_over = sizeof(zout_buffer) - zout_stream.avail_out;
+
+  if (left_over > 0)
+    AppendLevelLump(zout_lump, zout_buffer, left_over);
+
+  deflateEnd(&zout_stream);
+  zout_lump = NULL;
 }
 
 
