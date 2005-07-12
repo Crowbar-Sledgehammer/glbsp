@@ -1,0 +1,46 @@
+#
+# glBSP Command-line: < Win32 + MinGW MAKEFILE >
+#
+# (Note: requires GNU make)
+# 
+
+# SHELL=bash.exe
+
+BIN=glbsp.exe
+
+# INCS=-I../DEV-CPP/include  -Iinclude
+
+ZLIB_DIR=../zlib-1.2.2-lib
+
+CC=gcc.exe
+CFLAGS=-O2 -Wall -DGLBSP_TEXT -DWIN32 -DINLINE_G=inline -I$(ZLIB_DIR)/include
+LIBS=-lm $(ZLIB_DIR)/lib/libz.a
+
+# ----- OBJECTS ------------------------------------------------------
+
+OBJS= \
+    cmdline/main.o     \
+    cmdline/display.o  \
+    analyze.o \
+    blockmap.o \
+    glbsp.o \
+    level.o \
+    node.o \
+    reject.o \
+    seg.o \
+    system.o \
+    util.o \
+    wad.o
+
+# ----- TARGETS ------------------------------------------------------
+
+all: $(BIN)
+
+clean:
+	rm -f $(OBJS) $(BIN) 
+	
+$(BIN): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LDFLAGS) $(LIBS)
+ 
+.PHONY: all clean
+
