@@ -76,7 +76,7 @@ typedef struct level_s
 level_t;
 
 /* this level information holds GL lumps */
-#define LEVEL_IS_GL   0x0002
+#define LEVEL_IS_GL    0x0002
 
 /* limit flags, to show what went wrong */
 #define LIMIT_VERTEXES     0x000001
@@ -214,6 +214,10 @@ lump_t *CreateGLLump(const char *name);
 // with the above function).
 //
 void AppendLevelLump(lump_t *lump, const void *data, int length);
+
+// for the current GL lump, add a keyword/value pair into the
+// level marker lump.
+void AddGLTextLine(const char *keyword, const char *value);
 
 // Zlib compression support
 void ZLibBeginLump(lump_t *lump);

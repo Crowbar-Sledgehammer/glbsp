@@ -46,6 +46,7 @@ static FILE *out_file = NULL;
 
 #define DEBUG_DIR   0
 #define DEBUG_LUMP  0
+#define DEBUG_KEYS  0
 
 #define APPEND_BLKSIZE  256
 #define LEVNAME_BUNCH   20
@@ -102,9 +103,6 @@ static int CheckLevelName(const char *name)
 {
   int n;
   
-  if (strlen(name) > 5)
-    return FALSE;
-
   for (n=0; n < wad.num_level_names; n++)
   {
     if (strcmp(wad.level_names[n], name) == 0)
@@ -213,6 +211,25 @@ static lump_t *NewLump(char *name)
 }
 
 
+static void FreeLump(lump_t *lump);
+
+//
+// FreeWadLevel
+//
+static void FreeWadLevel(level_t *level)
+{
+  while (level->children)
+  {
+    lump_t *head = level->children;
+    level->children = head->next;
+
+    // the ol' recursion trick... :)
+    FreeLump(head);
+  }
+
+  UtilFree(level);
+}
+
 //
 // FreeLump
 //
@@ -221,16 +238,7 @@ static void FreeLump(lump_t *lump)
   // free level lumps, if any
   if (lump->lev_info)
   {
-    while (lump->lev_info->children)
-    {
-      lump_t *head = lump->lev_info->children;
-      lump->lev_info->children = head->next;
-
-      // the ol' recursion trick... :)
-      FreeLump(head);
-    }
-
-    UtilFree(lump->lev_info);
+    FreeWadLevel(lump->lev_info);
   }
 
   // check `data' here, since it gets freed in WriteLumpData()
@@ -351,13 +359,18 @@ static void DetermineLevelNames(void)
     PrintDebug("Found level name: %s\n", L->name);
 #   endif
 
-    // check for invalid name and duplicate levels
+    // check for duplicate levels (ignored)
+    if (CheckLevelName(L->name))
+    {
+      PrintWarn("Level name '%s' found twice in wad\n", L->name);
+      continue;
+    }
+
+    // check for long names
     if (strlen(L->name) > 5)
-      PrintWarn("Bad level name `%s' in wad (too long)\n", L->name);
-    else if (CheckLevelName(L->name))
-      PrintWarn("Level name `%s' found twice in wad\n", L->name);
-    else
-      AddLevelName(L->name);
+      PrintWarn("Long level name '%s' found in wad\n", L->name);
+
+    AddLevelName(L->name);
   }
 }
 
@@ -654,12 +667,24 @@ static void WriteHeader(void)
 //
 // CreateGLMarker
 //
-lump_t *CreateGLMarker(lump_t *level)
+lump_t *CreateGLMarker(void)
 {
+  lump_t *level = wad.current_level;
   lump_t *cur;
-  char name_buf[16];
 
-  sprintf(name_buf, "GL_%s", level->name);
+  char name_buf[16];
+  boolean_g long_name = FALSE;
+
+  if (strlen(level->name) <= 5)
+  {
+    sprintf(name_buf, "GL_%s", level->name);
+  }
+  else
+  {
+    // support for level names longer than 5 letters
+    strcpy(name_buf, "GL_LEVEL");
+    long_name = TRUE;
+  }
 
   cur = NewLump(UtilStrDup(name_buf));
 
@@ -674,6 +699,11 @@ lump_t *CreateGLMarker(lump_t *level)
 
   level->next = cur;
   level->lev_info->buddy = cur;
+
+  if (long_name)
+  {
+    AddGLTextLine("LEVEL", level->name);
+  }
 
   return cur;
 }
@@ -1045,7 +1075,7 @@ lump_t *CreateGLLump(const char *name)
 
   // create GL level marker if necessary
   if (! wad.current_level->lev_info->buddy)
-    CreateGLMarker(wad.current_level);
+    CreateGLMarker();
   
   gl_level = wad.current_level->lev_info->buddy;
 
@@ -1107,6 +1137,31 @@ void AppendLevelLump(lump_t *lump, const void *data, int length)
 
   lump->length += length;
   lump->space  -= length;
+}
+
+
+//
+// AddGLTextLine
+//
+void AddGLTextLine(const char *keyword, const char *value)
+{
+  lump_t *gl_level;
+
+  // create GL level marker if necessary
+  if (! wad.current_level->lev_info->buddy)
+    CreateGLMarker();
+
+  gl_level = wad.current_level->lev_info->buddy;
+
+# if DEBUG_KEYS
+  PrintDebug("[%s] Adding: %s=%s\n", gl_level->name, keyword, value);
+# endif
+
+  AppendLevelLump(gl_level, keyword, strlen(keyword));
+  AppendLevelLump(gl_level, "=", 1);
+
+  AppendLevelLump(gl_level, value, strlen(value));
+  AppendLevelLump(gl_level, "\n", 1);
 }
 
 
@@ -1579,7 +1634,7 @@ void ReportV5Switches(void)
 
     if (lev->v5_switch & LIMIT_VERTEXES)
     {
-      PrintMsg("%-6s : Number of vertices overflowed the limit.\n", cur->name);
+      PrintMsg("%-6s : Number of Vertices overflowed the limit.\n", cur->name);
     }
 
     if (lev->v5_switch & LIMIT_GL_SSECT)
