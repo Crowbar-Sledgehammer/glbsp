@@ -1618,6 +1618,34 @@ void FreeLevel(void)
 }
 
 //
+// PutGLChecksum
+//
+void PutGLChecksum(void)
+{
+  uint32_g crc;
+  lump_t *lump;
+  char num_buf[32];
+
+  Adler32_Begin(&crc);
+
+  lump = FindLevelLump("VERTEXES");
+
+  if (lump && lump->length > 0)
+    Adler32_AddBlock(&crc, lump->data, lump->length);
+
+  lump = FindLevelLump("LINEDEFS");
+
+  if (lump && lump->length > 0)
+    Adler32_AddBlock(&crc, lump->data, lump->length);
+
+  Adler32_Finish(&crc);
+
+  sprintf(num_buf, "0x%08x", crc);
+
+  AddGLTextLine("CHECKSUM", num_buf);
+}
+
+//
 // SaveLevel
 //
 void SaveLevel(node_t *root_node)
@@ -1706,5 +1734,16 @@ void SaveLevel(node_t *root_node)
     if (!cur_info->no_reject || !FindLevelLump("REJECT"))
       PutReject();
   }
+
+  // keyword support (v5.0 of the specs)
+  AddGLTextLine("BUILDER", "glBSP " GLBSP_VER);
+
+  const char *time_str = UtilTimeString();
+  if (time_str)
+    AddGLTextLine("TIME", time_str);
+
+  // this must be done _after_ the normal nodes have been built,
+  // so that we use the new VERTEXES lump in the checksum.
+  PutGLChecksum();
 }
 
