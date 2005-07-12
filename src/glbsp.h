@@ -22,8 +22,8 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "2.15-ALPHA"
-#define GLBSP_VER_HEX  0x215
+#define GLBSP_VER  "2.19"
+#define GLBSP_VER_HEX  0x219
 
 
 // certain GCC attributes can be useful
@@ -39,9 +39,9 @@ extern "C" {
 
 /* ----- basic types --------------------------- */
 
-typedef char  sint8_g;
-typedef short sint16_g;
-typedef int   sint32_g;
+typedef signed char  sint8_g;
+typedef signed short sint16_g;
+typedef signed int   sint32_g;
    
 typedef unsigned char  uint8_g;
 typedef unsigned short uint16_g;
