@@ -724,6 +724,7 @@ void DetectOverlappingLines(void)
 
   for (i=0; i < num_linedefs - 1; i++)
   {
+    // FIXME: not 100% correct
     if (LineStartCompare(array + i, array + i+1) == 0 &&
           LineEndCompare(array + i, array + i+1) == 0)
     {
