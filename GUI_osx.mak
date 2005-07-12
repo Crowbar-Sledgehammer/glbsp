@@ -18,7 +18,7 @@ CXX=g++
 CFLAGS=-O2 -Wall -DGLBSP_GUI -DMACOSX -DINLINE_G=inline $(FLTK_CFLAGS)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS=-framework Carbon -framework ApplicationServices -Wl,-x
-LIBS=-lm $(FLTK_LIBS)
+LIBS=-lm -lz $(FLTK_LIBS)
 REZ=/Developer/Tools/Rez -t APPL
 
 OBJS=$(SYSDIR)/main.o     \

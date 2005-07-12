@@ -16,7 +16,7 @@ CXX=g++
 CFLAGS=-O2 -Wall -DGLBSP_GUI -DUNIX -DINLINE_G=inline $(FLTK_CFLAGS)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS=-L/usr/X11R6/lib
-LIBS=-lm $(FLTK_LIBS)
+LIBS=-lm -lz $(FLTK_LIBS)
 
 OBJS=$(SYSDIR)/main.o     \
      $(SYSDIR)/about.o    \
