@@ -2,32 +2,24 @@
 TODO
 ====
 
-TEST: blockmap: if overflows, don't write anything.
-TEST: V5 structures.
-TEST: write ZDoom format normal nodes.
+Test:  UtilTimeString() under WIN32.
 
-+  GL_LEVEL support (remove 5-letter level-name limit).
++  don't merge vertices.
 
--  store info in GL header lumps.
-
--  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
-
-   >> Algorithm: 1) detect anomalous lines in MinisegIntersect pass.
-                 2) double check line by casting a ray on "void" side.
-
--  don't merge vertices.
+-  documentation stuff ??
 
 
 LATER / IDEAS
 =============
 
++  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
+
+   >> Algorithm: 1) detect anomalous lines in MinisegIntersect pass.
+                 2) double check line by casting a ray on "void" side.
+
+-  simplify callback interface.
 -  reinstate "normal-only" node build.
-
 -  create empty REJECT rather than "minimal" (save space) ?
-
-+  simplify callback interface.
-
--  MacOS X: Project builder setup for glBSPX.
-
 -  Autoconf / Automake.
+-  MacOS X: Project builder setup for glBSPX.
 

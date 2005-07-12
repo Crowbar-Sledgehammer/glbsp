@@ -2,6 +2,27 @@
 CHANGELOG
 =========
 
+Changes in V2.20  (Unreleased)
+------------------------------
+
+ - create an empty BLOCKMAP lump when the blockmap overflows (force
+   the engine to generate it).
+
+ - support V5 GL-Nodes (removes all limits), which is now the default
+   format when limits overflow (e.g. too many GL segs).
+
+ - support for writing ZDBSP format for regular nodes.  This kicks in
+   whenever V5 is used: either explicitly with the -v5 option, or
+   implicitly when the limits overflow.
+
+ - store keyword/value pairs in the GL level marker lump.  This
+   includes a checksum over the plain level data (CHECKSUM keyword),
+   as well as the BUILDER and TIME keywords.
+
+ - allow level names longer than 5 characters, using the special GL
+   level marker "GL_LEVEL" and the LEVEL keyword (inside the lump).
+
+
 Changes in V2.10  (27th September 2004)
 ---------------------------------------
 
