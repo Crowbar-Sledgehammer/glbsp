@@ -37,6 +37,11 @@ Changes in V2.20  (Unreleased)
    same spot could suppress a miniseg where it was needed.  The code
    for creating intersections is a lot simpler now.
 
+ - added code to detect the 'One-Sided Window' effect, where a
+   one-sided linedef can be looked through from behind (e.g. MAP07
+   in 10SECTO2.WAD).  When found, a miniseg is added along the back
+   side of the wall.
+
  - fixed the s8_t typedef which was missing the 'signed' qualifier
    (needed on some platforms because the plain 'char' is unsigned).
 

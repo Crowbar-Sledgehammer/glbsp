@@ -2,17 +2,21 @@
 TODO
 ====
 
-Test:  UtilTimeString() under WIN32.
++  check out problem with YYY.wad.
 
-Test:  don't merge vertices.
+-  update documentation for 2.20
 
--  documentation stuff ??
+-  update glBSPX for 2.20
+
+TEST:  don't merge vertices.
+
+TEST:  UtilTimeString() under WIN32.
+
+DONE:  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
 
 
 LATER / IDEAS
 =============
-
-+  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
 
 -  simplify callback interface.
 -  reinstate "normal-only" node build.
