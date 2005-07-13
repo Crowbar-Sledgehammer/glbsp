@@ -296,32 +296,6 @@ void DetectPolyobjSectors(void)
   }
 }
 
-#if 0
-//
-// BoxContainsThing
-//
-static int BoxContainsThing(const bbox_t *bbox)
-{
-  int i;
-
-  for (i = 0; i < num_things; i++)
-  {
-    thing_t *T = LookupThing(i);
-
-    if (T->x < bbox->minx || T->x > bbox->maxx)
-      continue;
-
-    if (T->y < bbox->miny || T->y > bbox->maxy)
-      continue;
-
-    return TRUE;
-  }
-
-  return FALSE;
-}
-#endif
-
-
 /* ----- analysis routines ----------------------------- */
 
 static int VertexCompare(const void *p1, const void *p2)
@@ -838,15 +812,15 @@ vertex_t *NewVertexFromSplitSeg(seg_t *seg, float_g x, float_g y)
 
   vert->ref_count = seg->partner ? 4 : 2;
 
-  if (! (cur_info->spec_version == 1 && lev_doing_normal))
-  {
-    vert->index = num_gl_vert | IS_GL_VERTEX;
-    num_gl_vert++;
-  }
-  else
+  if (lev_doing_normal && cur_info->spec_version == 1)
   {
     vert->index = num_normal_vert;
     num_normal_vert++;
+  }
+  else
+  {
+    vert->index = num_gl_vert | IS_GL_VERTEX;
+    num_gl_vert++;
   }
 
   // compute wall_tip info
@@ -923,14 +897,11 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end)
 //
 // VertexCheckOpen
 //
-int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
-    sector_t ** left_sec, sector_t ** right_sec)
+sector_t * VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy)
 {
   wall_tip_t *tip;
 
   angle_g angle = UtilComputeAngle(dx, dy);
-
-  *left_sec = *right_sec = NULL;
 
   // first check whether there's a wall_tip that lies in the exact
   // direction of the given direction (which is relative to the
@@ -938,14 +909,11 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
 
   for (tip=vert->tip_set; tip; tip=tip->next)
   {
-    if (fabs(tip->angle - angle) < ANG_EPSILON)
+    if (fabs(tip->angle - angle) < ANG_EPSILON ||
+        fabs(tip->angle - angle) > (360.0 - ANG_EPSILON))
     {
       // yes, found one
-
-      *left_sec  = tip->left;
-      *right_sec = tip->right;
-
-      return FALSE;
+      return NULL;
     }
   }
 
@@ -958,9 +926,7 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
     if (angle + ANG_EPSILON < tip->angle)
     {
       // found it
-      *left_sec = *right_sec = tip->right;
-
-      return (tip->right != NULL);
+      return tip->right;
     }
 
     if (! tip->next)
@@ -968,12 +934,10 @@ int VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy,
       // no more tips, thus we must be on the LEFT side of the tip
       // with the largest angle.
 
-      *left_sec = *right_sec = tip->left;
-
-      return (tip->left != NULL);
+      return tip->left;
     }
   }
-  
+ 
   InternalError("Vertex %d has no tips !", vert->index);
   return FALSE;
 }
