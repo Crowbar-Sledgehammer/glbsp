@@ -109,7 +109,13 @@ void PrintVerbose(const char *str, ...)
   }
 
 #if DEBUG_ENABLED
-  PrintDebug(">>> %s", message_buf);
+  {
+    va_start(args, str);
+    vsprintf(message_buf, str, args);
+    va_end(args);
+
+    PrintDebug(">>> %s", message_buf);
+  }
 #endif
 }
 
