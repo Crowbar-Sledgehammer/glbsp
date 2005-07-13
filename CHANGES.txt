@@ -22,6 +22,24 @@ Changes in V2.20  (Unreleased)
  - allow level names longer than 5 characters, using the special GL
    level marker "GL_LEVEL" and the LEVEL keyword (inside the lump).
 
+ - significantly decreased number of mini warnings, firstly by not
+   showing a mismatch warning near self-referencing linedefs, and
+   secondly by limiting the number of certain warnings to only one
+   per sector.
+
+ - duplicate vertices are no longer merged (request from Graham
+   Jackson).
+
+ - increased default -factor to 11 (advice from Jack Vermeulen,
+   although he suggested an even higher default).
+
+ - handle some cases (like Hexen MAP02) where two vertices at the
+   same spot could suppress a miniseg where it was needed.  The code
+   for creating intersections is a lot simpler now.
+
+ - fixed the s8_t typedef which was missing the 'signed' qualifier
+   (needed on some platforms because the plain 'char' is unsigned).
+
 
 Changes in V2.10  (27th September 2004)
 ---------------------------------------

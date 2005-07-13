@@ -4,7 +4,7 @@ TODO
 
 Test:  UtilTimeString() under WIN32.
 
-+  don't merge vertices.
+Test:  don't merge vertices.
 
 -  documentation stuff ??
 
@@ -13,9 +13,6 @@ LATER / IDEAS
 =============
 
 +  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
-
-   >> Algorithm: 1) detect anomalous lines in MinisegIntersect pass.
-                 2) double check line by casting a ray on "void" side.
 
 -  simplify callback interface.
 -  reinstate "normal-only" node build.
