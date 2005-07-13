@@ -484,14 +484,6 @@ static void DetermineMiddle(subsec_t *sub)
   sub->mid_y = mid_y / total;
 }
 
-static int LinedefSelfRef(const linedef_t *L)
-{
-  if (! L->left || ! L->right)
-    return FALSE;
-
-  return (L->left->sector == L->right->sector) ? TRUE : FALSE;
-}
-
 //
 // ClockwiseOrder
 //
@@ -571,7 +563,7 @@ static void ClockwiseOrder(subsec_t *sub)
 
     if (! array[i]->linedef)
       cur_score = 0;
-    else if (LinedefSelfRef(array[i]->linedef))
+    else if (array[i]->linedef->self_ref)
       cur_score = 1;
 
     if (cur_score > score)
@@ -678,6 +670,12 @@ static void SanityCheckSameSector(subsec_t *sub)
     // "special" with sector tag >= 900. Original idea, Lee Killough
     if (cur->sector->coalesce)
       continue;
+
+    // prevent excessive number of warnings
+    if (compare->sector->warned_facing == cur->sector->index)
+      continue;
+
+    compare->sector->warned_facing = cur->sector->index;
 
     if (cur->linedef)
       PrintMiniWarn("Sector #%d has sidedef facing #%d (line #%d) "

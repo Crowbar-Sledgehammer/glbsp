@@ -318,6 +318,8 @@ void GetSectors(void)
     /* sector indices never change */
     sector->index = i;
 
+    sector->warned_facing = -1;
+
     /* Note: rej_* fields are handled completely in reject.c */
   }
 }
@@ -526,6 +528,9 @@ void GetLinedefs(void)
       line->left->ref_count++;
       line->left->on_special |= (line->type > 0) ? 1 : 0;
     }
+
+    line->self_ref = (line->left && line->right &&
+        (line->left->sector == line->right->sector));
 
     line->index = i;
   }
@@ -1576,7 +1581,7 @@ void LoadLevel(void)
  
   if (lev_doing_normal && !cur_info->no_prune)
   {
-    DetectDuplicateVertices();
+//  DetectDuplicateVertices();
 
     if (cur_info->pack_sides)
       DetectDuplicateSidedefs();
@@ -1650,8 +1655,8 @@ void PutGLChecksum(void)
 //
 void SaveLevel(node_t *root_node)
 {
-  // Note: RoundOffBspTree will convert the GL vertices in segs to their
-  // normal counterparts (pointer change: use normal_dup).
+  // Note: RoundOffBspTree will convert the GL vertices in segs to
+  // their normal counterparts (pointer change: use normal_dup).
 
   if (cur_info->spec_version == 1)
     RoundOffBspTree(root_node);

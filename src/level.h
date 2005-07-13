@@ -116,6 +116,10 @@ typedef struct sector_s
 
   struct sector_s *rej_next;
   struct sector_s *rej_prev;
+
+  // suppress superfluous mini warnings
+  int warned_facing;
+  char warned_unclosed;
 }
 sector_t;
 
@@ -172,8 +176,8 @@ typedef struct linedef_s
   // zero length (line should be totally ignored)
   char zero_len;
 
-  // one-sided linedef used for a special effect (windows)
-  char window_effect;
+  // sector is the same on both sides
+  char self_ref;
 
   int flags;
   int type;
