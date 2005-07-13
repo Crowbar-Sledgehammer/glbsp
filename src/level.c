@@ -1603,6 +1603,7 @@ void LoadLevel(void)
   }
 
   DetectOverlappingLines();
+  DetectWindowEffects();
 }
 
 //

@@ -179,6 +179,9 @@ typedef struct linedef_s
   // sector is the same on both sides
   char self_ref;
 
+  // one-sided linedef used for a special effect (windows)
+  char window_effect;
+
   int flags;
   int type;
   int tag;

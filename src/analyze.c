@@ -40,8 +40,9 @@
 #include "wad.h"
 
 
-#define DEBUG_WALLTIPS  0
-#define DEBUG_POLYOBJ   0
+#define DEBUG_WALLTIPS   0
+#define DEBUG_POLYOBJ    0
+#define DEBUG_WINDOW_FX  0   
 
 #define POLY_BOX_SZ  10
 
@@ -718,6 +719,163 @@ void DetectOverlappingLines(void)
   }
 
   UtilFree(array);
+}
+
+static void CountWallTips(vertex_t *vert, int *one_sided, int *two_sided)
+{
+    wall_tip_t *tip;
+
+    *one_sided = 0;
+    *two_sided = 0;
+
+    for (tip=vert->tip_set; tip; tip=tip->next)
+    {
+      if (!tip->left || !tip->right)
+        (*one_sided) += 1;
+      else
+        (*two_sided) += 1;
+    }
+}
+
+void TestForWindowEffect(linedef_t *L)
+{
+  // cast a line horizontally or vertically and see what we hit.
+  // OUCH, we have to iterate over all linedefs.
+
+  int i;
+
+  float_g mx = (L->start->x + L->end->x) / 2.0;
+  float_g my = (L->start->y + L->end->y) / 2.0;
+
+  float_g dx = L->end->x - L->start->x;
+  float_g dy = L->end->y - L->start->y;
+
+  int cast_horiz = fabs(dx) < fabs(dy) ? 1 : 0;
+
+  float_g best_dist = 999999.0;
+  boolean_g best_open = FALSE;
+  int best_line = -1;
+
+  for (i=0; i < num_linedefs; i++)
+  {
+    linedef_t *N = lev_linedefs[i];
+
+    float_g dist;
+    sidedef_t *hit_side;
+
+    float_g dx2, dy2;
+
+    if (N == L || N->zero_len || N->overlap)
+      continue;
+
+    if (cast_horiz)
+    {
+      dx2 = N->end->x - N->start->x;
+      dy2 = N->end->y - N->start->y;
+
+      if (fabs(dy2) < DIST_EPSILON)
+        continue;
+
+      if ((MAX(N->start->y, N->end->y) < my - DIST_EPSILON) ||
+          (MIN(N->start->y, N->end->y) > my + DIST_EPSILON))
+        continue;
+
+      dist = (N->start->x + (my - N->start->y) * dx2 / dy2) - mx;
+
+      if ((dy > 0) == (dist > 0))
+        continue;
+
+      dist = fabs(dist);
+      if (dist < DIST_EPSILON)  // too close (overlapping lines ?)
+        continue;
+
+      hit_side = ((dy > 0) == (dy2 > 0)) ? N->right : N->left;
+    }
+    else  /* vert */
+    {
+      dx2 = N->end->x - N->start->x;
+      dy2 = N->end->y - N->start->y;
+
+      if (fabs(dx2) < DIST_EPSILON)
+        continue;
+
+      if ((MAX(N->start->x, N->end->x) < mx - DIST_EPSILON) ||
+          (MIN(N->start->x, N->end->x) > mx + DIST_EPSILON))
+        continue;
+
+      dist = (N->start->y + (mx - N->start->x) * dy2 / dx2) - my;
+
+      if ((dx > 0) != (dist > 0))
+        continue;
+
+      dist = fabs(dist);
+      if (dist < DIST_EPSILON)  // too close (overlapping lines ?)
+        continue;
+
+      hit_side = ((dx > 0) == (dx2 > 0)) ? N->right : N->left;
+    }
+
+    if (dist < best_dist)
+    {
+      best_dist = dist;
+      best_open = (hit_side && hit_side->sector) ? TRUE : FALSE;
+      best_line = i;
+    }
+  }
+
+#if DEBUG_WINDOW_FX
+  PrintDebug("best line: %d  best dist: %1.1f  best_open: %s\n",
+      best_line, best_dist, best_open ? "OPEN" : "CLOSED");
+#endif
+
+  if (best_open)
+  {
+    L->window_effect = 1;
+    PrintMiniWarn("Linedef %d is one-sided but faces into a sector.\n", L->index);
+  }
+}
+
+void DetectWindowEffects(void)
+{
+  // Algorithm:
+  //   Scan the linedef list looking for possible candidates,
+  //   checking for an odd number of one-sided linedefs connected
+  //   to a single vertex.  This idea courtesy of Graham Jackson.
+
+  int i;
+  int one_siders;
+  int two_siders;
+
+  for (i=0; i < num_linedefs; i++)
+  {
+    linedef_t *L = lev_linedefs[i];
+
+    if (L->two_sided || L->zero_len || L->overlap || !L->right)
+      continue;
+
+    CountWallTips(L->start, &one_siders, &two_siders);
+
+    if ((one_siders % 2) == 1 && (one_siders + two_siders) > 1)
+    {
+#if DEBUG_WINDOW_FX
+      PrintDebug("FUNNY LINE %d : start vertex %d has odd number of one-siders\n",
+          i, L->start->index);
+#endif
+      TestForWindowEffect(L);
+      continue;
+    }
+
+    CountWallTips(L->end, &one_siders, &two_siders);
+
+    if ((one_siders % 2) == 1 && (one_siders + two_siders) > 1)
+    {
+#if DEBUG_WINDOW_FX
+      PrintDebug("FUNNY LINE %d : end vertex %d has odd number of one-siders\n",
+          i, L->end->index);
+#endif
+      TestForWindowEffect(L);
+    }
+  }
 }
 
 

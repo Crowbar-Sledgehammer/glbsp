@@ -455,6 +455,30 @@ superblock_t *CreateSegs(void)
             line->index);
         line->two_sided = 0;
       }
+
+      // handle the 'One-Sided Window' trick
+      if (line->window_effect)
+      {
+        seg_t *left = NewSeg();
+
+        left->start   = line->end;
+        left->end     = line->start;
+        left->side    = 1;
+        left->linedef = NULL; // miniseg
+        left->sector  = NULL; //
+
+        left->source_line = line;
+        left->index = -1;
+
+        RecomputeSeg(left);
+
+        AddSegToSuper(block, left);
+
+        // setup partner info (it's very strange to have a miniseg
+        // and a normal seg partnered together).
+        left->partner = right;
+        right->partner = left;
+      }
     }
   }
 
