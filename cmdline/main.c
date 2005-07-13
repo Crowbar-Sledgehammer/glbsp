@@ -65,7 +65,9 @@ static void ShowInfo(void)
     "  Matt Fell                  for the Doom Specs\n"
     "  Raphael Quinet             for DEU and the original idea\n"
     "  ... and everyone who helped with the original BSP.\n"
-    "\n"
+    "\n");
+
+  TextPrintMsg(
     "This program is free software, under the terms of the GNU General\n"
     "Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
     "accompanying documentation for more details.\n"
@@ -90,7 +92,9 @@ static void ShowOptions(void)
     "  -warn            Show extra warning messages\n"
     "  -packsides       Pack sidedefs (remove duplicates)\n"
     "  -normal          Forces the normal nodes to be recomputed\n"
-    "\n"
+    "\n");
+
+  TextPrintMsg(
     "Rarely Useful:\n"
     "  -v1 .. -v5       Version of GL-Nodes to use (1,2,3 or 5)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"

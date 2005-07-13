@@ -1338,10 +1338,10 @@ void PutZSubsecs(void)
   int count;
   uint32_g raw_num = UINT32(num_subsecs);
 
+  int cur_seg_index = 0;
+
   ZLibAppendLump(&raw_num, 4);
   DisplayTicker();
-
-  int cur_seg_index = 0;
 
   for (i=0; i < num_subsecs; i++)
   {
@@ -1497,11 +1497,13 @@ void PutZNodes(node_t *root)
 
 void SaveZDFormat(node_t *root_node)
 {
+  lump_t *lump;
+
   // leave SEGS and SSECTORS empty
   CreateLevelLump("SEGS");
   CreateLevelLump("SSECTORS");
 
-  lump_t *lump = CreateLevelLump("NODES");
+  lump = CreateLevelLump("NODES");
  
   AppendLevelLump(lump, lev_ZD_magic, 4);
 
@@ -1743,10 +1745,11 @@ void SaveLevel(node_t *root_node)
 
   // keyword support (v5.0 of the specs)
   AddGLTextLine("BUILDER", "glBSP " GLBSP_VER);
-
-  const char *time_str = UtilTimeString();
-  if (time_str)
-    AddGLTextLine("TIME", time_str);
+  {
+    const char *time_str = UtilTimeString();
+    if (time_str)
+      AddGLTextLine("TIME", time_str);
+  }
 
   // this must be done _after_ the normal nodes have been built,
   // so that we use the new VERTEXES lump in the checksum.

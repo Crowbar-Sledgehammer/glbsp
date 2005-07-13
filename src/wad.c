@@ -1476,6 +1476,8 @@ void ZLibAppendLump(const void *data, int length)
 //
 void ZLibFinishLump(void)
 {
+  int left_over;
+
   // ASSERT(zout_stream.avail_out > 0)
 
   zout_stream.next_in  = Z_NULL;
@@ -1500,7 +1502,7 @@ void ZLibFinishLump(void)
     }
   }
 
-  int left_over = sizeof(zout_buffer) - zout_stream.avail_out;
+  left_over = sizeof(zout_buffer) - zout_stream.avail_out;
 
   if (left_over > 0)
     AppendLevelLump(zout_lump, zout_buffer, left_over);
