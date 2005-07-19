@@ -195,7 +195,7 @@ void FreeSuper(superblock_t *block)
   quick_alloc_supers = block;
 }
 
-#if 0
+#if 0 // DEBUGGING CODE
 static void TestSuperWorker(superblock_t *block, int *real, int *mini)
 {
   seg_t *cur;
