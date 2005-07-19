@@ -1537,9 +1537,6 @@ void LoadLevel(void)
   // -JL- Identify Hexen mode by presence of BEHAVIOR lump
   lev_doing_hexen = (FindLevelLump("BEHAVIOR") != NULL);
 
-  lev_force_v3 = (cur_info->spec_version == 3) ? TRUE : FALSE;
-  lev_force_v5 = (cur_info->spec_version == 5) ? TRUE : FALSE;
-  
   if (lev_doing_normal)
     sprintf(message, "Building normal and GL nodes on %s", level_name);
   else
@@ -1658,6 +1655,9 @@ void PutGLChecksum(void)
 //
 void SaveLevel(node_t *root_node)
 {
+  lev_force_v3 = (cur_info->spec_version == 3) ? TRUE : FALSE;
+  lev_force_v5 = (cur_info->spec_version == 5) ? TRUE : FALSE;
+  
   // Note: RoundOffBspTree will convert the GL vertices in segs to
   // their normal counterparts (pointer change: use normal_dup).
 
@@ -1669,23 +1669,28 @@ void SaveLevel(node_t *root_node)
     if (num_normal_vert > 32767 || num_gl_vert > 32767)
     {
       if (cur_info->spec_version < 3)
+      {
         lev_force_v5 = TRUE;
-
-      MarkV5Switch(LIMIT_VERTEXES | LIMIT_GL_SEGS);
+        MarkV5Switch(LIMIT_VERTEXES | LIMIT_GL_SEGS);
+      }
     }
 
     if (num_segs > 65534)
     {
       if (cur_info->spec_version < 3)
+      {
         lev_force_v5 = TRUE;
-
-      MarkV5Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
+        MarkV5Switch(LIMIT_GL_SSECT | LIMIT_GL_SEGS);
+      }
     }
 
     if (num_nodes > 32767)
     {
-      lev_force_v5 = TRUE;
-      MarkV5Switch(LIMIT_GL_NODES);
+      if (cur_info->spec_version < 5)
+      {
+        lev_force_v5 = TRUE;
+        MarkV5Switch(LIMIT_GL_NODES);
+      }
     }
 
     if (cur_info->spec_version == 1)
@@ -1727,6 +1732,10 @@ void SaveLevel(node_t *root_node)
  
     if (lev_force_v5)
     {
+      // don't report a problem when -v5 was explicitly given
+      if (cur_info->spec_version < 5)
+        MarkZDSwitch();
+
       SaveZDFormat(root_node);
     }
     else

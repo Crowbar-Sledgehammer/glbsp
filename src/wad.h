@@ -76,7 +76,7 @@ typedef struct level_s
 level_t;
 
 /* this level information holds GL lumps */
-#define LEVEL_IS_GL    0x0002
+#define LEVEL_IS_GL      0x0002
 
 /* limit flags, to show what went wrong */
 #define LIMIT_VERTEXES     0x000001
@@ -96,6 +96,7 @@ level_t;
 #define LIMIT_BAD_SIDE     0x001000
 #define LIMIT_BMAP_TRUNC   0x002000
 #define LIMIT_BLOCKMAP     0x004000
+#define LIMIT_ZDBSP        0x008000
 
 
 // directory entry
@@ -228,6 +229,7 @@ void ZLibFinishLump(void);
 void MarkSoftFailure(int soft);
 void MarkHardFailure(int hard);
 void MarkV5Switch(int v5);
+void MarkZDSwitch(void);
 
 // alert the user if any levels failed to build properly.
 void ReportFailedLevels(void);

@@ -1533,6 +1533,16 @@ void MarkV5Switch(int v5)
   wad.current_level->lev_info->v5_switch |= v5;
 }
 
+void MarkZDSwitch(void)
+{
+  level_t *lev = wad.current_level->lev_info;
+
+  lev->v5_switch |= LIMIT_ZDBSP;
+
+  lev->soft_limit &= ~ (LIMIT_VERTEXES);
+  lev->hard_limit &= ~ (LIMIT_VERTEXES);
+}
+
 
 //
 // ReportOneOverflow(
@@ -1542,7 +1552,7 @@ void ReportOneOverflow(const lump_t *lump, int limit, boolean_g hard)
   const char *msg = hard ? "overflowed the absolute limit" :
     "overflowed the original limit";
 
-  PrintMsg("%-6s : ", lump->name);
+  PrintMsg("%-8s: ", lump->name);
 
   switch (limit)
   {
@@ -1624,6 +1634,8 @@ void ReportV5Switches(void)
     "which supports V5 GL-Nodes, otherwise they will fail (or crash).\n\n"
   );
 
+  int saw_zdbsp = FALSE;
+
   for (cur=wad.dir_head; cur; cur=cur->next)
   {
     level_t *lev = cur->lev_info;
@@ -1634,14 +1646,20 @@ void ReportV5Switches(void)
     if (lev->v5_switch == 0)
       continue;
 
+    if ((lev->v5_switch & LIMIT_ZDBSP) && ! saw_zdbsp)
+    {
+      PrintMsg("ZDBSP FORMAT has also been used for regular nodes.\n\n");
+      saw_zdbsp = TRUE;
+    }
+
     if (lev->v5_switch & LIMIT_VERTEXES)
     {
-      PrintMsg("%-6s : Number of Vertices overflowed the limit.\n", cur->name);
+      PrintMsg("%-8s: Number of Vertices overflowed the limit.\n", cur->name);
     }
 
     if (lev->v5_switch & LIMIT_GL_SSECT)
     {
-      PrintMsg("%-6s : Number of GL segs overflowed the limit.\n", cur->name);
+      PrintMsg("%-8s: Number of GL segs overflowed the limit.\n", cur->name);
     }
   }
 }
