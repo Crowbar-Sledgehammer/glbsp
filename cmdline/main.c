@@ -86,18 +86,18 @@ static void ShowOptions(void)
     "General Options:\n"
     "  -q               Quieter output, no level statistics\n"
     "  -fast            Reuse original nodes to build faster\n"
-    "  -factor  <nnn>   Changes the cost assigned to SEG splits\n"
-    "  -noreject        Don't clobber the reject map\n"
-    "  -noprog          Don't show progress indicator\n"
     "  -warn            Show extra warning messages\n"
-    "  -packsides       Pack sidedefs (remove duplicates)\n"
     "  -normal          Forces the normal nodes to be recomputed\n"
+    "  -factor  <nnn>   Changes the cost assigned to SEG splits\n"
+    "  -packsides       Pack sidedefs (remove duplicates)\n"
+    "  -noreject        Don't clobber the reject map\n"
     "\n");
 
   TextPrintMsg(
     "Rarely Useful:\n"
     "  -v1 .. -v5       Version of GL-Nodes to use (1,2,3 or 5)\n"
     "  -loadall         Loads all data from source wad (don't copy)\n"
+    "  -noprog          Don't show progress indicator\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
     "  -keepsect        Don't remove unused sectors\n"
