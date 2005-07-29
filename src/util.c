@@ -205,7 +205,7 @@ const char *UtilTimeString(void)
 
   SYSTEMTIME sys_time;
 
-  static str_buf[200];
+  static char str_buf[200];
 
   GetSystemTime(&sys_time);
 
