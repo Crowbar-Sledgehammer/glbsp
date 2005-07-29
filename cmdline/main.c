@@ -72,7 +72,8 @@ static void ShowInfo(void)
     "Public License, and comes with ABSOLUTELY NO WARRANTY.  See the\n"
     "accompanying documentation for more details.\n"
     "\n"
-    "Usage: glbsp [options] input.wad ... [ -o output.wad ]\n"
+    "Usage: glbsp [options] input.wad ... [-o output.wad]\n"
+    "       glbsp @arg_file.rsp\n"
     "\n"
     "For a list of the available options, type: glbsp -help\n"
   );
@@ -81,7 +82,7 @@ static void ShowInfo(void)
 static void ShowOptions(void)
 {
   TextPrintMsg(
-    "Usage: glbsp [options] input.wad ... [ -o output.wad ]\n"
+    "Usage: glbsp [options] input.wad ... [-o output.wad]\n"
     "\n"
     "General Options:\n"
     "  -q               Quieter output, no level statistics\n"
@@ -89,7 +90,7 @@ static void ShowOptions(void)
     "  -warn            Show extra warning messages\n"
     "  -normal          Forces the normal nodes to be recomputed\n"
     "  -factor  <nnn>   Changes the cost assigned to SEG splits\n"
-    "  -packsides       Pack sidedefs (remove duplicates)\n"
+    "  -pack            Pack sidedefs (remove duplicates)\n"
     "  -noreject        Don't clobber the reject map\n"
     "\n");
 
@@ -100,8 +101,8 @@ static void ShowOptions(void)
     "  -noprog          Don't show progress indicator\n"
     "  -nonormal        Don't add (if missing) the normal nodes\n"
     "  -forcegwa        Forces the output file to be GWA style\n"
-    "  -keepsect        Don't remove unused sectors\n"
-    "  -noprune         Don't remove anything which is unused\n"
+    "  -prunesec        Remove unused sectors\n"
+    "  -mergevert       Merge duplicate vertices\n" 
     "  -maxblock <nnn>  Sets the BLOCKMAP truncation limit\n"
   );
 }
@@ -122,6 +123,110 @@ static int FileExists(const char *filename)
   }
 
   return FALSE;
+}
+
+
+/* ----- response files ----------------------------- */
+
+#define RESP_MAX_ARGS  1000
+#define MAX_WORD_LEN   4000
+
+static const char *resp_argv[RESP_MAX_ARGS+4];
+static int resp_argc;
+
+static char word_buffer[MAX_WORD_LEN+4];
+
+
+static void AddArg(const char *str)
+{
+  if (resp_argc >= RESP_MAX_ARGS)
+    TextFatalError("Error: Too many options! (limit is %d)\n", RESP_MAX_ARGS);
+
+  resp_argv[resp_argc++] = GlbspStrDup(str);
+}
+
+static void ProcessResponseFile(const char *filename)
+{
+  int word_len = 0;
+  int in_quote = 0;
+ 
+  FILE *fp = fopen(filename, "rb");
+
+  if (! fp)
+    TextFatalError("Error: Cannot find RESPONSE file: %s\n", filename);
+
+  // the word buffer is always kept NUL-terminated
+  word_buffer[0] = 0;
+
+  for (;;)
+  {
+    int ch = fgetc(fp);
+
+    if (ch == EOF)
+      break;
+
+    if (isspace(ch) && !in_quote)
+    {
+      if (word_len > 0)
+        AddArg(word_buffer);
+
+      word_len = 0;
+      in_quote = 0;
+
+      continue;
+    }
+
+    if (isspace(ch) && !in_quote)
+      continue;
+
+    if ((ch == '\n' || ch == '\r') && in_quote)
+      break;  // causes the unclosed-quotes error
+
+    if (ch == '"')
+    {
+      in_quote = ! in_quote;
+      continue;
+    }
+
+    if (word_len >= MAX_WORD_LEN)
+      TextFatalError("Error: option in RESPONSE file too long (limit %d chars)\n",
+          MAX_WORD_LEN);
+
+    word_buffer[word_len++] = ch;
+    word_buffer[word_len] = 0;
+  }
+
+  if (in_quote)
+    TextFatalError("Error: unclosed quotes in RESPONSE file\n");
+
+  if (word_len > 0)
+    AddArg(word_buffer);
+
+  fclose(fp);
+}
+
+static void BuildArgumentList(int argc, char **argv)
+{
+  for (; argc > 0; argv++, argc--)
+  {
+    if (argv[0][0] == '@')
+    {
+      ProcessResponseFile(argv[0] + 1);
+      continue;
+    }
+
+    AddArg(*argv);
+  }
+
+  resp_argv[resp_argc] = NULL;
+}
+
+static void FreeArgumentList(void)
+{
+  while (--resp_argc >= 0)
+  {
+    GlbspFree(resp_argv[resp_argc]);
+  }
 }
 
 
@@ -154,11 +259,12 @@ int main(int argc, char **argv)
     exit(1);
   }
 
+  BuildArgumentList(argc, argv);
+
   info  = default_buildinfo;
   comms = default_buildcomms;
 
-  if (GLBSP_E_OK != GlbspParseArgs(&info, &comms, 
-      (const char **)argv, argc))
+  if (GLBSP_E_OK != GlbspParseArgs(&info, &comms, resp_argv, resp_argc))
   {
     TextFatalError("Error: %s\n", comms.message ? comms.message : 
         "(Unknown error when parsing args)");
@@ -173,14 +279,14 @@ int main(int argc, char **argv)
     if (info.input_file && info.extra_files[0] && ! info.extra_files[1] &&
         FileExists(info.input_file) && ! FileExists(info.extra_files[0]))
     {
-      TextFatalError("Error: Cannot find WAD file %s ("
+      TextFatalError("Error: Cannot find WAD file: %s ("
           "Maybe you forgot -o)\n", info.extra_files[0]);
     }
 
     /* balk NOW if any of the input files doesn't exist */
 
     if (! FileExists(info.input_file))
-      TextFatalError("Error: Cannot find WAD file %s\n",
+      TextFatalError("Error: Cannot find WAD file: %s\n",
           info.input_file);
 
     for (ext_j = 0; info.extra_files[ext_j]; ext_j++)
@@ -188,7 +294,7 @@ int main(int argc, char **argv)
       if (FileExists(info.extra_files[ext_j]))
         continue;
 
-      TextFatalError("Error: Cannot find WAD file %s\n",
+      TextFatalError("Error: Cannot find WAD file: %s\n",
           info.extra_files[ext_j]);
     }
   }
@@ -229,6 +335,7 @@ int main(int argc, char **argv)
   }
 
   TextShutdown();
+  FreeArgumentList();
 
   return 0;
 }
