@@ -2,25 +2,27 @@
 TODO
 ====
 
-+  check out problem with YYY.wad.
+TEST:  Don't prune sectors by default.
 
--  update documentation for 2.20
+TEST:  don't merge vertices by default.
+
++  glBSPX: update to FLTK 1.1.6
+
+-  update documentation for 2.20 (SYNC with web page)
+   -  manual page too
+   -  response files
 
 -  update glBSPX for 2.20
 
-TEST:  don't merge vertices.
-
-TEST:  UtilTimeString() under WIN32.
-
-DONE:  detect "see through one-siders" and add miniseg there. (MAP07 10sec2)
+-  update web-site for 2.20
 
 
 LATER / IDEAS
 =============
 
 -  simplify callback interface.
--  reinstate "normal-only" node build.
 -  create empty REJECT rather than "minimal" (save space) ?
+-  reinstate "normal-only" node build.
 -  Autoconf / Automake.
 -  MacOS X: Project builder setup for glBSPX.
 
