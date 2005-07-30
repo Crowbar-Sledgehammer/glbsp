@@ -5,7 +5,7 @@
 BIN=libglbsp.a
 
 CC=gcc
-CFLAGS=-O3 -Wall -DGLBSP_PLUGIN -DUNIX -DINLINE_G=inline
+CFLAGS=-O2 -Wall -DGLBSP_PLUGIN -DUNIX -DINLINE_G=inline
 
 AR=ar rc
 RANLIB=ranlib

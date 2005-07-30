@@ -9,7 +9,7 @@ SRC_DIR=glbsp
 PROGNAME=glbsp
 
 CC=gcc
-CFLAGS=-O3 -Wall -DGLBSP_TEXT -DMACOSX -DINLINE_G=inline
+CFLAGS=-O2 -Wall -DGLBSP_TEXT -DMACOSX -DINLINE_G=inline
 LIBS=-lm -lz
 
 OBJS=$(SYSDIR)/main.o     \

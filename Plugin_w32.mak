@@ -11,7 +11,7 @@ BIN=libglbsp.a
 # INCS=-I../DEV-CPP/include  -Iinclude
 
 CC=gcc.exe
-CFLAGS=-O3 -Wall -DGLBSP_PLUGIN -DWIN32 -DINLINE_G=inline
+CFLAGS=-O2 -Wall -DGLBSP_PLUGIN -DWIN32 -DINLINE_G=inline
 
 AR=ar r
 RANLIB=ranlib

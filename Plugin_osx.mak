@@ -5,7 +5,7 @@
 BIN=libglbsp.a
 
 CC=gcc
-CFLAGS=-O3 -Wall -DGLBSP_PLUGIN -DMACOSX -DINLINE_G=inline
+CFLAGS=-O2 -Wall -DGLBSP_PLUGIN -DMACOSX -DINLINE_G=inline
 
 # ----- OBJECTS ------------------------------------------------------
 
