@@ -682,8 +682,9 @@ static int LineEndCompare(const void *p1, const void *p2)
 void DetectOverlappingLines(void)
 {
   // Algorithm:
-  //   Sort all lines by left-most vertex (for vertical lines, bottom-most).
-  //   Overlapping lines will then be contiguous in this set.
+  //   Sort all lines by left-most vertex.
+  //   Overlapping lines will then be near each other in this set.
+  //   Note: does not detect partially overlapping lines.
 
   int i;
   int *array = UtilCalloc(num_linedefs * sizeof(int));
@@ -699,17 +700,23 @@ void DetectOverlappingLines(void)
 
   for (i=0; i < num_linedefs - 1; i++)
   {
-    // FIXME: not 100% correct
-    if (LineStartCompare(array + i, array + i+1) == 0 &&
-          LineEndCompare(array + i, array + i+1) == 0)
+    int j;
+
+    for (j = i+1; j < num_linedefs; j++)
     {
-      linedef_t *A = lev_linedefs[array[i]];
-      linedef_t *B = lev_linedefs[array[i+1]];
+      if (LineStartCompare(array + i, array + j) != 0)
+        break;
 
-      // found an overlap !
-      B->overlap = A->overlap ? A->overlap : A;
+      if (LineEndCompare(array + i, array + j) == 0)
+      {
+        linedef_t *A = lev_linedefs[array[i]];
+        linedef_t *B = lev_linedefs[array[j]];
 
-      count++;
+        // found an overlap !
+        B->overlap = A->overlap ? A->overlap : A;
+
+        count++;
+      }
     }
   }
 
