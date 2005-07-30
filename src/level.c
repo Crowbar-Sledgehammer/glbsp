@@ -592,8 +592,7 @@ void GetLinedefsHexen(void)
     line->right = SafeLookupSidedef(UINT16(raw->sidedef1));
     line->left  = SafeLookupSidedef(UINT16(raw->sidedef2));
 
-    // -JL- Added missing sidedef handling that caused all sidedefs to be
-    //      pruned.
+    // -JL- Added missing sidedef handling that caused all sidedefs to be pruned
     if (line->right)
     {
       line->right->ref_count++;
@@ -1578,18 +1577,27 @@ void LoadLevel(void)
     GetStaleNodes();
   }
  
-  if (lev_doing_normal && !cur_info->no_prune)
+  if (lev_doing_normal)
   {
-//  DetectDuplicateVertices();
+    if (!cur_info->no_prune)
+      PruneLinedefs();
 
-    if (cur_info->pack_sides)
-      DetectDuplicateSidedefs();
+    if (cur_info->merge_vert)
+      DetectDuplicateVertices();
 
-    PruneLinedefs();
+    // always prune vertices (ignore -noprune), otherwise all the
+    // unused vertices from seg splits would keep accumulating.
     PruneVertices();
-    PruneSidedefs();
-    
-    if (!cur_info->keep_sect)
+
+    if (!cur_info->no_prune)
+    {
+      if (cur_info->pack_sides)
+        DetectDuplicateSidedefs();
+
+      PruneSidedefs();
+    }
+
+    if (cur_info->prune_sect)
       PruneSectors();
   }
  
