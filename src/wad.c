@@ -266,7 +266,7 @@ static int ReadHeader(const char *filename)
 
   if (len != 1)
   {
-    sprintf(strbuf, "Trouble reading wad header for %s : %s", 
+    sprintf(strbuf, "Trouble reading wad header for %s (%s)", 
       filename, strerror(errno));
 
     SetErrorMsg(strbuf);
@@ -275,7 +275,7 @@ static int ReadHeader(const char *filename)
 
   if (! CheckMagic(header.type))
   {
-    sprintf(strbuf, "%s does not appear to be a wad file : bad magic", 
+    sprintf(strbuf, "%s does not appear to be a wad file (bad magic)", 
         filename);
 
     SetErrorMsg(strbuf);
@@ -1260,7 +1260,7 @@ glbsp_ret_e ReadWadFile(const char *filename)
 
   if (! in_file)
   {
-    sprintf(strbuf, "Cannot open WAD file %s : %s", filename, 
+    sprintf(strbuf, "Cannot open WAD file: %s (%s)", filename, 
         strerror(errno));
     
     SetErrorMsg(strbuf);
@@ -1329,8 +1329,9 @@ glbsp_ret_e WriteWadFile(const char *filename)
 
   if (! out_file)
   {
-    sprintf(strbuf, "Cannot open output WAD file: %s", strerror(errno));
-    
+    sprintf(strbuf, "Cannot create WAD file: %s (%s)", filename,
+        strerror(errno));
+
     SetErrorMsg(strbuf);
 
     return GLBSP_E_WriteError;
@@ -1373,7 +1374,7 @@ void DeleteGwaFile(const char *base_wad_name)
   char *gwa_file = ReplaceExtension(base_wad_name, "gwa");
 
   if (remove(gwa_file) == 0)
-    PrintMsg("Deleted GWA file : %s\n", gwa_file);
+    PrintMsg("Deleted GWA file: %s\n", gwa_file);
  
   UtilFree(gwa_file);
 }
