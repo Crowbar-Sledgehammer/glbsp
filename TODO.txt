@@ -2,10 +2,6 @@
 TODO
 ====
 
-TEST:  Don't prune sectors by default.
-
-TEST:  don't merge vertices by default.
-
 +  glBSPX: update to FLTK 1.1.6
 
 -  update documentation for 2.20 (SYNC with web page)
