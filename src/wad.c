@@ -266,7 +266,7 @@ static int ReadHeader(const char *filename)
 
   if (len != 1)
   {
-    sprintf(strbuf, "Trouble reading wad header for %s (%s)", 
+    sprintf(strbuf, "Trouble reading wad header for %s [%s]", 
       filename, strerror(errno));
 
     SetErrorMsg(strbuf);
@@ -1260,9 +1260,12 @@ glbsp_ret_e ReadWadFile(const char *filename)
 
   if (! in_file)
   {
-    sprintf(strbuf, "Cannot open WAD file: %s (%s)", filename, 
-        strerror(errno));
-    
+    if (errno == ENOENT)
+      sprintf(strbuf, "Cannot open WAD file: %s", filename); 
+    else
+      sprintf(strbuf, "Cannot open WAD file: %s [%s]", filename, 
+          strerror(errno));
+
     SetErrorMsg(strbuf);
 
     return GLBSP_E_ReadError;
@@ -1329,7 +1332,7 @@ glbsp_ret_e WriteWadFile(const char *filename)
 
   if (! out_file)
   {
-    sprintf(strbuf, "Cannot create WAD file: %s (%s)", filename,
+    sprintf(strbuf, "Cannot create WAD file: %s [%s]", filename,
         strerror(errno));
 
     SetErrorMsg(strbuf);
