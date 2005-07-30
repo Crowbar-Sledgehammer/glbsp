@@ -143,6 +143,10 @@ static void AddArg(const char *str)
     TextFatalError("Error: Too many options! (limit is %d)\n", RESP_MAX_ARGS);
 
   resp_argv[resp_argc++] = GlbspStrDup(str);
+
+#if 0  // DEBUGGING
+  fprintf(stderr, "Arg [%s]\n", str);
+#endif
 }
 
 static void ProcessResponseFile(const char *filename)
