@@ -1579,23 +1579,23 @@ void LoadLevel(void)
  
   if (lev_doing_normal)
   {
-    if (!cur_info->no_prune)
-      PruneLinedefs();
+    // NOTE: order here is critical
+
+    if (cur_info->pack_sides)
+      DetectDuplicateSidedefs();
 
     if (cur_info->merge_vert)
       DetectDuplicateVertices();
+
+    if (!cur_info->no_prune)
+      PruneLinedefs();
 
     // always prune vertices (ignore -noprune), otherwise all the
     // unused vertices from seg splits would keep accumulating.
     PruneVertices();
 
     if (!cur_info->no_prune)
-    {
-      if (cur_info->pack_sides)
-        DetectDuplicateSidedefs();
-
       PruneSidedefs();
-    }
 
     if (cur_info->prune_sect)
       PruneSectors();
