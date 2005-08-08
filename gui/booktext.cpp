@@ -2,7 +2,7 @@
 // BOOKTEXT : Unix/FLTK Manual Text
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2004 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
 //  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -31,7 +31,7 @@ static const char *contents_text[] =
   "@-",
   "",
   "@r by Andrew Apted   ",
-  "@r Updated: 4th July 2004   ",
+  "@r Updated: 30th July 2005   ",
   "",
   "@c@m Table of Contents",
   "",
@@ -86,7 +86,7 @@ static const char *intro_text[] =
   "@m Legal stuff:",
   "",
   "#P00",
-  "glBSP and glBSPX are Copyright (C) 2000-2004 Andrew Apted.  It",
+  "glBSP and glBSPX are Copyright (C) 2000-2005 Andrew Apted.  It",
   "was originally based on `BSP 2.3' (C) Colin Reed and Lee Killough,",
   "which was created from the basic theory stated in DEU5 (OBJECTS.C)",
   "by Raphael Quinet.",
