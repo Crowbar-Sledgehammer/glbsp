@@ -2,14 +2,13 @@
 # glBSPX Makefile for FLTK under MacOS X
 #
 
-FLTK_PREFIX=$(HOME)
-
-FLTK_CFLAGS=-I$(FLTK_PREFIX)/include
-FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk -lz
-
 MAIN=.
 SYSDIR=fltk
 SRC_DIR=glbsp
+
+FLTK_PREFIX=$(HOME)
+FLTK_CFLAGS=-I$(FLTK_PREFIX)/include
+FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk -lz
 
 PROGNAME=$(SYSDIR)/glBSPX.app/Contents/glBSPX
 
