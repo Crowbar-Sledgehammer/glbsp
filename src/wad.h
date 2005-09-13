@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -155,7 +155,7 @@ int CheckExtension(const char *filename, const char *ext);
 char *ReplaceExtension(const char *filename, const char *ext);
 
 // open the input wad file and read the contents into memory.  When
-// `load_all' is false, lumps other than level info will be marked as
+// 'load_all' is false, lumps other than level info will be marked as
 // copyable instead of loaded.
 //
 // Returns GLBSP_E_OK if all went well, otherwise an error code (in
@@ -186,7 +186,7 @@ void DeleteGwaFile(const char *base_wad_name);
 int CountLevels(void);
 
 // find the next level lump in the wad directory, and store the
-// reference in `wad.current_level'.  Call this straight after
+// reference in 'wad.current_level'.  Call this straight after
 // ReadWadFile() to get the first level.  Returns 1 if found,
 // otherwise 0 if there are no more levels in the wad.
 //

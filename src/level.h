@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -264,7 +264,7 @@ typedef struct seg_s
   float_g p_perp;
 
   // linedef that this seg initially comes from.  For "real" segs,
-  // this is just the same as the `linedef' field above.  For
+  // this is just the same as the 'linedef' field above.  For
   // "minisegs", this is the linedef of the partition line.
   linedef_t *source_line;
 }

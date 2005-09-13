@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -122,7 +122,7 @@ void FreeQuickAllocCuts(void)
 //
 // RecomputeSeg
 //
-// Fill in the fields `angle', `len', `pdx', `pdy', etc...
+// Fill in the fields 'angle', 'len', 'pdx', 'pdy', etc...
 //
 void RecomputeSeg(seg_t *seg)
 {
@@ -543,7 +543,7 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
 //
 // -AJA- Evaluate a partition seg & determine the cost, taking into
 //       account the number of splits, difference between left &
-//       right, and linedefs that are tagged `precious'.
+//       right, and linedefs that are tagged 'precious'.
 //
 // Returns the computed cost, or a negative value if the seg should be
 // skipped altogether.
@@ -1174,8 +1174,8 @@ void AddMinisegs(seg_t *part,
     buddy->start = next->vertex;
     buddy->end   = cur->vertex;
 
-    // leave `linedef' field as NULL.
-    // leave `side' as zero too (not needed for minisegs).
+    // leave 'linedef' field as NULL.
+    // leave 'side' as zero too (not needed for minisegs).
 
     seg->sector = buddy->sector = cur->after;
 

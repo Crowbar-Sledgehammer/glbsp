@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -181,7 +181,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
 
     opt_str = &argv[0][1];
 
-    // handle GNU style options beginning with `--'
+    // handle GNU style options beginning with '--'
     if (opt_str[0] == '-')
       opt_str++;
 

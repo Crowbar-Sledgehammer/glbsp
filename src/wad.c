@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -191,7 +191,7 @@ static level_t *NewLevel(int flags)
 //
 // NewLump
 //
-// Create new lump.  `name' must be allocated storage.
+// Create new lump.  'name' must be allocated storage.
 //
 static lump_t *NewLump(char *name)
 {
@@ -241,7 +241,7 @@ static void FreeLump(lump_t *lump)
     FreeWadLevel(lump->lev_info);
   }
 
-  // check `data' here, since it gets freed in WriteLumpData()
+  // check 'data' here, since it gets freed in WriteLumpData()
   if (lump->data)
     UtilFree(lump->data);
   
@@ -394,7 +394,7 @@ static void ProcessDirEntry(lump_t *lump)
     return;
   }
 
-  // mark the lump as `ignorable' when in GWA mode.
+  // mark the lump as 'ignorable' when in GWA mode.
   if (cur_info->gwa_mode)
     lump->flags |= LUMP_IGNORE_ME;
 
@@ -441,7 +441,7 @@ static void ProcessDirEntry(lump_t *lump)
       // check for duplicates
       if (FindLevelLump(lump->name))
       {
-        PrintWarn("Duplicate entry `%s' ignored in %s\n",
+        PrintWarn("Duplicate entry '%s' ignored in %s\n",
             lump->name, wad.current_level->name);
 
         FreeLump(lump);
@@ -480,7 +480,7 @@ static void ProcessDirEntry(lump_t *lump)
 # endif
 
   if (CheckLevelLumpName(lump->name))
-    PrintWarn("Level lump `%s' found outside any level\n", lump->name);
+    PrintWarn("Level lump '%s' found outside any level\n", lump->name);
 
   // maybe load data
   if (cur_info->load_all)
@@ -560,10 +560,10 @@ static void ReadLumpData(lump_t *lump)
   if (len != 1)
   {
     if (wad.current_level)
-      PrintWarn("Trouble reading lump `%s' in %s\n",
+      PrintWarn("Trouble reading lump '%s' in %s\n",
           lump->name, wad.current_level->name);
     else
-      PrintWarn("Trouble reading lump `%s'\n", lump->name);
+      PrintWarn("Trouble reading lump '%s'\n", lump->name);
   }
 
   lump->flags &= ~LUMP_READ_ME;
@@ -766,7 +766,7 @@ static void RecomputeDirectory(void)
   wad.num_entries = 0;
   wad.dir_start = sizeof(raw_wad_header_t);
   
-  // run through all the lumps, computing the `new_start' fields, the
+  // run through all the lumps, computing the 'new_start' fields, the
   // number of lumps in the directory, the directory starting pos, and
   // also sorting the lumps in the levels.
 

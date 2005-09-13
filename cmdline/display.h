@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,8 +18,8 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __GLBSP_DISPLAY_H__
-#define __GLBSP_DISPLAY_H__
+#ifndef __CMDLINE_DISPLAY_H__
+#define __CMDLINE_DISPLAY_H__
 
 
 extern const nodebuildfuncs_t cmdline_funcs;
@@ -40,4 +40,4 @@ void TextDisplaySetBarText(int barnum, const char *str);
 void TextDisplayClose(void);
 
 
-#endif /* __GLBSP_DISPLAY_H__ */
+#endif /* __CMDLINE_DISPLAY_H__ */
