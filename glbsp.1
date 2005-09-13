@@ -1,5 +1,5 @@
 .\" -*-nroff-*-
-.TH glbsp 1 "July 2004"
+.TH glbsp 1 "September 2005"
 .\" .UC 4
 .SH NAME
 glbsp \- GL Nodes builder for DOOM ports
@@ -7,6 +7,9 @@ glbsp \- GL Nodes builder for DOOM ports
 .B glbsp
 .RI "[" options "] "
 input.wad ... [-o output.wad]
+.PP
+.B glbsp
+.I @argfile.rsp
 .PP
 .SH DESCRIPTION
 .I glBSP
@@ -22,26 +25,19 @@ options will show an informational screen.
 .BI \-help
 Show a option summary screen.
 .TP
-.BI "\-q -quiet"
+.BI \-q
 Quieter output.  Information about each level (like
 the number of linedefs, blockmap size, etc) is not
 displayed when this option is given, and a few other
 messages are skipped.  Important messages, like
 failure to build a certain level, are still shown.
 .TP
-.BI \-factor " <num>" 
-Changes the cost assigned to seg splits.  Factor can
-be any number greater than 0, larger values make seg
-splits more costly (and thus glBSP tries harder to
-avoid them), but smaller values produce better BSP trees.
-The default value is known to be a good compromise.
-.TP
 .BI \-fast
-Starting with version 2.00, glBSP can cheat a bit and
+Lets glBSP can cheat a bit and
 re-use the original node information to create the GL
-nodes, doing it *much* faster.  Use this option to
+nodes, doing it much faster.  Use this option to
 enable this feature.  The message "Using original nodes
-to speed things up" will be displayed.
+to speed things up" will be shown.
 
 The downside to reusing the original nodes is that they
 may not be as good as the ones glBSP normally creates,
@@ -56,41 +52,46 @@ problem in the level (e.g. a non-closed sector or
 invalid sidedef), so they are worth checking now and
 then.
 .TP
+.BI \-normal
+glBSP usually detects if the normal node info (i.e.
+the non-GL variety) is present: when yes, it is left untouched,
+otherwise glBSP creates it.  This option forces
+glBSP to replace the normal node data with newly
+constructed nodes.
+.TP
+.BI \-factor " <num>" 
+Changes the cost assigned to seg splits.  Factor can
+be any number greater than 0, larger values make seg
+splits more costly (and thus glBSP tries harder to
+avoid them), but smaller values produce better BSP trees.
+The default value is known to be a good compromise.
+.TP
+.BI \-pack
+Pack sidedefs, by detecting which sidedefs are
+identical and removing the duplicates, producing a
+smaller PWAD.
+
+NOTE: this may make your level a lot harder to edit!
+Therefore this is most useful when producing the
+final WAD for public release.
+.TP
 .BI \-noreject
 Normally glBSP will create an simple REJECT map for
 each level.  This options prevents any existing
 REJECT map, such as one time-consumingly built by a
 dedicated reject builder, from being clobbered.
-.TP
-.BI \-noprog
-Turn off the progress indicator.
-.TP
-.BI \-normal
-glBSP usually detects if the normal node info (i.e.
-the non-GL variety) is present, and leave it untouched
-when it is, otherwise create it.  This option forces
-glBSP to recreate the normal node info.
-.TP
-.BI \-packsides
-Pack sidedefs, by detecting which sidedefs are
-identical and removing the duplicates, producing a
-smaller PWAD.
-
-NOTE: this may make your level a lot harder to edit !
-Therefore this option is most useful when producing the
-final WAD for public release.
 .PP
-These next set of options normally don't need to be used, but they are
-provided to allow complete control or for special circumstances:
+The following options are rarely needed:
 .TP
-.B \-v1 .. \-v3
-Specify the version of the "GL Nodes" spec to use.
-Using -v1 provides backwards compatibility.
-The default is -v2.
-Giving -v3 will force certain lumps
-to use the new V3.0 formats, but is only useful for
-testing since glBSP will automatically switch to these
-formats when certain limits are exceeded.
+.B \-v1 .. \-v5
+Specify the version of the "GL Nodes" spec to use
+(either 1, 2, 3 or 5).
+V1 is considered obsolete now.
+The default is V2.
+Giving -v3 or -v5 will force certain lumps
+to use the new formats, but is only useful for
+testing since glBSP will automatically switch to V5
+format whenever the ordinary limits are exceeded.
 .TP
 .BI \-loadall
 glBSP will normally try to copy lumps from the input
@@ -105,6 +106,9 @@ the same file for both input and output, but I strongly
 recommend _against_ it: you could lose your original
 WAD if something goes wrong (and you know Murphy...).
 .TP
+.BI \-noprog
+Turn off the progress indicator.
+.TP
 .BI \-nonormal
 Forces glBSP to not create the normal node information
 when it detects that it is absent.
@@ -115,19 +119,21 @@ output filename is missing (i.e. no -o option) or if
 the output filename has the ".gwa" extension.  This
 option forces glBSP into GWA mode.
 .TP
-.BI \-keepsect
-Prevents unused sectors that are found in the level
-from being removed.  This is important for anything
-that refers to sector numbers directly (e.g. certain
-obsolete RTS commands in EDGE), since pruning unused
-sectors can make their numbers (as seen in an editor)
-different.
+.BI \-prunesec
+Removes any unused sectors that are found in the level.
+This has the potential to cause problems, since in
+certain scripting languages (e.g. EDGE's RTS, or Doom
+Legacy's Fragglescript) some commands use sector
+numbers directly, and pruning unused sectors can
+cause those references to become invalid.
 .TP
-.BI \-noprune
-Disables all pruning of unused vertices, sidedefs,
-linedefs and sectors from levels.  Pruning only occurs
-when normal nodes are being built (i.e. it is
-automatically disabled when in GWA mode).
+.BI \-mergevert
+Merge duplicate vertices at the same location
+into a single vertex.
+This is usually safe, but is not done by default
+because some engines (e.g. Risen3D) need the
+duplicate vertices to stay separate for a special
+effect.
 .TP
 .BI \-maxblock " <num>"
 Sets the limit of the number of blocks the BLOCKMAP may
@@ -140,15 +146,27 @@ through walls and other objects and bullets/missiles
 don't hit anything.  On very large but sparse levels,
 using a larger value (e.g. 60000) may help.
 
-A more serious problem is when the blockmap overflows
-(glBSP will show a message about this).  The blockmap
-created is invalid, and could crash the DOOM engine
-when used.  Setting a lower limit (e.g. 20000 or less)
-may help prevent crashes -- at the expense of the
-no-collision problem popping up.  Some DOOM engines
-(e.g. BOOM and MBF) have a "-blockmap" option that
-generates their own blockmap internally, fixing these
-problems.
+A more serious problem is when the blockmap overflows.
+The blockmap created would be invalid, and could crash
+the DOOM engine when used.  glBSP will create an empty
+blockmap instead, causing modern ports to build their
+own blockmap.
+.SH RESPONSE FILES
+New in version 2.20 is support for response files.  These are
+files containing a list of options.  You specify the response
+file by prefixing it with '@'.  For example:
+.PP
+.B glbsp
+.I @argfile.rsp
+.PP
+The "@argfile.rsp" on the command line will be replaced with
+the contents of that file.  New-line characters are treated like spaces.
+Recursion (using '@' inside a response file) is not supported.
+.SH ZDBSP NODES
+When the normal nodes overflow, older versions of glBSP would
+simply write out the invalid node data.  glBSP 2.20 now writes
+the node data in the ZDBSP format (originally created for the
+ZDoom engine).
 .SH AUTHORS
 Andrew Apted created glBSP and glBSPX and continues to maintain
 them.
