@@ -11,10 +11,12 @@ BIN=glbsp.exe
 # INCS=-I../DEV-CPP/include  -Iinclude
 
 ZLIB_DIR=../zlib-1.2.2-lib
+ZLIB_CFLAGS=-I$(ZLIB_DIR)/include
+ZLIB_LIBS=$(ZLIB_DIR)/lib/libz.a
 
 CC=gcc.exe
-CFLAGS=-O2 -Wall -DGLBSP_TEXT -DWIN32 -DINLINE_G=inline -I$(ZLIB_DIR)/include
-LIBS=-lm $(ZLIB_DIR)/lib/libz.a
+CFLAGS=-O2 -Wall -DGLBSP_TEXT -DWIN32 -DINLINE_G=inline $(ZLIB_CFLAGS)
+LIBS=-lm $(ZLIB_LIBS)
 
 # ----- OBJECTS ------------------------------------------------------
 
