@@ -214,7 +214,7 @@ Changes in V1.95  (24th September 2001)
  - improved wad.c to return error values instead of doing
    FatalError(), setting up the comms->message appropriately.
  
- - removed `display_setText' function from nodebuildfuncs API.
+ - removed 'display_setText' function from nodebuildfuncs API.
 
  - fixed the memory semantics for the glbsp API, with new functions
    GlbspStrDup() and GlbspFree().

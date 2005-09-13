@@ -8,8 +8,8 @@ by Andrew Apted.  13th September 2005.
 Running glBSP
 -------------
 
-There are now two versions of glBSP: normal `glbsp' (the text
-version), and `glBSPX' (offering a graphical interface).  This
+There are now two versions of glBSP: normal 'glbsp' (the text
+version), and 'glBSPX' (offering a graphical interface).  This
 documentation applies to the text version only.  Under Windows,
 the text version must be run from the command shell.
 
