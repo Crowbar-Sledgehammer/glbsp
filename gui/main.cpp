@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
   // handle drag and drop: a single non-option argument
   //
   // NOTE: there is no support for giving options to glBSPX via the
-  // command line.  Plain `glbsp' should be used if this is desired.
+  // command line.  Plain 'glbsp' should be used if this is desired.
   // The difficult here lies in possible conflicts between given
   // options and those already set from within the GUI.  Plus we may
   // want to handle a drag-n-drop of multiple files later on.

@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@
 Guix_TextBox::Guix_TextBox(int x, int y, int w, int h) :
     Fl_Multi_Browser(x, y, w, h)
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   // (it's an ancestor of Fl_Browser).
   end();
  
@@ -151,7 +151,7 @@ boolean_g Guix_TextBox::SaveLog(const char *filename)
       continue;
     }
 
-    // remove any `@' formatting info
+    // remove any '@' formatting info
 
     while (*L_txt == '@')
     {

@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -80,7 +80,7 @@ static void file_out_guess_CB(Fl_Widget *w, void *data)
 Guix_FileBox::Guix_FileBox(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, "Files")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
   
   box(FL_THIN_UP_BOX);
@@ -270,7 +270,7 @@ void Guix_FileBox::LockOut(boolean_g lock_it)
 Guix_FactorBox::Guix_FactorBox(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h)
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
  
   box(FL_THIN_UP_BOX);
@@ -662,7 +662,7 @@ static void builder_build_CB(Fl_Widget *w, void *data)
 
   // sleight of hand for GWA mode: we remember the old output name in
   // the nodebuildinfo and replace it with the gwa name.  The memory
-  // stuff is messy, since we can't be 100% sure that `output_file'
+  // stuff is messy, since we can't be 100% sure that 'output_file'
   // field won't be freed and assigned a new value by the main code.
 
   const char *old_output = guix_info.output_file;

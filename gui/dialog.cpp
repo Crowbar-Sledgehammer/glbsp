@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -171,7 +171,7 @@ static void DialogRun()
 //
 // DialogShowAndGetChoice
 //
-// The `pic' parameter is the picture to show on the left, or NULL for
+// The 'pic' parameter is the picture to show on the left, or NULL for
 // none.  The message can contain newlines.  The right/middle/left
 // parameters allow up to three buttons.
 //
@@ -284,7 +284,7 @@ int DialogShowAndGetChoice(const char *title, Fl_Pixmap *pic,
 // 
 // Shows the current filename (name_ptr) in an input box, and provides
 // a browse button to choose a new filename, and an optional button to
-// guess the new filename (if `guess_name' is NULL, then the button is
+// guess the new filename (if 'guess_name' is NULL, then the button is
 // disabled).
 //
 // This routine does NOT ensure that the filename is valid (or any

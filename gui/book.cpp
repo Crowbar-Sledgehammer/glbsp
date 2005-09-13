@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -64,7 +64,7 @@ static void book_selector_CB(Fl_Widget *w, void *data)
 Guix_Book::Guix_Book() : Fl_Window(guix_prefs.manual_w,
     guix_prefs.manual_h, "glBSP Manual")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
  
   size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);
@@ -354,8 +354,8 @@ void Guix_Book::ParaAddLine(const char *line)
     while (*line && word_len < 98)
     {
       // handle escapes:
-      //  `#-'  : non-break space.
-      //  `. '  : add a non-break space after dot
+      //  '#-'  : non-break space.
+      //  '. '  : add a non-break space after dot
 
       if (line[0] == '#' && line[1] == '-')
       {
@@ -402,7 +402,7 @@ static void license_quit_CB(Fl_Widget *w, void *data)
 Guix_License::Guix_License() : Fl_Window(guix_prefs.manual_w,
     guix_prefs.manual_h, "glBSP License")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
  
   size_range(MANUAL_WINDOW_MIN_W, MANUAL_WINDOW_MIN_H);

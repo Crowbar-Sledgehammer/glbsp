@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@ int HelperCaseCmp(const char *A, const char *B)
 //
 // HelperCaseCmpLen
 //
-// Like the above routine, but compares no more than `len' characters
+// Like the above routine, but compares no more than 'len' characters
 // at the start of each string.
 //
 int HelperCaseCmpLen(const char *A, const char *B, int len)

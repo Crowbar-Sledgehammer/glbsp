@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,7 +47,7 @@
 Guix_ProgressBox::Guix_ProgressBox(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, "Progress")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
  
   box(FL_THIN_UP_BOX);
