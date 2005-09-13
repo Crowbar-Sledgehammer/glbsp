@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -48,7 +48,7 @@ static void build_mode_radio_CB(Fl_Widget *w, void *data)
 Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, "Build Mode")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
   
   box(FL_THIN_UP_BOX);
@@ -71,7 +71,7 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   gwa->callback((Fl_Callback *) build_mode_radio_CB);
   add(gwa);
 
-  CY += 22;
+  CY += 24;
 
   maybe_normal = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL, Normal if missing");
@@ -81,7 +81,7 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   maybe_normal->callback((Fl_Callback *) build_mode_radio_CB);
   add(maybe_normal);
 
-  CY += 22;
+  CY += 24;
 
   both = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL and Normal nodes");
@@ -91,7 +91,7 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   both->callback((Fl_Callback *) build_mode_radio_CB);
   add(both);
 
-  CY += 22;
+  CY += 24;
 
   gl_only = new Fl_Check_Button(CX, CY,
       BM_BUTTONSIZE, BM_BUTTONSIZE, "GL nodes only");
@@ -101,7 +101,7 @@ Guix_BuildMode::Guix_BuildMode(int x, int y, int w, int h) :
   gl_only->callback((Fl_Callback *) build_mode_radio_CB);
   add(gl_only);
 
-  CY += 22;
+  CY += 24;
 
   ReadInfo();
 }
@@ -194,7 +194,7 @@ static void misc_opts_check_CB(Fl_Widget *w, void *data)
 Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, "Misc Options")
 {
-  // cancel the automatic `begin' in Fl_Group constructor
+  // cancel the automatic 'begin' in Fl_Group constructor
   end();
   
   box(FL_THIN_UP_BOX);
@@ -215,15 +215,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   warnings->callback((Fl_Callback *) misc_opts_check_CB);
   add(warnings);
 
-  CY += 21;
-
-  v1_vert = new Fl_Check_Button(CX, CY, 22, 22, "V1 GL Nodes");
-  v1_vert->down_box(FL_DOWN_BOX);
-  v1_vert->align(FL_ALIGN_RIGHT);
-  v1_vert->callback((Fl_Callback *) misc_opts_check_CB);
-  add(v1_vert);
-
-  CY += 21;
+  CY += 24;
 
   no_reject = new Fl_Check_Button(CX, CY, 22, 22, "Don't clobber REJECT");
   no_reject->down_box(FL_DOWN_BOX);
@@ -231,7 +223,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   no_reject->callback((Fl_Callback *) misc_opts_check_CB);
   add(no_reject);
 
-  CY += 21;
+  CY += 24;
 
   pack_sides = new Fl_Check_Button(CX, CY, 22, 22, "Pack Sidedefs");
   pack_sides->down_box(FL_DOWN_BOX);
@@ -239,7 +231,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   pack_sides->callback((Fl_Callback *) misc_opts_check_CB);
   add(pack_sides);
 
-  CY += 21;
+  CY += 24;
 
   choose_fresh = new Fl_Check_Button(CX, CY, 22, 22, "Fresh Partition Lines");
   choose_fresh->down_box(FL_DOWN_BOX);
@@ -247,7 +239,7 @@ Guix_MiscOptions::Guix_MiscOptions(int x, int y, int w, int h) :
   choose_fresh->callback((Fl_Callback *) misc_opts_check_CB);
   add(choose_fresh);
 
-  CY += 21;
+  CY += 24;
 
   ReadInfo();
 }
@@ -267,9 +259,6 @@ void Guix_MiscOptions::ReadInfo()
   choose_fresh->value(guix_info.fast ? 0 : 1);  // API change
   choose_fresh->redraw();
 
-  v1_vert->value((guix_info.spec_version == 1) ? 1 : 0);  // API change
-  v1_vert->redraw();
-
   warnings->value(guix_info.mini_warnings ? 1 : 0);
   warnings->redraw();
 
@@ -285,7 +274,6 @@ void Guix_MiscOptions::ReadInfo()
 
 void Guix_MiscOptions::WriteInfo()
 {
-  guix_info.spec_version = v1_vert->value() ? 1 : 2;  // API change
   guix_info.fast = choose_fresh->value() ? FALSE : TRUE;  // API change
   guix_info.no_reject = no_reject->value() ? TRUE : FALSE;
   guix_info.mini_warnings = warnings->value() ? TRUE : FALSE;
@@ -297,19 +285,19 @@ void Guix_MiscOptions::GWA_Changed()
 {
   if (guix_info.gwa_mode)
   {
-    no_reject->hide();
-    pack_sides->hide();
+    no_reject->deactivate();
+    pack_sides->deactivate();
   }
   else
   {
-    no_reject->show();
-    pack_sides->show();
+    no_reject->activate();
+    pack_sides->activate();
   }
 
   if (guix_info.force_normal)
-    choose_fresh->hide();
+    choose_fresh->deactivate();
   else
-    choose_fresh->show();
+    choose_fresh->activate();
 }
 
 
@@ -318,7 +306,6 @@ void Guix_MiscOptions::LockOut(boolean_g lock_it)
   if (lock_it)
   {
     choose_fresh->set_output();
-    v1_vert->set_output();
     warnings->set_output();
     no_reject->set_output();
     pack_sides->set_output();
@@ -326,7 +313,6 @@ void Guix_MiscOptions::LockOut(boolean_g lock_it)
   else
   {
     choose_fresh->clear_output();
-    v1_vert->clear_output();
     warnings->clear_output();
     no_reject->clear_output();
     pack_sides->clear_output();

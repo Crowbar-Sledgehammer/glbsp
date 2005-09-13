@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -140,8 +140,8 @@ extern const unsigned char about_image_data[];
 typedef struct book_page_s
 {
   // array of lines, ends with NULL.
-  // Link lines start with `#L' and two decimal digits.
-  // Paragraphcs start with `#P' and two digits, first digit is major
+  // Link lines start with '#L' and two decimal digits.
+  // Paragraphcs start with '#P' and two digits, first digit is major
   // indent level, second digit is minor indent level.
   // 
   const char ** text;
@@ -174,7 +174,7 @@ public:
   // total number of pages ?
   int PageCount();
 
-  // load a new page into the browser.  Updates `page_num'.  This
+  // load a new page into the browser.  Updates 'page_num'.  This
   // routine should be called shortly after construction, to display
   // the initial page.  Zero will get the contents page.  Invalid
   // page numbers will be safely ignored.
@@ -322,7 +322,7 @@ public:
   void GWA_Changed();
 
   // routine to call when the in_file changes.  It should compute
-  // a new value for `gwa_filename', and update the out_gwa_file
+  // a new value for 'gwa_filename', and update the out_gwa_file
   // widget.
   //
   void InFileChanged();
@@ -459,7 +459,6 @@ public:
   // child widgets: a set of toggle buttons
   Fl_Button *choose_fresh;
   Fl_Button *warnings;
-  Fl_Button *v1_vert;
   Fl_Button *no_reject;
   Fl_Button *pack_sides;
  
@@ -596,7 +595,7 @@ public:
   virtual ~Guix_TextBox();
 
   // adds the message to the text box.  The message may contain
-  // newlines ('\n').  The message doesn't need a trailing `\n', i.e.
+  // newlines ('\n').  The message doesn't need a trailing '\n', i.e.
   // it is implied.
   //
   void AddMsg(const char *msg, Fl_Color col = FL_BLACK, 
@@ -675,7 +674,7 @@ public:
 
   // this routine will update the user interface to prevent the user
   // from modifying most of the widgets (used during building).  When
-  // `lock_it' is FALSE, we are actually unlocking a previous lock.
+  // 'lock_it' is FALSE, we are actually unlocking a previous lock.
   // 
   void LockOut(boolean_g lock_it);
    

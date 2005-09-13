@@ -4,7 +4,7 @@
 //
 //  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
 //
-//  Based on `BSP 2.3' by Colin Reed, Lee Killough and others.
+//  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -128,18 +128,6 @@ static boolean_g CookieSetBuildVar(const char *name, const char *value)
       return FALSE;
 
     guix_info.fast = ! guix_info.fast;
-    return TRUE;
-  }
-
-  // API change in main glbsp code: 'v1_vert' --> 'spec_version'.
-  if (strcasecmp(name, "v1_vert") == 0)
-  {
-    boolean_g v1_vert;
-
-    if (! SetBooleanVar(v1_vert, value))
-      return FALSE;
-
-    guix_info.spec_version = v1_vert ? 1 : 2;
     return TRUE;
   }
 
@@ -270,7 +258,7 @@ static boolean_g CookieParseLine(char *buf)
   while (len > 0 && isspace(buf[len-1]))
     buf[--len] = 0;
  
-  CookieDebug("PRE-PARSE: `%s'\n", buf);
+  CookieDebug("PRE-PARSE: '%s'\n", buf);
 
   // comment ?
   if (*buf == '#')
@@ -344,7 +332,7 @@ static boolean_g CookieParseLine(char *buf)
 //
 // CookieCheckEm
 //
-// Increments `problems' each time something is fixed up.
+// Increments 'problems' each time something is fixed up.
 //
 void CookieCheckEm(int& problems)
 {
@@ -436,7 +424,7 @@ void CookieSetPath(const char *argv0)
  
   cookie_filename = GlbspStrDup(buffer);
 
-  CookieDebug("CookieFilename: `%s'\n", cookie_filename);
+  CookieDebug("CookieFilename: '%s'\n", cookie_filename);
 }
 
 //
@@ -521,7 +509,6 @@ static void CookieWriteBuildInfo(FILE *fp)
   fprintf(fp, "mini_warnings = %d\n", guix_info.mini_warnings ? 1 : 0); 
   fprintf(fp, "pack_sides = %d\n", guix_info.pack_sides ? 1 : 0); 
   fprintf(fp, "choose_fresh = %d\n", guix_info.fast ? 0 : 1);  // API change
-  fprintf(fp, "v1_vert = %d\n", (guix_info.spec_version == 1) ? 1 : 0);  // API change
 
   // block limit
   fprintf(fp, "block_limit = %d\n", guix_info.block_limit); 
