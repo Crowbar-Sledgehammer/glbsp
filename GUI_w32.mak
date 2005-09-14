@@ -7,8 +7,8 @@ SYSDIR=fltk
 SRC_DIR=glbsp
 
 FLTK_PREFIX=../fltk-1.1.6
-FLTK_CFLAGS=-I$(FLTK_PREFIX)/include
-FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk -lz
+FLTK_CFLAGS=-I$(FLTK_PREFIX)
+FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk
 
 ZLIB_DIR=../zlib-1.2.2-lib
 ZLIB_CFLAGS=-I$(ZLIB_DIR)/include
@@ -21,8 +21,9 @@ CC=gcc.exe
 CXX=g++.exe
 CFLAGS=-O2 -Wall -DGLBSP_GUI -DWIN32 -DINLINE_G=inline $(FLTK_CFLAGS) $(ZLIB_CFLAGS)
 CXXFLAGS=$(CFLAGS)
-LDFLAGS=-framework Carbon -framework ApplicationServices -Wl,-x
-LIBS=-lm $(ZLIB_LIBS) $(FLTK_LIBS)
+LDFLAGS=
+LIBS=-lm $(ZLIB_LIBS) $(FLTK_LIBS) -mwindows -lole32 -luuid -lgdi32 -lcomctl32 \
+     -lwsock32 -lsupc++
 WINDRES=windres.exe
 
 OBJS=$(SYSDIR)/main.o     \
