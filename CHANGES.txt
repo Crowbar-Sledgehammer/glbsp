@@ -2,8 +2,8 @@
 CHANGELOG
 =========
 
-Changes in V2.20  (Unreleased)
-------------------------------
+Changes in V2.20  (14th September 2005)
+---------------------------------------
 
  - support for response files, which work the same as Doom: use a
    filename prefixed with '@' (e.g. @list.rsp) and the contents of
