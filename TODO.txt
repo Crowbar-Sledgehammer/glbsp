@@ -2,23 +2,17 @@
 TODO
 ====
 
-+  glBSPX: update to FLTK 1.1.6
++  build Linux/i386 binaries.
 
--  update documentation for 2.20 (SYNC with web page)
-   -  manual page too
-   -  response files
++  build MacOS-X binaries.
 
--  update glBSPX for 2.20
-
--  update web-site for 2.20
++  update web-site for 2.20
 
 
 LATER / IDEAS
 =============
 
 -  simplify callback interface.
--  create empty REJECT rather than "minimal" (save space) ?
--  reinstate "normal-only" node build.
 -  Autoconf / Automake.
 -  MacOS X: Project builder setup for glBSPX.
 
