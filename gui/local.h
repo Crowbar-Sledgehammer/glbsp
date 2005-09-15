@@ -54,6 +54,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Counter.H>
+#include <FL/Fl_File_Icon.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Image.H>
@@ -77,7 +78,7 @@
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 
 
 //
