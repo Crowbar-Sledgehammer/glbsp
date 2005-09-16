@@ -6,9 +6,9 @@ MAIN=.
 SYSDIR=fltk
 SRC_DIR=glbsp
 
-FLTK_PREFIX=$(HOME)
-FLTK_CFLAGS=-I$(FLTK_PREFIX)/include
-FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk -lz
+FLTK_PREFIX=../fltk-1.1.6
+FLTK_CFLAGS=-I$(FLTK_PREFIX) -I$(FLTK_PREFIX)/zlib
+FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg -lfltk
 
 PROGNAME=$(SYSDIR)/glBSPX.app/Contents/glBSPX
 
@@ -17,7 +17,7 @@ CXX=g++
 CFLAGS=-O2 -Wall -DGLBSP_GUI -DMACOSX -DINLINE_G=inline $(FLTK_CFLAGS)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS=-framework Carbon -framework ApplicationServices -Wl,-x
-LIBS=-lm -lz $(FLTK_LIBS)
+LIBS=-lm $(FLTK_LIBS)
 REZ=/Developer/Tools/Rez -t APPL
 
 OBJS=$(SYSDIR)/main.o     \
