@@ -8,10 +8,13 @@
 
 BIN=libglbsp.a
 
-# INCS=-I../DEV-CPP/include  -Iinclude
+#ZLIB_DIR="C:/Program Files/GnuWin32/src/zlib/1.2.3/zlib-1.2.3"
+ZLIB_DIR=C:/Program\ Files/GnuWin32/src/zlib/1.2.3/zlib-1.2.3
 
-CC=gcc.exe
-CFLAGS=-O2 -Wall -DGLBSP_PLUGIN -DWIN32 -DINLINE_G=inline
+INCS=-I$(ZLIB_DIR) 
+
+CC=gcc
+CFLAGS=-O2 -Wall $(INCS) -DGLBSP_PLUGIN -DWIN32 -DINLINE_G=inline
 
 AR=ar r
 RANLIB=ranlib
@@ -36,7 +39,10 @@ all: $(BIN)
 
 clean:
 	rm -f $(OBJS) $(BIN) 
-	
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@	
+
 $(BIN): $(OBJS)
 	$(AR) $(BIN) $(OBJS)
 	$(RANLIB) $(BIN)
