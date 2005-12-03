@@ -22,8 +22,8 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define GLBSP_VER  "2.20"
-#define GLBSP_VER_HEX  0x220
+#define GLBSP_VER  "2.22"
+#define GLBSP_VER_HEX  0x222
 
 
 // certain GCC attributes can be useful
