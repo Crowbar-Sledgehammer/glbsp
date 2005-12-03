@@ -32,7 +32,7 @@ just copy the glbsp (or glBSPX) executable where you want it.
 Command-line glBSP
 ------------------
 
-Unix/Linux: make
+Unix/Linux: make -f Makefile.unx
 MacOS X:    make -f Makefile.osx
 
 MSDOS with DJGPP: make -f Makefile.dj
