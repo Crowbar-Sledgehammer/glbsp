@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+Changes in V2.22  (Unreleased)
+------------------------------
+
+ - initial support for configure script (autoconf), courtesy Andrew Baker.
+
+
 Changes in V2.20  (14th September 2005)
 ---------------------------------------
 
