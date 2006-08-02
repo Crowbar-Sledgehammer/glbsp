@@ -1,0 +1,32 @@
+#
+# SConscript file for GLBSP plugin
+#
+import os
+
+env = Environment()
+
+env.Append(CCFLAGS = ['-DGLBSP_PLUGIN'])
+
+# warnings
+env.Append(CCFLAGS = ['-Wall'])
+
+# optimisation
+env.Append(CCFLAGS = ['-O2', '-DINLINE_G=inline'])
+
+#FIXME: ZLIB dependency
+
+glbsp_sources = [
+	'analyze.c', 'blockmap.c', 'glbsp.c', 'level.c', 'node.c',
+	'reject.c', 'seg.c', 'system.c', 'util.c', 'wad.c']
+
+# operating system specifics
+if os.name == "nt":
+	env.Append(CCFLAGS = '-DWIN32')
+elif os.name == "posix":
+	env.Append(CCFLAGS = '-DLINUX')
+else:
+	print 'Unknown OS type: ' + os.name
+	Exit(1)
+
+env.StaticLibrary('glbsp', glbsp_sources)
+
