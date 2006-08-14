@@ -28,8 +28,8 @@ void TextStartup(void);
 void TextShutdown(void);
 void TextDisableProgress(void);
 
-void TextFatalError(const char *str, ...);
-void TextPrintMsg(const char *str, ...);
+void TextFatalError(const char *str, ...) GCCATTR((format (printf, 1, 2)));
+void TextPrintMsg(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 void TextTicker(void);
 
 boolean_g TextDisplayOpen(displaytype_e type);

@@ -28,8 +28,12 @@
 
 // certain GCC attributes can be useful
 #ifndef GCCATTR
-#define GCCATTR(attr)  /* nothing */
+#ifdef __GNUC__
+#define GCCATTR(xyz)  __attribute__ (xyz)
+#else
+#define GCCATTR(xyz)  /* nothing */
 #endif
+#endif // GCCATTR
 
 
 #ifdef __cplusplus
@@ -147,13 +151,13 @@ typedef struct nodebuildfuncs_s
   // goes wrong, e.g. out of memory.  This routine should show the
   // error to the user and abort the program.
   // 
-  void (* fatal_error)(const char *str, ...);
+  void (* fatal_error)(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 
   // The print_msg routine is used to display the various messages
   // that occur, e.g. "Building GL nodes on MAP01" and that kind of
   // thing.
   // 
-  void (* print_msg)(const char *str, ...);
+  void (* print_msg)(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 
   // This routine is called frequently whilst building the nodes, and
   // can be used to keep a GUI responsive to user input.  Many
