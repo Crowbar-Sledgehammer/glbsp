@@ -100,6 +100,8 @@ glBSP under the GNU GPL.
 
 Janis Legzdinsh for fixing many problems with Hexen wads.
 
+Darren Salt has sent in numerous patches.
+
 Jaakko Keränen, who gave some useful feedback on the "GL Friendly
 Nodes" specification.
 
