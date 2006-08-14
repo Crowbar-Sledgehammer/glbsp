@@ -6,7 +6,7 @@ glbsp \- GL Nodes builder for DOOM ports
 .SH SYNOPSIS
 .B glbsp
 .RI "[" options "] "
-input.wad ... [-o output.wad]
+input.wad ... [\-o output.wad]
 .PP
 .B glbsp
 .I @argfile.rsp
@@ -42,7 +42,7 @@ to speed things up" will be shown.
 The downside to reusing the original nodes is that they
 may not be as good as the ones glBSP normally creates,
 e.g. the special checks to minimise slime-trails don't
-kick in, and the -factor value doesn't have much effect.
+kick in, and the \-factor value doesn't have much effect.
 .TP
 .BI \-warn
 Shows extra warning messages, which detail various
@@ -88,7 +88,7 @@ Specify the version of the "GL Nodes" spec to use
 (either 1, 2, 3 or 5).
 V1 is considered obsolete now.
 The default is V2.
-Giving -v3 or -v5 will force certain lumps
+Giving \-v3 or \-v5 will force certain lumps
 to use the new formats, but is only useful for
 testing since glBSP will automatically switch to V5
 format whenever the ordinary limits are exceeded.
@@ -115,7 +115,7 @@ when it detects that it is absent.
 .TP
 .BI \-forcegwa
 Normally glBSP will automatically use GWA mode if the
-output filename is missing (i.e. no -o option) or if
+output filename is missing (i.e. no \-o option) or if
 the output filename has the ".gwa" extension.  This
 option forces glBSP into GWA mode.
 .TP
@@ -171,7 +171,7 @@ ZDoom engine).
 Andrew Apted created glBSP and glBSPX and continues to maintain
 them.
 .PP
-Andrew Baker, Janis Legzdinsh and André Majoral have
+Andrew Baker, Janis Legzdinsh and Andr\('e Majoral have
 contributed code, and Marc Pullen helped with the documentation.
 .PP
 glBSP was originally
