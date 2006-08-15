@@ -56,7 +56,7 @@ void PrintWarn(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 void PrintMiniWarn(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 
 // set message for certain errors
-void SetErrorMsg(const char *str);
+void SetErrorMsg(const char *str, ...) GCCATTR((format (printf, 1, 2)));
 
 // endian handling
 void InitEndian(void);

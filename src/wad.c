@@ -260,25 +260,22 @@ static int ReadHeader(const char *filename)
 {
   size_t len;
   raw_wad_header_t header;
-  char strbuf[1024];
 
   len = fread(&header, sizeof(header), 1, in_file);
 
   if (len != 1)
   {
-    sprintf(strbuf, "Trouble reading wad header for %s [%s]", 
+    SetErrorMsg("Trouble reading wad header for %s [%s]", 
       filename, strerror(errno));
 
-    SetErrorMsg(strbuf);
     return FALSE;
   }
 
   if (! CheckMagic(header.type))
   {
-    sprintf(strbuf, "%s does not appear to be a wad file (bad magic)", 
+    SetErrorMsg("%s does not appear to be a wad file (bad magic)", 
         filename);
 
-    SetErrorMsg(strbuf);
     return FALSE;
   }
 
@@ -672,12 +669,12 @@ lump_t *CreateGLMarker(void)
   lump_t *level = wad.current_level;
   lump_t *cur;
 
-  char name_buf[16];
+  char name_buf[32];
   boolean_g long_name = FALSE;
 
   if (strlen(level->name) <= 5)
   {
-    sprintf(name_buf, "GL_%s", level->name);
+    snprintf(name_buf, sizeof(name_buf), "GL_%s", level->name);
   }
   else
   {
@@ -1253,7 +1250,7 @@ int CheckLevelLumpZero(lump_t *lump)
 glbsp_ret_e ReadWadFile(const char *filename)
 {
   int check;
-  char strbuf[1024];
+  char *read_msg;
 
   // open input wad file & read header
   in_file = fopen(filename, "rb");
@@ -1261,12 +1258,10 @@ glbsp_ret_e ReadWadFile(const char *filename)
   if (! in_file)
   {
     if (errno == ENOENT)
-      sprintf(strbuf, "Cannot open WAD file: %s", filename); 
+      SetErrorMsg("Cannot open WAD file: %s", filename); 
     else
-      sprintf(strbuf, "Cannot open WAD file: %s [%s]", filename, 
+      SetErrorMsg("Cannot open WAD file: %s [%s]", filename, 
           strerror(errno));
-
-    SetErrorMsg(strbuf);
 
     return GLBSP_E_ReadError;
   }
@@ -1288,11 +1283,13 @@ glbsp_ret_e ReadWadFile(const char *filename)
   DisplayOpen(DIS_FILEPROGRESS);
   DisplaySetTitle("glBSP Reading Wad");
   
-  sprintf(strbuf, "Reading: %s", filename);
+  read_msg = UtilFormat("Reading: %s", filename);
 
-  DisplaySetBarText(1, strbuf);
+  DisplaySetBarText(1, read_msg);
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_READ_ME, LUMP_READ_ME));
   DisplaySetBar(1, 0);
+
+  UtilFree(read_msg);
 
   cur_comms->file_pos = 0;
 
@@ -1317,7 +1314,7 @@ glbsp_ret_e ReadWadFile(const char *filename)
 glbsp_ret_e WriteWadFile(const char *filename)
 {
   int check1, check2;
-  char strbuf[1024];
+  char *write_msg;
 
   PrintMsg("\n");
   PrintMsg("Saving WAD as %s\n", filename);
@@ -1332,10 +1329,8 @@ glbsp_ret_e WriteWadFile(const char *filename)
 
   if (! out_file)
   {
-    sprintf(strbuf, "Cannot create WAD file: %s [%s]", filename,
+    SetErrorMsg("Cannot create WAD file: %s [%s]", filename,
         strerror(errno));
-
-    SetErrorMsg(strbuf);
 
     return GLBSP_E_WriteError;
   }
@@ -1345,11 +1340,13 @@ glbsp_ret_e WriteWadFile(const char *filename)
   DisplayOpen(DIS_FILEPROGRESS);
   DisplaySetTitle("glBSP Writing Wad");
   
-  sprintf(strbuf, "Writing: %s", filename);
+  write_msg = UtilFormat("Writing: %s", filename);
 
-  DisplaySetBarText(1, strbuf);
+  DisplaySetBarText(1, write_msg);
   DisplaySetBarLimit(1, CountLumpTypes(LUMP_IGNORE_ME, 0));
   DisplaySetBar(1, 0);
+
+  UtilFree(write_msg);
 
   cur_comms->file_pos = 0;
 
