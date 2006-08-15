@@ -117,6 +117,7 @@ static int CheckLevelName(const char *name)
 // CheckLevelLumpName
 //
 // Tests if the entry name is one of the level lumps.
+// Returns index after header (1..N), or zero if no match.
 //
 static int CheckLevelLumpName(const char *name)
 {
@@ -125,10 +126,10 @@ static int CheckLevelLumpName(const char *name)
   for (i=0; i < NUM_LEVEL_LUMPS; i++)
   {
     if (strcmp(name, level_lumps[i]) == 0)
-      return TRUE;
+      return 1 + i;
   }
-  
-  return FALSE;
+ 
+  return 0;
 }
 
 
@@ -342,12 +343,23 @@ static void DetermineLevelNames(void)
 
   for (L=wad.dir_head; L; L=L->next)
   {
+    int matched = 0;
+
+    // skip known lumps (these are never valid level names)
+    if (CheckLevelLumpName(L->name))
+      continue;
+
     // check if the next four lumps after the current lump match the
-    // level-lump names.
-    //
+    // level-lump names. Order doesn't matter, but repeats do.
     for (i=0, N=L->next; (i < 4) && N; i++, N=N->next)
-      if (strcmp(N->name, level_lumps[i]) != 0)
+    {
+      int idx = CheckLevelLumpName(N->name);
+
+      if (!idx || idx > 8 /* SECTORS */ || (matched & (1<<idx)))
         break;
+
+      matched |= (1<<idx);
+    }
 
     if (i != 4)
       continue;
@@ -359,7 +371,7 @@ static void DetermineLevelNames(void)
     // check for duplicate levels (ignored)
     if (CheckLevelName(L->name))
     {
-      PrintWarn("Level name '%s' found twice in wad\n", L->name);
+      PrintWarn("Level name '%s' found twice in wad - Skipped\n", L->name);
       continue;
     }
 
