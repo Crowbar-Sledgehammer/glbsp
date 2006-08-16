@@ -27,13 +27,12 @@
 
 
 // certain GCC attributes can be useful
-#ifndef GCCATTR
+#undef GCCATTR
 #ifdef __GNUC__
 #define GCCATTR(xyz)  __attribute__ (xyz)
 #else
 #define GCCATTR(xyz)  /* nothing */
 #endif
-#endif // GCCATTR
 
 
 #ifdef __cplusplus
