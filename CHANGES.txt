@@ -5,8 +5,11 @@ CHANGELOG
 Changes in V2.22  (Unreleased)
 ------------------------------
 
- - initial support for configure script (autoconf), courtesy Andrew Baker.
+ - level name detection: allow some variation in the order of
+   the level lumps (thanks to Darren Salt for the patch).
 
+ - avoid some potential buffer overflows in printf calls.
+ 
 
 Changes in V2.20  (14th September 2005)
 ---------------------------------------
@@ -55,7 +58,7 @@ Changes in V2.20  (14th September 2005)
  - added code to detect the 'One-Sided Window' effect, where a
    one-sided linedef can be looked through from behind (e.g. MAP07
    in 10SECTO2.WAD).  When found, a miniseg is added along the back
-   side of the wall.
+   side of the wall.  Based on an idea by Graham Jackson.
 
  - fixed a bug with the overlapping linedef detection.
 
