@@ -3,21 +3,22 @@
 #
 import os
 
-env = Environment()
+Import('base_env')
+
+env = base_env.Copy()
 
 env.Append(CCFLAGS = ['-DGLBSP_PLUGIN'])
-
-# warnings
-env.Append(CCFLAGS = ['-Wall'])
-
-# optimisation
-env.Append(CCFLAGS = ['-O2', '-DINLINE_G=inline'])
+env.Append(CCFLAGS = ['-DINLINE_G=inline'])
 
 #FIXME: ZLIB dependency
 
 glbsp_sources = [
-	'analyze.c', 'blockmap.c', 'glbsp.c', 'level.c', 'node.c',
-	'reject.c', 'seg.c', 'system.c', 'util.c', 'wad.c']
+	'src/analyze.c', 'src/blockmap.c', 'src/glbsp.c',
+  'src/level.c', 'src/node.c', 'src/reject.c',
+  'src/seg.c', 'src/system.c', 'src/util.c',
+  'src/wad.c' ]
+
+env.Append(CPPPATH = './src')
 
 # operating system specifics
 if os.name == "nt":
