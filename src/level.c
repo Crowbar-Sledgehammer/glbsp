@@ -340,7 +340,7 @@ void GetThings(void)
   {
     // Note: no error if no things exist, even though technically a map
     // will be unplayable without the player starts.
-    PrintWarn("Couldn't find any Things");
+    PrintWarn("Couldn't find any Things!\n");
     return;
   }
 
@@ -382,7 +382,7 @@ void GetThingsHexen(void)
   {
     // Note: no error if no things exist, even though technically a map
     // will be unplayable without the player starts.
-    PrintWarn("Couldn't find any Things");
+    PrintWarn("Couldn't find any Things!\n");
     return;
   }
 
