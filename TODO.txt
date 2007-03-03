@@ -2,17 +2,9 @@
 TODO
 ====
 
-+  build Linux/i386 binaries.
++  fix all the makefiles / project files for the new
+   directory layout.
 
-+  build MacOS-X binaries.
-
-+  update web-site for 2.20
-
-
-LATER / IDEAS
-=============
-
--  simplify callback interface.
--  Autoconf / Automake.
--  MacOS X: Project builder setup for glBSPX.
+   Especially: always build code in 'src' as libglbsp.a
+   and make the cmdline and gui binaries link to that.
 
