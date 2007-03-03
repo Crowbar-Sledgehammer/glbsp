@@ -218,24 +218,24 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit23]
-FileName=fltk\book.cpp
+FileName=gui\book.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\book.cpp -o fltk\book.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\book.cpp -o gui\book.o $(CXXFLAGS)
 
 [Unit24]
-FileName=fltk\booktext.cpp
+FileName=gui\booktext.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\booktext.cpp -o fltk\booktext.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\booktext.cpp -o gui\booktext.o $(CXXFLAGS)
 
 [VersionInfo]
 Major=0
@@ -276,77 +276,77 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit22]
-FileName=fltk\window.cpp
+FileName=gui\window.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\window.cpp -o fltk\window.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\window.cpp -o gui\window.o $(CXXFLAGS)
 
 [Unit25]
-FileName=fltk\cookie.cpp
+FileName=gui\cookie.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\cookie.cpp -o fltk\cookie.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\cookie.cpp -o gui\cookie.o $(CXXFLAGS)
 
 [Unit26]
-FileName=fltk\dialog.cpp
+FileName=gui\dialog.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\dialog.cpp -o fltk\dialog.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\dialog.cpp -o gui\dialog.o $(CXXFLAGS)
 
 [Unit27]
-FileName=fltk\files.cpp
+FileName=gui\files.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\files.cpp -o fltk\files.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\files.cpp -o gui\files.o $(CXXFLAGS)
 
 [Unit28]
-FileName=fltk\helper.cpp
+FileName=gui\helper.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\helper.cpp -o fltk\helper.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\helper.cpp -o gui\helper.o $(CXXFLAGS)
 
 [Unit29]
-FileName=fltk\images.cpp
+FileName=gui\images.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\images.cpp -o fltk\images.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\images.cpp -o gui\images.o $(CXXFLAGS)
 
 [Unit30]
-FileName=fltk\license.cpp
+FileName=gui\license.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\license.cpp -o fltk\license.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\license.cpp -o gui\license.o $(CXXFLAGS)
 
 [Unit31]
-FileName=fltk\local.h
+FileName=gui\local.h
 CompileCpp=0
 Folder=glbsp
 Compile=1
@@ -356,37 +356,37 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit32]
-FileName=fltk\main.cpp
+FileName=gui\main.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\main.cpp -o fltk\main.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\main.cpp -o gui\main.o $(CXXFLAGS)
 
 [Unit33]
-FileName=fltk\menu.cpp
+FileName=gui\menu.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\menu.cpp -o fltk\menu.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\menu.cpp -o gui\menu.o $(CXXFLAGS)
 
 [Unit34]
-FileName=fltk\options.cpp
+FileName=gui\options.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\options.cpp -o fltk\options.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\options.cpp -o gui\options.o $(CXXFLAGS)
 
 [Unit35]
-FileName=fltk\prefs.cpp
+FileName=gui\prefs.cpp
 CompileCpp=0
 Folder=glbsp
 Compile=1
@@ -396,32 +396,32 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit36]
-FileName=fltk\progress.cpp
+FileName=gui\progress.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\progress.cpp -o fltk\progress.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\progress.cpp -o gui\progress.o $(CXXFLAGS)
 
 [Unit37]
-FileName=fltk\textbox.cpp
+FileName=gui\textbox.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\textbox.cpp -o fltk\textbox.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\textbox.cpp -o gui\textbox.o $(CXXFLAGS)
 
 [Unit38]
-FileName=fltk\about.cpp
+FileName=gui\about.cpp
 CompileCpp=1
 Folder=glbsp
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CPP) -c fltk\about.cpp -o fltk\about.o $(CXXFLAGS)
+BuildCmd=$(CPP) -c gui\about.cpp -o gui\about.o $(CXXFLAGS)
 

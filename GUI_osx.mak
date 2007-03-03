@@ -2,8 +2,8 @@
 # glBSPX Makefile for FLTK under MacOS X
 #
 
-MAIN=.
-SYSDIR=fltk
+MAIN=src
+SYSDIR=gui
 SRC_DIR=glbsp
 
 FLTK_PREFIX=../fltk-1.1.6

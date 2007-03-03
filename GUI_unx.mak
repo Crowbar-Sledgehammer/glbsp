@@ -2,15 +2,15 @@
 # glBSPX Makefile for Unix/FLTK
 #
 
-MAIN=.
-SYSDIR=fltk
+MAIN=src
+SYSDIR=gui
 SRC_DIR=glbsp
 
 PROGNAME=glBSPX
 
-FLTK_PREFIX=../fltk-1.1.6
+FLTK_PREFIX=../fltk-1.1.7
 FLTK_CFLAGS=-I$(FLTK_PREFIX) -I$(FLTK_PREFIX)/zlib
-FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
+FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lpng -lz -ljpeg \
           -lfltk -lX11 -lXext
 
 CC=gcc

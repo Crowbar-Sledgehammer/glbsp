@@ -37,7 +37,7 @@
 //  INCLUDES
 //
 
-#include "../glbsp.h"
+#include "../src/glbsp.h"
 
 #include <stdio.h>
 #include <stdlib.h>

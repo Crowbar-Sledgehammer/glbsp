@@ -2,8 +2,8 @@
 # glBSPX with FLTK < Win32 + MinGW MAKEFILE >
 #
 
-MAIN=.
-SYSDIR=fltk
+MAIN=src
+SYSDIR=gui
 SRC_DIR=glbsp
 
 FLTK_PREFIX=../fltk-1.1.6
