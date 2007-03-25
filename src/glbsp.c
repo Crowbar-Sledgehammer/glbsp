@@ -137,7 +137,7 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
   int got_output = FALSE;
 
   cur_comms = comms;
-  SetErrorMsg("");
+  SetErrorMsg("(Unknown Problem)");
 
   while (argc > 0)
   {
@@ -304,7 +304,7 @@ glbsp_ret_e GlbspCheckInfo(nodebuildinfo_t *info,
     volatile nodebuildcomms_t *comms)
 {
   cur_comms = comms;
-  SetErrorMsg("");
+  SetErrorMsg("(Unknown Problem)");
 
   info->same_filenames = FALSE;
   info->missing_output = FALSE;
