@@ -134,7 +134,7 @@ void W_Grid::draw()
 
 	if (zoom >= 22)
 	{
-		fl_color(FL_GRAY_RAMP + 2);
+		fl_color(fl_rgb_color(32));
 		draw_grid(1);
 	}
 
@@ -375,7 +375,7 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 
 	if (! seg->linedef->left || ! seg->linedef->right)  // 1-sided line
 	{
-		fl_color(on ? FL_WHITE : FL_GRAY_RAMP+12);  
+		fl_color(on ? FL_WHITE : fl_rgb_color(128));
 		return true;
 	}
 
@@ -412,7 +412,7 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 	if (miniseg_MODE < 1)
 		return false;
 
-	fl_color(FL_GRAY_RAMP + (on ? 14 : 6));  // everything else
+	fl_color(fl_rgb_color(on ? 160 : 64));  // everything else
 	return true;
 }
 
