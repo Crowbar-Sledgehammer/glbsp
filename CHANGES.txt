@@ -10,6 +10,9 @@ Changes in V2.22  (Unreleased)
 
  - avoid some potential buffer overflows in printf calls.
  
+ - fixed potential crash in GlbspParseArgs and GlbspCheckInfo
+   (it depends on the compiler).
+ 
 
 Changes in V2.20  (14th September 2005)
 ---------------------------------------
