@@ -23,22 +23,21 @@ engines use the very first seg to decide what sector to
 associate the subsector with.
 
 Engines should be aware of the trick and perform their
-own analysis to emulate it.  NOTE this trick usually
-causes some subsectors to contain segs from multiple
-sectors.
+own analysis to emulate it.  NOTE this trick causes some
+subsectors to contain segs from multiple sectors.
 
 
 2. Overlapping Lines
 
 This trick is mostly used to make higher mid-masking textures.
 
-glBSP will detect perfectly overlapping linedefs (i.e. using
-the same start and end vertices, possibly swapped).  glBSP
-will IGNORE them (producing no segs from the second and
-subsequent lines).
+glBSP can detect perfectly overlapping linedefs (ones using
+the same start and end vertices, possibly swapped), and will
+IGNORE them (producing no segs from the second and subsequent
+lines).
 
 Engines should also detect overlapping lines and emulate
-the trick (render the additional mid-masked textures).
+the trick (by rendering the additional mid-masked textures).
 
 
 3. One-sided Windows
@@ -62,7 +61,7 @@ used on existing linedefs or partnered with normal segs.
 Engines should detect this (i.e. miniseg on a one-sided line)
 and emulate the trick accordingly.  Depending on how your
 renderer does occlusion culling, it may not be necessary
-to do anything special here.
+to do anything special.
 
 
 4. Map Errors
@@ -73,7 +72,7 @@ the IWADs contain some small errors, for example:
   Doom1 E3M2:  Linedef #156 has a wrong sector reference.
   Doom2 MAP02: Sector #23 is not properly closed.
   Doom2 MAP14: Linedefs #964 and #966 are missing back sidedefs.
-  Hexen MAP02: Vertex #1370 is only sitting on linedef #668.
+  Hexen MAP02: Vertex #1370 is not joined to linedef #668.
 
 glBSP is not psychic and cannot automatically fix errors
 in maps (and besides, sometimes they are used deliberately
@@ -81,9 +80,9 @@ for special effects, as described above).
 
 When a linedef has a wrong sector reference, the usual
 result is that the subsector (or subsectors) near that
-spot contain segs belonging to different sectors.
+spot will contain segs belonging to different sectors.
 
-Engines should @@@@ FIXME
+@@@ FIXME
 
 Other map errors are more serious and cause structural
 problems, like degenerate subsectors (which contain only
