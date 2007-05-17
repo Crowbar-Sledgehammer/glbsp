@@ -23,7 +23,9 @@ engines use the very first seg to decide what sector to
 associate the subsector with.
 
 Engines should be aware of the trick and perform their
-own analysis to emulate it.
+own analysis to emulate it.  NOTE this trick usually
+causes some subsectors to contain segs from multiple
+sectors.
 
 
 2. Overlapping Lines
@@ -36,7 +38,7 @@ will IGNORE them (producing no segs from the second and
 subsequent lines).
 
 Engines should also detect overlapping lines and emulate
-the trick.
+the trick (render the additional mid-masked textures).
 
 
 3. One-sided Windows
@@ -49,7 +51,7 @@ line when viewed from the back.  When viewed from the front,
 the one-sided linedef acted normally (blocked your view).
 
 glBSP can detect many usages of this trick (although not 100%
-as that would require much more expensive analysis).
+since that would require much more expensive analysis).
 
 When found, glBSP will add a MINISEG along the back of the
 one-sided linedef.  This miniseg will be partnered with the
@@ -58,12 +60,33 @@ gl_seg structure).  This is the only time that minisegs are
 used on existing linedefs or partnered with normal segs.
 
 Engines should detect this (i.e. miniseg on a one-sided line)
-and emulate the trick accordingly.
+and emulate the trick accordingly.  Depending on how your
+renderer does occlusion culling, it may not be necessary
+to do anything special here.
 
 
 4. Map Errors
 
-FIXME
+PWADs often contain a few mapping errors in them, and even
+the IWADs contain some small errors, for example:
 
+  Doom1 E3M2:  Linedef #156 has a wrong sector reference.
+  Doom2 MAP02: Sector #23 is not properly closed.
+  Doom2 MAP14: Linedefs #964 and #966 are missing back sidedefs.
+  Hexen MAP02: Vertex #1370 is only sitting on linedef #668.
 
+glBSP is not psychic and cannot automatically fix errors
+in maps (and besides, sometimes they are used deliberately
+for special effects, as described above).
+
+When a linedef has a wrong sector reference, the usual
+result is that the subsector (or subsectors) near that
+spot contain segs belonging to different sectors.
+
+Engines should @@@@ FIXME
+
+Other map errors are more serious and cause structural
+problems, like degenerate subsectors (which contain only
+one or two segs).  There is nothing glBSP or the engine
+can do in these cases.
 
