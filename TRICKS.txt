@@ -2,6 +2,7 @@
 glBSP and Map-Tricks/Errors
 ===========================
 
+
 1. Self-referencing Lines
 
 This trick involves linedefs with the same sector reference
@@ -81,8 +82,8 @@ for special effects, as described above).
 When a linedef has a wrong sector reference, the usual
 result is that the subsector (or subsectors) near that
 spot will contain segs belonging to different sectors.
-
-@@@ FIXME
+The best way to handle it isn't clear -- engine developers
+should at least be aware of this possibility.
 
 Other map errors are more serious and cause structural
 problems, like degenerate subsectors (which contain only
