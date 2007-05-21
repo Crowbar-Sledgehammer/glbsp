@@ -2,10 +2,14 @@
 NodeView README
 ===============
 
-by Andrew Apted.  21st May 2007.
+by Andrew Apted.  21st May 2007
 
 
-@@@ Intro
+Introduction
+------------
+
+NodeView is a small node/subsector browsing tool.
+Currently it only works with GL-Nodes.
 
 
 COLORS
@@ -37,6 +41,7 @@ u : go Up the BSP tree
 t : go back to Top of BSP tree
 
 p : toggle Partition drawing (below/on-top/none)
+b : toggle Bounding-box drawing
 m : toggle seg Mode (all/normal-only)
 g : toggle Grid
 
