@@ -2,7 +2,7 @@
 //  MENU : Menu handling
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,7 +49,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-	"By Andrew Apted (C) 2004-2005";
+	"By Andrew Apted (C) 2004-2007";
 
 
 static void menu_do_about(Fl_Widget *w, void * data)

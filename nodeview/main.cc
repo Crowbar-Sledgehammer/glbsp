@@ -2,7 +2,7 @@
 //  MAIN Program
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ static void ShowTitle(void)
 {
 	GUI_PrintMsg(
 		"\n"
-		"**** " PROG_NAME "  (C) 2005 Andrew Apted ****\n\n"
+		"**** " PROG_NAME "  (C) 2007 Andrew Apted ****\n\n"
 	);
 }
 
