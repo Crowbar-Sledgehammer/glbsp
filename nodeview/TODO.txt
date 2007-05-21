@@ -2,11 +2,30 @@
 NodeView TODO list
 ==================
 
-- info line at bottom of main window:
-	- map name.
-	- mouse coords.
-	- zoom factor.
-    - current node/subsector.
++ info panel:
 
-? partition line: draw arrow heads along it.
+	- map name  --->  menu select (c.f. Oblige 'game' menu) ?
+
+	- mouse coords.
+    -  nearby sector, linedef, vertex
+    -  nearby subsector, seg-pair, GL vertex
+
+	- zoom factor.
+
+  - current node/subsector index
+    
+  - coordinates for current partition, bbox
+
+  - seg list for subsector (index numbers + line numbers)
+
+  ? grid size
+
+  ? partition_MODE, seg_MODE
+
+
+- partition line: draw arrow heads along it.
+
+- menu for selecting level
+
+DONE: show node bounding boxes
 
