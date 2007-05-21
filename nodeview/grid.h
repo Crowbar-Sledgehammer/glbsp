@@ -2,7 +2,7 @@
 //  GRID : Draws the map (lines, nodes, etc)
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -60,6 +60,7 @@ private:
 
 	void draw_grid(int spacing);
 	void draw_partition(const node_c *nd, int ity);
+  void draw_bbox(const bbox_t *bbox, int ity);
 	void draw_all_partitions();
 	void draw_node(const node_c *nd, int pos, bool on_route);
 	void draw_child(const child_t *ch, int pos, bool on_route);
@@ -89,6 +90,7 @@ private:
 
 	int grid_MODE;
 	int partition_MODE;
+  int bbox_MODE;
 	int miniseg_MODE;
 	int shade_MODE;
 

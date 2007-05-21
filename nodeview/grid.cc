@@ -2,7 +2,7 @@
 //  GRID : Draws the map (lines, nodes, etc)
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,8 @@ W_Grid::W_Grid(int X, int Y, int W, int H, const char *label) :
         Fl_Widget(X, Y, W, H, label),
         zoom(DEF_GRID_ZOOM), zoom_mul(1.0),
         mid_x(0), mid_y(0),
-		grid_MODE(1), partition_MODE(1), miniseg_MODE(2), shade_MODE(1),
+		grid_MODE(1), partition_MODE(1), bbox_MODE(1),
+    miniseg_MODE(2), shade_MODE(1),
 		path(NULL), route_len(0)
 {
 	visit_route = new char[MAX_ROUTE];
@@ -272,36 +273,93 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
 	MapToWin(tlx, tly, &sx, &sy);
 	MapToWin(thx, thy, &ex, &ey);
 
+  if (partition_MODE < 2)
+  {
+    // move vertical or horizontal lines by one pixel
+    // (to prevent being clobbered by segs)
+    if (sx == ex) { sx++; ex++; }
+    if (sy == ey) { sy++; ey++; }
+  }
+
 	fl_color(fl_color_cube(ity, 0, ity));
 	fl_line(sx, sy, ex, ey);
+}
+
+void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
+{
+	double mlx = mid_x - w() * 0.5 / zoom_mul;
+	double mly = mid_y - h() * 0.5 / zoom_mul;
+	double mhx = mid_x + w() * 0.5 / zoom_mul;
+	double mhy = mid_y + h() * 0.5 / zoom_mul;
+
+	// check if bounding box is off screen
+
+	if (bbox->maxx < mlx || bbox->minx > mhx ||
+      bbox->maxy < mly || bbox->miny > mhy)
+	{
+			return;
+	}
+
+	int sx, sy;
+	int ex, ey;
+
+	MapToWin(bbox->minx, bbox->miny, &sx, &sy);
+	MapToWin(bbox->maxx, bbox->maxy, &ex, &ey);
+
+  if (partition_MODE < 2)
+  {
+    // make one pixel bigger (to prevent being clobbered by segs)
+    sx--; sy--; ex++; ey++;
+  }
+
+	fl_color(fl_color_cube(ity, ity + 1, 0));
+
+	fl_line(sx, sy, sx, ey);
+	fl_line(sx, sy, ex, sy);
+	fl_line(sx, ey, ex, ey);
+	fl_line(ex, sy, ex, ey);
 }
 
 void W_Grid::draw_all_partitions()
 {
 	node_c * nodes[4];
+  bbox_t * bboxs[4];
 
 	nodes[0] = nodes[1] = nodes[2] = NULL;
 	nodes[3] = lev_nodes.Get(lev_nodes.num - 1);
+
+	bboxs[0] = bboxs[1] = bboxs[2] = bboxs[3] = NULL;
 
 	for (int rt_idx = 0; rt_idx < route_len; rt_idx++)
 	{
 		node_c *cur = nodes[3];
 
-		node_c *next = (visit_route[rt_idx] == RT_LEFT) ? cur->l.node : cur->r.node;
+    child_t *next_ch = (visit_route[rt_idx] == RT_LEFT) ? &cur->l : &cur->r;
 
-		nodes[0] = nodes[1];
-		nodes[1] = nodes[2];
-		nodes[2] = nodes[3];
-		nodes[3] = next;
+		nodes[0] = nodes[1];  bboxs[0] = bboxs[1];
+		nodes[1] = nodes[2];  bboxs[1] = bboxs[2];
+		nodes[2] = nodes[3];  bboxs[2] = bboxs[3];
+
+		nodes[3] = next_ch->node;
+    bboxs[3] = &next_ch->bounds;
 
 		// quit if we reach a subsector
-		if (! next)
+		if (! nodes[3])
 			break;
 	}
 
+  // show bounding boxes _before_ partition lines
+  for (int n_idx = 1; n_idx <= 3; n_idx++)
+  {
+  }
+
 	// (Note: only displaying three of them)
-	for (int n_idx = 1; n_idx < 4; n_idx++)
+	for (int n_idx = 1; n_idx <= 3; n_idx++)
 	{
+    if (bbox_MODE == 1)
+      if (bboxs[n_idx])
+        draw_bbox(bboxs[n_idx], (n_idx == 3) ? 4 : n_idx);
+
 		if (nodes[n_idx])
 			draw_partition(nodes[n_idx], (n_idx == 3) ? 4 : n_idx);
 	}
@@ -642,6 +700,11 @@ int W_Grid::handle_key(int key)
 
 		case 'p': case 'P':
 			partition_MODE = (partition_MODE + 1) % 3;
+			redraw();
+			return 1;
+
+		case 'b': case 'B':
+			bbox_MODE = (bbox_MODE + 1) % 2;
 			redraw();
 			return 1;
 
