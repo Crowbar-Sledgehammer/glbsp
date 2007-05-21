@@ -277,8 +277,10 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
   {
     // move vertical or horizontal lines by one pixel
     // (to prevent being clobbered by segs)
-    if (sx == ex) { sx++; ex++; }
-    if (sy == ey) { sy++; ey++; }
+    if (ABS(nd->dx) < ABS(nd->dy))
+        sx++, ex++;
+    else
+        sy++, ey++;
   }
 
 	fl_color(fl_color_cube(ity, 0, ity));
@@ -348,13 +350,8 @@ void W_Grid::draw_all_partitions()
 			break;
 	}
 
-  // show bounding boxes _before_ partition lines
-  for (int n_idx = 1; n_idx <= 3; n_idx++)
-  {
-  }
-
-	// (Note: only displaying three of them)
-	for (int n_idx = 1; n_idx <= 3; n_idx++)
+	// (Note: only displaying two of them)
+	for (int n_idx = 2; n_idx <= 3; n_idx++)
 	{
     if (bbox_MODE == 1)
       if (bboxs[n_idx])
@@ -808,3 +805,5 @@ void W_Grid::lowest_node(node_c **nd, subsec_c **sub)
 	*nd  = cur;
 	*sub = NULL;
 }
+
+
