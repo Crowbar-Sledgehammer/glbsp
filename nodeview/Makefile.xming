@@ -4,7 +4,7 @@
 #  GNU Makefile for WIN32, using CROSS-COMPILER on Linux
 #
 
-PROGRAM=nodeview
+PROGRAM=NodeView.exe
 SRC_DIR=nodeview
 
 LIB_LOC=/home/aapted/ebuild
@@ -47,7 +47,7 @@ $(PROGRAM): $(OBJS)
 	$(CXX) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
 bin: all
-	mingw32-strip --strip-unneeded $(PROGRAM)
+	i586-mingw32msvc-strip --strip-unneeded $(PROGRAM)
 
 .PHONY: all clean bin
 
