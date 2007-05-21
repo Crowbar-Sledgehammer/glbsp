@@ -1,8 +1,8 @@
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //  ASSERTIONS
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -14,7 +14,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 #ifndef __NODEVIEW_ASSERT_H__
 #define __NODEVIEW_ASSERT_H__
