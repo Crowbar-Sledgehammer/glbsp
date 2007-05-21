@@ -2,7 +2,7 @@
 //  DEFINITIONS
 //------------------------------------------------------------------------
 //
-//  GL-Node Viewer (C) 2004-2005 Andrew Apted
+//  GL-Node Viewer (C) 2004-2007 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -73,7 +73,7 @@
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 
 //
 //  LOCAL INCLUDES
