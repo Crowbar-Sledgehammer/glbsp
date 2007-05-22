@@ -285,6 +285,20 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
 
 	fl_color(fl_color_cube(ity, 0, ity));
 	fl_line(sx, sy, ex, ey);
+
+  // draw arrow heads along it
+  float pd_len = sqrt(nd->dx*nd->dx + nd->dy*nd->dy);
+  float pdx =  nd->dx / pd_len;
+  float pdy = -nd->dy / pd_len;
+
+  for (float u=0.1; u <= 0.91; u += 0.16)
+  {
+    int ax = int(sx + (ex-sx) * u);
+    int ay = int(sy + (ey-sy) * u);
+
+    fl_line(ax, ay, ax + int((-pdy-pdx*1.0)*8), ay + int(( pdx-pdy*1.0)*8) );
+    fl_line(ax, ay, ax + int(( pdy-pdx*1.0)*8), ay + int((-pdx-pdy*1.0)*8) );
+  }
 }
 
 void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
@@ -314,7 +328,7 @@ void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
     sx--; sy--; ex++; ey++;
   }
 
-	fl_color(fl_color_cube(ity, ity + 1, 0));
+	fl_color(fl_color_cube(MAX(3,ity), ity + 1, 0));
 
 	fl_line(sx, sy, sx, ey);
 	fl_line(sx, sy, ex, sy);
@@ -402,7 +416,7 @@ void W_Grid::draw_child(const child_t *ch, int pos, bool on_route)
 		for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
 		{
 			if (on_route && pos == route_len-1)
-				fl_color(fl_color_cube(4,3,4));
+				fl_color(fl_color_cube(4,5,4));
 			else if (! set_seg_color(seg, on_route))
 				continue;
 
