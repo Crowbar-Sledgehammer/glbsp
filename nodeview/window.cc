@@ -27,6 +27,13 @@
 Guix_MainWin *guix_win;
 
 
+#define WINDOW_MIN_W  480
+#define WINDOW_MIN_H  400
+
+#define WINDOW_NORM_W  620
+#define WINDOW_NORM_H  460
+
+
 static void main_win_close_CB(Fl_Widget *w, void *data)
 {
 	if (guix_win)
@@ -56,13 +63,13 @@ void WindowSmallDelay(void)
 //
 // MainWin Constructor
 //
-	Guix_MainWin::Guix_MainWin(const char *title) :
-Fl_Double_Window(MAIN_WINDOW_MIN_W, MAIN_WINDOW_MIN_H, title)
+Guix_MainWin::Guix_MainWin(const char *title) :
+     Fl_Double_Window(WINDOW_NORM_W, WINDOW_NORM_H, title)
 {
 	// turn off auto-add-widget mode
 	end();
 
-	size_range(MAIN_WINDOW_MIN_W, MAIN_WINDOW_MIN_H);
+	size_range(WINDOW_MIN_W, WINDOW_MIN_H);
 
 	// Set initial position.
 	//
