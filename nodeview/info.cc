@@ -33,9 +33,35 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   box(FL_FLAT_BOX);
 
-	color(INFO_BG_COLOR, INFO_BG_COLOR);
+//	color(INFO_BG_COLOR, INFO_BG_COLOR);
 
-  //.... FIXME
+
+  X += 6;
+  Y += 6;
+  W -= 12;
+
+  map_name = new Fl_Output(X+88, Y, W-88, 22, "Map Name:");
+  map_name->align(FL_ALIGN_LEFT);
+  map_name->value("unknown");
+  add(map_name);
+
+  Y += map_name->h() + 4;
+
+  node_type = new Fl_Output(X+88, Y, W-88, 22, "Node Type:");
+  node_type->align(FL_ALIGN_LEFT);
+  node_type->value("unknown");
+  add(node_type);
+
+  Y += map_name->h() + 4;
+
+  grid_size = new Fl_Output(X+88, Y, W-88, 22, "Grid Size:");
+  grid_size->align(FL_ALIGN_LEFT);
+  grid_size->value("0");
+  add(grid_size);
+
+  Y += map_name->h() + 4;
+
+  // ETC....
 }
 
 //
@@ -43,5 +69,11 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 //
 W_Info::~W_Info()
 {
+}
+
+
+void W_Info::SetMap(const char *name)
+{
+  map_name->value(name);
 }
 

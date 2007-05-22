@@ -25,8 +25,18 @@ public:
 	W_Info(int X, int Y, int W, int H, const char *label = 0);
 	~W_Info();
 
-public:
+private:
+  Fl_Output *map_name;
 
+  Fl_Output *node_type;
+
+  Fl_Output *grid_size;
+
+
+  Fl_Output *mouse_coord;
+
+public:
+  void SetMap(const char *name);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */
