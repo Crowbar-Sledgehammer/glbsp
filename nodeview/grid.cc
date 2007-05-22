@@ -661,6 +661,13 @@ int W_Grid::handle(int event)
 			redraw();
 			return 1;
 
+    case FL_MOUSEWHEEL:
+      if (Fl::event_dy() < 0)
+        SetZoom(zoom + 1);
+      else if (Fl::event_dy() > 0)
+        SetZoom(zoom - 1);
+      return 1;
+
 		case FL_DRAG:
 		case FL_RELEASE:
 			// these are currently ignored.
