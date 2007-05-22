@@ -92,9 +92,12 @@ Fl_Double_Window(620, 520, title)
 	menu_bar = MenuCreate(0, 0, w(), 28);
 	add(menu_bar);
 
-	grid = new W_Grid(0, mh, w(), h()-mh);
+	grid = new W_Grid(0, mh, w()-160, h()-mh);
 	add(grid);
 	resizable(grid);
+
+  info = new W_Info(w()-160, mh, 160, h()-mh);
+  add(info);
 
 #if 0
 	build_mode = new Guix_BuildMode(8, 4+mh, hw, 176);

@@ -21,6 +21,7 @@ OBJS=./main.o     \
      ./asserts.o  \
      ./dialog.o   \
      ./grid.o     \
+     ./info.o     \
      ./level.o    \
      ./lists.o    \
      ./menu.o     \

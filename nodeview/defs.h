@@ -89,6 +89,7 @@
 #include "level.h"
 #include "path.h"
 #include "grid.h"
+#include "info.h"
 #include "window.h"
 
 #endif /* __NODEVIEW_DEFS_H__ */
