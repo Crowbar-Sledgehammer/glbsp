@@ -74,6 +74,8 @@ private:
 public:
 	int handle_key(int key);
 
+  void handle_mouse(int wx, int wy);
+
 private:
 	int zoom;
 	// zoom factor: (2 ^ (zoom/2)) pixels per 512 units on the map

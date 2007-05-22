@@ -328,7 +328,7 @@ void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
     sx--; sy--; ex++; ey++;
   }
 
-	fl_color(fl_color_cube(MAX(3,ity), ity + 1, 0));
+	fl_color(fl_color_cube(MIN(3,ity), ity + 1, 0));
 
 	fl_line(sx, sy, sx, ey);
 	fl_line(sx, sy, ex, sy);
@@ -636,14 +636,18 @@ int W_Grid::handle(int event)
 
 		case FL_KEYDOWN:
 		case FL_SHORTCUT:
-			return handle_key(Fl::event_key());
+    {
+			int result = handle_key(Fl::event_key());
+			handle_mouse(Fl::event_x(), Fl::event_y());
+      return result;
+    }
 
 		case FL_ENTER:
 		case FL_LEAVE:
 			return 1;
 
 		case FL_MOVE:
-			//...
+			handle_mouse(Fl::event_x(), Fl::event_y());
 			return 1;
 
 		case FL_PUSH:
@@ -827,4 +831,12 @@ void W_Grid::lowest_node(node_c **nd, subsec_c **sub)
 	*sub = NULL;
 }
 
+void W_Grid::handle_mouse(int wx, int wy)
+{
+	double mx, my;
+
+	WinToMap(wx, wy, &mx, &my);
+
+  // FIXME ....
+}
 
