@@ -91,109 +91,111 @@ static void DisplayError(const char *str, ...)
 
 int main(int argc, char **argv)
 {
-	try
-	{
-		// skip program name
-		argv++, argc--;
+  try
+  {
+    // skip program name
+    argv++, argc--;
 
-		ArgvInit(argc, (const char **)argv);
-	 
-		InitDebug(ArgvFind(0, "debug") >= 0);
-		InitEndian();
+    ArgvInit(argc, (const char **)argv);
 
-		if (ArgvFind('?', NULL) >= 0 || ArgvFind('h', "help") >= 0)
-		{
-			ShowTitle();
-			ShowInfo();
-			exit(1);
-		}
+    InitDebug(ArgvFind(0, "debug") >= 0);
+    InitEndian();
 
-		InitFLTK();
+    if (ArgvFind('?', NULL) >= 0 || ArgvFind('h', "help") >= 0)
+    {
+      ShowTitle();
+      ShowInfo();
+      exit(1);
+    }
 
-		// set defaults, also initializes the nodebuildxxxx stuff
-		MainSetDefaults();
+    InitFLTK();
 
-		const char *filename = "data/doom2.wad";
+    // set defaults, also initializes the nodebuildxxxx stuff
+    MainSetDefaults();
 
-		if (arg_count > 0 && ! ArgvIsOption(0))
-			filename = arg_list[0];
-		else
-		{
-			int params;
-			int idx = ArgvFind(0, "file", &params);
+    const char *filename = "data/doom2.wad";
 
-			if (idx >= 0 && params >= 1)
-				filename = arg_list[idx + 1];
-		}
+    if (arg_count > 0 && ! ArgvIsOption(0))
+      filename = arg_list[0];
+    else
+    {
+      int params;
+      int idx = ArgvFind(0, "file", &params);
 
-		if (CheckExtension(filename, "gwa"))
-			FatalError("Main file must be a normal WAD (not GWA).\n");
+      if (idx >= 0 && params >= 1)
+        filename = arg_list[idx + 1];
+    }
 
-		the_wad = wad_c::Load(filename);
-		if (!the_wad)
-			FatalError("Unable to read WAD file: %s\n", filename);
+    if (CheckExtension(filename, "gwa"))
+      FatalError("Main file must be a normal WAD (not GWA).\n");
 
-		const char *gwa_name = ReplaceExtension(filename, "gwa");
-		
-		if (FileExists(gwa_name))
-		{
-			the_gwa = wad_c::Load(gwa_name);
-			if (!the_gwa)
-				FatalError("Unable to read GWA file: %s\n", gwa_name);
-		}
+    the_wad = wad_c::Load(filename);
+    if (!the_wad)
+      FatalError("Unable to read WAD file: %s\n", filename);
 
-		const char *level_name = NULL;
-		{
-			int params;
-			int idx = ArgvFind(0, "warp", &params);
+    const char *gwa_name = ReplaceExtension(filename, "gwa");
 
-			if (idx >= 0 && params >= 1)
-				level_name = arg_list[idx + 1];
-		}
+    if (FileExists(gwa_name))
+    {
+      the_gwa = wad_c::Load(gwa_name);
+      if (!the_gwa)
+        FatalError("Unable to read GWA file: %s\n", gwa_name);
+    }
 
-		path_c *path = NULL;
-		{
-			int params;
-			int idx = ArgvFind(0, "path", &params);
+    const char *level_name = NULL;
+    {
+      int params;
+      int idx = ArgvFind(0, "warp", &params);
 
-			if (idx >= 0 && params >= 1)
-				path = path_c::ReadFile(arg_list[idx + 1]);
-		}
+      if (idx >= 0 && params >= 1)
+        level_name = arg_list[idx + 1];
+    }
 
-		LoadLevel(level_name);
+    path_c *path = NULL;
+    {
+      int params;
+      int idx = ArgvFind(0, "path", &params);
 
-		guix_win = new Guix_MainWin(PROG_NAME);
+      if (idx >= 0 && params >= 1)
+        path = path_c::ReadFile(arg_list[idx + 1]);
+    }
 
-		if (path)
-			guix_win->grid->SetPath(path);
+    LoadLevel(level_name);
 
-		double lx, ly, hx, hy;
-		LevelGetBounds(&lx, &ly, &hx, &hy);
-		guix_win->grid->FitBBox(lx, ly, hx, hy);
+    guix_win = new Guix_MainWin(PROG_NAME);
 
-		// run the GUI until the user quits
-		while (! guix_win->want_quit)
-			Fl::wait();
-	}
-	catch (const char * err)
-	{
-		DisplayError("%s", err);
-	}
-	catch (assert_fail_c err)
-	{
-		DisplayError("Sorry, an internal error occurred:\n%s", err.GetMessage());
-	}
-	catch (...)
-	{
-		DisplayError("An unknown problem occurred (UI code)");
-	}
+    if (path)
+      guix_win->grid->SetPath(path);
 
-	delete guix_win;
-	delete the_wad;
-	delete the_gwa;
+    double lx, ly, hx, hy;
+    LevelGetBounds(&lx, &ly, &hx, &hy);
+    guix_win->grid->FitBBox(lx, ly, hx, hy);
 
-	TermDebug();
+    guix_win->info->SetMap(level_name);
 
-	return main_result;
+    // run the GUI until the user quits
+    while (! guix_win->want_quit)
+      Fl::wait();
+  }
+  catch (const char * err)
+  {
+    DisplayError("%s", err);
+  }
+  catch (assert_fail_c err)
+  {
+    DisplayError("Sorry, an internal error occurred:\n%s", err.GetMessage());
+  }
+  catch (...)
+  {
+    DisplayError("An unknown problem occurred (UI code)");
+  }
+
+  delete guix_win;
+  delete the_wad;
+  delete the_gwa;
+
+  TermDebug();
+
+  return main_result;
 }
 
