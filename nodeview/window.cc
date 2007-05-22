@@ -57,7 +57,7 @@ void WindowSmallDelay(void)
 // MainWin Constructor
 //
 	Guix_MainWin::Guix_MainWin(const char *title) :
-Fl_Double_Window(620, 520, title)
+Fl_Double_Window(MAIN_WINDOW_MIN_W, MAIN_WINDOW_MIN_H, title)
 {
 	// turn off auto-add-widget mode
 	end();
@@ -92,11 +92,11 @@ Fl_Double_Window(620, 520, title)
 	menu_bar = MenuCreate(0, 0, w(), 28);
 	add(menu_bar);
 
-	grid = new W_Grid(0, mh, w()-160, h()-mh);
+	grid = new W_Grid(0, mh, w()-200, h()-mh);
 	add(grid);
 	resizable(grid);
 
-  info = new W_Info(w()-160, mh, 160, h()-mh);
+  info = new W_Info(w()-200, mh, 200, h()-mh);
   add(info);
 
 #if 0
