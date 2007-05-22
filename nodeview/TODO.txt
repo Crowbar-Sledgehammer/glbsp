@@ -4,13 +4,15 @@ NodeView TODO list
 
 + info panel:
 
-	- map name  --->  menu select (c.f. Oblige 'game' menu) ?
+  - map name
 
-	- mouse coords.
+  - node type (normal | GL V2 | GL V3 | GL V5 )
+
+  - mouse coords.
     -  nearby sector, linedef, vertex
     -  nearby subsector, seg-pair, GL vertex
 
-	- zoom factor.
+  - zoom factor / grid size
 
   - current node/subsector index
     
@@ -18,14 +20,10 @@ NodeView TODO list
 
   - seg list for subsector (index numbers + line numbers)
 
-  ? grid size
 
-  ? partition_MODE, seg_MODE
+- File|Select_Map : to select a new level
 
-
-- partition line: draw arrow heads along it.
-
-- menu for selecting level
-
-DONE: show node bounding boxes
+DONE: show node bounding boxes.
+DONE: partition line: draw arrow heads along it.
+DONE: allow zooming with the mouse-wheel.
 
