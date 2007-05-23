@@ -44,7 +44,9 @@ private:
   Fl_Output *bb_x2;
   Fl_Output *bb_y2;
 
-  Fl_Output *mouse_coord;
+  Fl_Box    *m_label;
+  Fl_Output *mouse_x;
+  Fl_Output *mouse_y;
 
 public:
   void SetMap(const char *name);
@@ -55,6 +57,8 @@ public:
   void SetSubsectorIndex(int index);
   void SetCurBBox(const bbox_t *bbox);
   void SetPartition(const node_c *part);
+
+  void SetMouse(double mx, double my);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */

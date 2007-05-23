@@ -54,12 +54,6 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   Y += node_type->h() + 4;
 
-  grid_size = new Fl_Output(X+88, Y, W-88, 22, "Zooming:");
-  grid_size->align(FL_ALIGN_LEFT);
-  add(grid_size);
-
-  Y += grid_size->h() + 4;
-
   
   // ---- middle section ----
  
@@ -129,7 +123,34 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   Y += bb_y2->h() + 4;
 
-  // ETC....
+  
+  // ---- bottom section ----
+
+  Y = H - 22;
+
+  mouse_x = new Fl_Output(X+28,   Y, 72, 22, "x");
+  mouse_y = new Fl_Output(X+W-72, Y, 72, 22, "y");
+
+  mouse_x->align(FL_ALIGN_LEFT);
+  mouse_y->align(FL_ALIGN_LEFT);
+
+  add(mouse_x);
+  add(mouse_y);
+
+  Y -= mouse_x->h() + 4;
+
+  m_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Mouse Coords:");
+  m_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(m_label);
+  
+  Y -= m_label->h() + 4;
+
+  grid_size = new Fl_Output(X+50, Y, 80, 22, "Scale:");
+  grid_size->align(FL_ALIGN_LEFT);
+  add(grid_size);
+
+  Y -= grid_size->h() + 4;
+
 }
 
 //
@@ -166,11 +187,11 @@ void W_Info::SetZoom(float zoom_mul)
 
   if (zoom_mul < 0.99)
   {
-    sprintf(buffer, "1/%1.3f", 1.0/zoom_mul);
+    sprintf(buffer, "/ %1.3f", 1.0/zoom_mul);
   }
   else // zoom_mul > 1
   {
-    sprintf(buffer, "%1.3f", zoom_mul);
+    sprintf(buffer, "x %1.3f", zoom_mul);
   }
 
   grid_size->value(buffer);
@@ -241,3 +262,23 @@ void W_Info::SetPartition(const node_c *part)
   sprintf(buffer, "%d", part->dy);  pt_dy->value(buffer);
 }
 
+void W_Info::SetMouse(double mx, double my)
+{
+  if (mx < -32767.0 || mx > 32767.0 ||
+      my < -32767.0 || my > 32767.0)
+  {
+    mouse_x->value("off map");
+    mouse_y->value("off map");
+
+    return;
+  }
+
+  char x_buffer[60];
+  char y_buffer[60];
+
+  sprintf(x_buffer, "%1.1f", mx);
+  sprintf(y_buffer, "%1.1f", my);
+
+  mouse_x->value(x_buffer);
+  mouse_y->value(y_buffer);
+}

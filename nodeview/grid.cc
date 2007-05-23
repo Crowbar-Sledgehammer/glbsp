@@ -101,6 +101,8 @@ void W_Grid::FitBBox(double lx, double ly, double hx, double hy)
   guix_win->info->SetZoom(zoom_mul);
 
   SetPos(lx + dx / 2.0, ly + dy / 2.0);
+
+  new_node_or_sub();  // bit hackish (calling it here)
 }
 
 void W_Grid::MapToWin(double mx, double my, int *X, int *Y) const
@@ -682,6 +684,8 @@ int W_Grid::handle(int event)
         SetZoom(zoom + 1);
       else if (Fl::event_dy() > 0)
         SetZoom(zoom - 1);
+
+      handle_mouse(Fl::event_x(), Fl::event_y());
       return 1;
 
     case FL_DRAG:
@@ -857,11 +861,14 @@ void W_Grid::lowest_node(node_c **nd, subsec_c **sub, bbox_t **bbox)
 
 void W_Grid::handle_mouse(int wx, int wy)
 {
+  if (! guix_win)
+    return;
+
   double mx, my;
 
   WinToMap(wx, wy, &mx, &my);
 
-  // FIXME ....
+  guix_win->info->SetMouse(mx, my);
 }
 
 void W_Grid::new_node_or_sub(void)
