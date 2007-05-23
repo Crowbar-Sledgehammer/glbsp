@@ -119,6 +119,16 @@ int UtilStrCaseCmp(const char *A, const char *B)
 	return 0;
 }
 
+char *UtilStrUpper(const char *name)
+{
+  char *copy = UtilStrDup(name);
+
+  for (char *p = copy; *p; p++)
+    *p = toupper(*p);
+
+  return copy;
+}
+
 //
 // UtilRoundPOW2
 //

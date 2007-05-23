@@ -55,6 +55,9 @@ void *UtilRealloc(void *old, int size);
 char *UtilStrDup(const char *str);
 char *UtilStrNDup(const char *str, int size);
 
+// copy the string and make it uppercase
+char *UtilStrUpper(const char *name);
+  
 // free some memory or a string.
 void UtilFree(void *data);
 
