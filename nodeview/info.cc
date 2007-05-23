@@ -104,7 +104,6 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   int save_Y = Y;
 
-#if 0  // TEMP
   pt_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Partition:");
   pt_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
   add(pt_label);
@@ -132,7 +131,7 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
   add(pt_dy);
 
   Y += pt_dy->h() + 4;
-#endif
+
 
   // seg list
 
@@ -144,8 +143,12 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   Y += seg_label->h() + 4;
 
-  seg_list = new Fl_Multiline_Output(X+6, Y, W-6, 96);
+  seg_list = new Fl_Multiline_Output(X+10, Y, W-10, 96);
   add(seg_list);
+
+  // keep 'em hidden
+  seg_label->hide();
+  seg_list->hide();
 
   Y += seg_list->h() + 4;
 
@@ -241,6 +244,15 @@ void W_Info::SetNodeIndex(int index)
   ns_index->label("Node #    ");
   ns_index->value(buffer);
 
+  seg_label->hide();
+  seg_list->hide();
+
+  pt_label->show();
+  pt_x ->show();
+  pt_y ->show();
+  pt_dx->show();
+  pt_dy->show();
+
   redraw();
 }
 
@@ -252,6 +264,15 @@ void W_Info::SetSubsectorIndex(int index)
   
   ns_index->label("Subsec #");
   ns_index->value(buffer);
+
+  pt_label->hide();
+  pt_x ->hide();
+  pt_y ->hide();
+  pt_dx->hide();
+  pt_dy->hide();
+
+  seg_label->show();
+  seg_list->show();
 
   redraw();
 }
@@ -278,8 +299,6 @@ void W_Info::SetCurBBox(const bbox_t *bbox)
 
 void W_Info::SetPartition(const node_c *part)
 {
-return; //!!!!!!
-
   if (! part)
   {
     pt_x ->value("");
