@@ -112,7 +112,7 @@ private:
   bool descend_by_mouse(int wx, int wy);  // true if OK
   bool descend_tree(char side);  // true if OK
 
-  void lowest_node(node_c **nd, subsec_c **sub);
+  void lowest_node(node_c **nd, subsec_c **sub, bbox_t **bbox);
 
   static inline int GRID_FIND(double x, double y)
   {

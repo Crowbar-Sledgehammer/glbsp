@@ -331,8 +331,8 @@ void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
   int sx, sy;
   int ex, ey;
 
-  MapToWin(bbox->minx, bbox->miny, &sx, &sy);
-  MapToWin(bbox->maxx, bbox->maxy, &ex, &ey);
+  MapToWin(bbox->minx, bbox->maxy, &sx, &sy);
+  MapToWin(bbox->maxx, bbox->miny, &ex, &ey);
 
   if (partition_MODE < 2)
   {
@@ -782,8 +782,9 @@ bool W_Grid::descend_by_mouse(int wx, int wy)
 {
   node_c *cur_nd;
   subsec_c *cur_sub;
+  bbox_t *cur_bbox;
   
-  lowest_node(&cur_nd, &cur_sub);
+  lowest_node(&cur_nd, &cur_sub, &cur_bbox);
 
   if (cur_sub)
     return false;
@@ -809,8 +810,9 @@ bool W_Grid::descend_tree(char side)
 
   node_c *cur_nd;
   subsec_c *cur_sub;
+  bbox_t *cur_bbox;
 
-  lowest_node(&cur_nd, &cur_sub);
+  lowest_node(&cur_nd, &cur_sub, &cur_bbox);
 
   if (cur_sub)
     return false;
@@ -822,20 +824,26 @@ bool W_Grid::descend_tree(char side)
   return true;
 }
 
-void W_Grid::lowest_node(node_c **nd, subsec_c **sub)
+void W_Grid::lowest_node(node_c **nd, subsec_c **sub, bbox_t **bbox)
 {
+  *bbox = NULL;
+
   node_c *cur = lev_nodes.Get(lev_nodes.num - 1);
+  node_c *next;
 
   for (int rt_idx = 0; rt_idx < route_len; rt_idx++)
   {
-    node_c *next = (visit_route[rt_idx] == RT_LEFT) ? cur->l.node : cur->r.node;
+    child_t *child = (visit_route[rt_idx] == RT_LEFT) ? &cur->l : &cur->r;
+
+    next  = child->node;
+    *bbox = &child->bounds;
 
     // reached a subsector ?
     if (! next)
     {
       *nd = cur;
-      *sub = (visit_route[rt_idx] == RT_LEFT) ? cur->l.subsec : cur->r.subsec;
-      
+      *sub = child->subsec;
+
       SYS_NULL_CHECK(*sub);
       return;
     }
@@ -860,12 +868,21 @@ void W_Grid::new_node_or_sub(void)
 {
   node_c *cur_nd;
   subsec_c *cur_sub;
+  bbox_t *cur_bbox;
   
-  lowest_node(&cur_nd, &cur_sub);
+  lowest_node(&cur_nd, &cur_sub, &cur_bbox);
 
   if (cur_sub)
+  {
     guix_win->info->SetSubsectorIndex(cur_sub->index);
+    guix_win->info->SetPartition(NULL);
+  }
   else
+  {
     guix_win->info->SetNodeIndex(cur_nd->index);
+    guix_win->info->SetPartition(cur_nd);
+  }
+
+  guix_win->info->SetCurBBox(cur_bbox); // NULL is OK
 }
 

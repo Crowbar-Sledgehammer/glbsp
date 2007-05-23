@@ -70,7 +70,65 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
   add(ns_index);
 
   Y += ns_index->h() + 4;
+
+
+  pt_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Partition:");
+  pt_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(pt_label);
   
+  Y += pt_label->h() + 4;
+
+  pt_x  = new Fl_Output(X+32,   Y, 64, 22, "x");
+  pt_dx = new Fl_Output(X+W-64, Y, 64, 22, "dx");
+
+  pt_x ->align(FL_ALIGN_LEFT);
+  pt_dx->align(FL_ALIGN_LEFT);
+
+  add(pt_x);
+  add(pt_dx);
+
+  Y += pt_x->h() + 4;
+
+  pt_y  = new Fl_Output(X+32,   Y, 64, 22, "y");
+  pt_dy = new Fl_Output(X+W-64, Y, 64, 22, "dy");
+
+  pt_y ->align(FL_ALIGN_LEFT);
+  pt_dy->align(FL_ALIGN_LEFT);
+
+  add(pt_y);
+  add(pt_dy);
+
+  Y += pt_dy->h() + 4;
+
+
+  bb_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Bounding Box:");
+  bb_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(bb_label);
+  
+  Y += bb_label->h() + 4;
+
+  bb_x1 = new Fl_Output(X+32,   Y, 64, 22, "x1");
+  bb_x2 = new Fl_Output(X+W-64, Y, 64, 22, "x2");
+
+  bb_x1->align(FL_ALIGN_LEFT);
+  bb_x2->align(FL_ALIGN_LEFT);
+
+  add(bb_x1);
+  add(bb_x2);
+
+  Y += bb_x1->h() + 4;
+
+  bb_y1 = new Fl_Output(X+32,   Y, 64, 22, "y1");
+  bb_y2 = new Fl_Output(X+W-64, Y, 64, 22, "y2");
+
+  bb_y1->align(FL_ALIGN_LEFT);
+  bb_y2->align(FL_ALIGN_LEFT);
+
+  add(bb_y1);
+  add(bb_y2);
+
+  Y += bb_y2->h() + 4;
+
   // ETC....
 }
 
@@ -137,9 +195,49 @@ void W_Info::SetSubsectorIndex(int index)
 
   sprintf(buffer, "%d", index);
   
-  ns_index->label("Subsector #");
+  ns_index->label("Subsec #");
   ns_index->value(buffer);
 
   redraw();
+}
+
+void W_Info::SetCurBBox(const bbox_t *bbox)
+{
+  if (! bbox)
+  {
+    bb_x1->value("");
+    bb_y1->value("");
+    bb_x2->value("");
+    bb_y2->value("");
+
+    return;
+  }
+
+  char buffer[60]; 
+
+  sprintf(buffer, "%d", bbox->minx);  bb_x1->value(buffer);
+  sprintf(buffer, "%d", bbox->miny);  bb_y1->value(buffer);
+  sprintf(buffer, "%d", bbox->maxx);  bb_x2->value(buffer);
+  sprintf(buffer, "%d", bbox->maxy);  bb_y2->value(buffer);
+}
+
+void W_Info::SetPartition(const node_c *part)
+{
+  if (! part)
+  {
+    pt_x ->value("");
+    pt_y ->value("");
+    pt_dx->value("");
+    pt_dy->value("");
+
+    return;
+  }
+
+  char buffer[60]; 
+
+  sprintf(buffer, "%d", part->x );  pt_x ->value(buffer);
+  sprintf(buffer, "%d", part->y );  pt_y ->value(buffer);
+  sprintf(buffer, "%d", part->dx);  pt_dx->value(buffer);
+  sprintf(buffer, "%d", part->dy);  pt_dy->value(buffer);
 }
 

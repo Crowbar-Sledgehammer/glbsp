@@ -32,6 +32,18 @@ private:
 
   Fl_Output *ns_index;
 
+  Fl_Box    *pt_label;
+  Fl_Output *pt_x;
+  Fl_Output *pt_y;
+  Fl_Output *pt_dx;
+  Fl_Output *pt_dy;
+
+  Fl_Box    *bb_label;
+  Fl_Output *bb_x1;
+  Fl_Output *bb_y1;
+  Fl_Output *bb_x2;
+  Fl_Output *bb_y2;
+
   Fl_Output *mouse_coord;
 
 public:
@@ -41,6 +53,8 @@ public:
 
   void SetNodeIndex(int index);
   void SetSubsectorIndex(int index);
+  void SetCurBBox(const bbox_t *bbox);
+  void SetPartition(const node_c *part);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */
