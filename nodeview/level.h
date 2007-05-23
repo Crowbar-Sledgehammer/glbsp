@@ -186,8 +186,7 @@ public:
   // count of segs
   int seg_count;
 
-  // subsector index.  Always valid, set when the subsector is
-  // initially created.
+  // subsector index in lump.
   int index;
 
   // approximate middle point
@@ -236,8 +235,7 @@ public:
   child_t r;
   child_t l;
 
-  // node index.  Only valid once the NODES or GL_NODES lump has been
-  // created.
+  // node index in lump
   int index;
 
   node_c (int _idx, const raw_node_t *raw);
