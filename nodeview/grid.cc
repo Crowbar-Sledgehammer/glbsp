@@ -139,32 +139,22 @@ void W_Grid::draw()
   fl_color(FL_BLACK);
   fl_rectf(x(), y(), w(), h());
 
-  if (zoom >= 21)
-  {
-    draw_grid(1,   96);
-    draw_grid(8,   150);
-    draw_grid(64,  200);
-    draw_grid(512, 255);
-  }
-  else if (zoom >= 15)
-  {
-    draw_grid(8,    96);
-    draw_grid(64,   150);
-    draw_grid(512,  200);
-    draw_grid(4096, 255);
-  }
-  else if (zoom >= 9)
-  {
-    draw_grid(64,   150);
-    draw_grid(512,  200);
-    draw_grid(4096, 255);
-  }
-  else
-  {
-    draw_grid(512,   150);
-    draw_grid(4096,  200);
-    draw_grid(32768, 255);
-  }
+                                //  3456789012345678901234567890
+  static const char *ity_2_to_N3 = "-------------------------233";
+  static const char *ity_2_to_0  = "-------------------334455555";
+  static const char *ity_2_to_3  = "-------------334455667777777";
+  static const char *ity_2_to_6  = "-------33445566778899999----";
+  static const char *ity_2_to_9  = "-33445566778899999----------";
+  static const char *ity_2_to_12 = "566778899999----------------";
+  static const char *ity_2_to_15 = "999999----------------------";
+
+//draw_grid(0.125,   ity_2_to_N3[zoom - 3]);
+  draw_grid(1.0,     ity_2_to_0 [zoom - 3]);
+  draw_grid(8.0,     ity_2_to_3 [zoom - 3]);
+  draw_grid(64.0,    ity_2_to_6 [zoom - 3]);
+  draw_grid(512.0,   ity_2_to_9 [zoom - 3]);
+  draw_grid(4096.0,  ity_2_to_12[zoom - 3]);
+  draw_grid(32768.0, ity_2_to_15[zoom - 3]);
 
   node_c *root = lev_nodes.Get(lev_nodes.num - 1);
 
@@ -182,15 +172,17 @@ void W_Grid::draw()
   fl_pop_clip();
 }
 
-void W_Grid::draw_grid(int spacing, int ity)
+void W_Grid::draw_grid(double spacing, int ity)
 {
   if (grid_MODE == 0)
     return;
 
-  if (ity <= 0)
+  if (! isdigit(ity))
     return;
 
-  fl_color(fl_rgb_color(0, 0, ity));
+  ity = MIN(ity - '0', 9);
+
+  fl_color(fl_rgb_color(0, 0, 255 * ity / 9));
 
   double mlx = mid_x - w() * 0.5 / zoom_mul;
   double mly = mid_y - h() * 0.5 / zoom_mul;
