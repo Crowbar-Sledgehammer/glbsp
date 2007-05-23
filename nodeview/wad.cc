@@ -491,21 +491,19 @@ bool wad_c::FindLevel(const char *map_name)
 }
 
 //
-// FindFirstLevel
+// FirstLevelName
 //
-bool wad_c::FindFirstLevel()
+const char *wad_c::FirstLevelName()
 {
 	lump_c *L;
 
 	for (L = (lump_c*)dir.begin(); L != NULL; L = L->LumpNext())
 	{
 		if (L->lev_info)
-			break;
+			return L->name;
 	}
 
-	current_level = L;
-
-	return (L != NULL);
+	return NULL;
 }
 
 //

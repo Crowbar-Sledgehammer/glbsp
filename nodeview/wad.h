@@ -62,10 +62,13 @@ public:
 	bool CheckLevelNameGL(const char *name);
 
 	// find a particular level in the wad directory, and store the
-	// reference in `wad.current_level'.  Returns false if not
+	// reference in 'wad.current_level'.  Returns false if not
 	// found.
 	bool FindLevel(const char *map_name);
-	bool FindFirstLevel();
+
+  // name of first level in the wad.  Returns NULL if there
+  // are no levels at all.
+	const char *FirstLevelName();
 
 	// find the level lump with the given name in the current level, and
 	// return a reference to it.  Returns NULL if no such lump exists.
