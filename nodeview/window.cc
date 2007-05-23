@@ -96,14 +96,14 @@ Guix_MainWin::Guix_MainWin(const char *title) :
   mh = 1;
 #endif
 
-  menu_bar = MenuCreate(0, 0, w(), 28);
+  menu_bar = MenuCreate(0, 0, w()-200, 28);
   add(menu_bar);
 
   grid = new W_Grid(0, mh, w()-200, h()-mh);
   add(grid);
   resizable(grid);
 
-  info = new W_Info(w()-200, mh, 200, h()-mh);
+  info = new W_Info(w()-200, mh*0, 200, h()-mh*0);
   add(info);
 
 #if 0
