@@ -30,17 +30,17 @@ static int main_result = 0;
 
 static void ShowTitle(void)
 {
-	GUI_PrintMsg(
-		"\n"
-		"**** " PROG_NAME "  (C) 2007 Andrew Apted ****\n\n"
-	);
+  GUI_PrintMsg(
+    "\n"
+    "**** " PROG_NAME "  (C) 2007 Andrew Apted ****\n\n"
+  );
 }
 
 static void ShowInfo(void)
 {
-	GUI_PrintMsg(
-		"Info...\n\n"
-	);
+  GUI_PrintMsg(
+    "Info...\n\n"
+  );
 }
 
 
@@ -50,39 +50,39 @@ void MainSetDefaults(void)
 
 void InitFLTK(void)
 {
-	Fl::scheme(NULL);
+  Fl::scheme(NULL);
 
-	fl_message_font(FL_HELVETICA, 18);
+  fl_message_font(FL_HELVETICA, 18);
 
-	Fl_File_Icon::load_system_icons();
+  Fl_File_Icon::load_system_icons();
 
-	inited_FLTK = true;
+  inited_FLTK = true;
 }
 
 static void DisplayError(const char *str, ...)
 {
-	va_list args;
+  va_list args;
 
-	if (inited_FLTK)
-	{
-		char buffer[1024];
+  if (inited_FLTK)
+  {
+    char buffer[1024];
 
-		va_start(args, str);
-		vsprintf(buffer, str, args);
-		va_end(args);
+    va_start(args, str);
+    vsprintf(buffer, str, args);
+    va_end(args);
 
-		fl_alert("%s", buffer);
-	}
-	else
-	{
-		va_start(args, str);
-		vfprintf(stderr, str, args);
-		va_end(args);
+    fl_alert("%s", buffer);
+  }
+  else
+  {
+    va_start(args, str);
+    vfprintf(stderr, str, args);
+    va_end(args);
 
-		fprintf(stderr, "\n");
-	}
+    fprintf(stderr, "\n");
+  }
 
-	main_result = 9;
+  main_result = 9;
 }
 
 //------------------------------------------------------------------------

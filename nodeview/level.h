@@ -27,16 +27,16 @@ class sector_c;
 class vertex_c
 {
 public:
-	// coordinates
-	double x, y;
+  // coordinates
+  double x, y;
 
-	// vertex index.  Always valid after loading and pruning of unused
-	// vertices has occurred.  For GL vertices, bit 30 will be set.
-	int index;
+  // vertex index.  Always valid after loading and pruning of unused
+  // vertices has occurred.  For GL vertices, bit 30 will be set.
+  int index;
 
-	vertex_c(int _idx, const raw_vertex_t *raw);
-	vertex_c(int _idx, const raw_v2_vertex_t *raw);
-	~vertex_c();
+  vertex_c(int _idx, const raw_vertex_t *raw);
+  vertex_c(int _idx, const raw_v2_vertex_t *raw);
+  ~vertex_c();
 };
 
 #define IS_GL_VERTEX  (1 << 30)
@@ -45,183 +45,183 @@ public:
 class sector_c
 {
 public:
-	// sector index.  Always valid after loading & pruning.
-	int index;
+  // sector index.  Always valid after loading & pruning.
+  int index;
 
-	// heights
-	int floor_h, ceil_h;
+  // heights
+  int floor_h, ceil_h;
 
-	// textures
-	char floor_tex[8];
-	char ceil_tex[8];
+  // textures
+  char floor_tex[8];
+  char ceil_tex[8];
 
-	// attributes
-	int light;
-	int special;
-	int tag;
+  // attributes
+  int light;
+  int special;
+  int tag;
 
-	sector_c(int _idx, const raw_sector_t *raw);
-	~sector_c();
+  sector_c(int _idx, const raw_sector_t *raw);
+  ~sector_c();
 };
 
 
 class sidedef_c
 {
 public:
-	// adjacent sector.  Can be NULL (invalid sidedef)
-	sector_c *sector;
+  // adjacent sector.  Can be NULL (invalid sidedef)
+  sector_c *sector;
 
-	// offset values
-	int x_offset, y_offset;
+  // offset values
+  int x_offset, y_offset;
 
-	// texture names
-	char upper_tex[8];
-	char lower_tex[8];
-	char mid_tex[8];
+  // texture names
+  char upper_tex[8];
+  char lower_tex[8];
+  char mid_tex[8];
 
-	// sidedef index.  Always valid after loading & pruning.
-	int index;
+  // sidedef index.  Always valid after loading & pruning.
+  int index;
 
-	sidedef_c(int _idx, const raw_sidedef_t *raw);
-	~sidedef_c();
+  sidedef_c(int _idx, const raw_sidedef_t *raw);
+  ~sidedef_c();
 };
 
 
 class linedef_c
 {
 public:
-	vertex_c *start;    // from this vertex...
-	vertex_c *end;      // ... to this vertex
+  vertex_c *start;    // from this vertex...
+  vertex_c *end;      // ... to this vertex
 
-	sidedef_c *right;   // right sidedef
-	sidedef_c *left;    // left sidede, or NULL if none
+  sidedef_c *right;   // right sidedef
+  sidedef_c *left;    // left sidede, or NULL if none
 
-	// line is marked two-sided
-	char two_sided;
+  // line is marked two-sided
+  char two_sided;
 
-	// zero length (line should be totally ignored)
-	char zero_len;
+  // zero length (line should be totally ignored)
+  char zero_len;
 
-	int flags;
-	int type;
-	int tag;
+  int flags;
+  int type;
+  int tag;
 
-	// Hexen support
-	int specials[5];
+  // Hexen support
+  int specials[5];
 
-	// linedef index.  Always valid after loading & pruning of zero
-	// length lines has occurred.
-	int index;
+  // linedef index.  Always valid after loading & pruning of zero
+  // length lines has occurred.
+  int index;
 
-	linedef_c(int _idx, const raw_linedef_t *raw);
-	linedef_c(int _idx, const raw_hexen_linedef_t *raw);
-	~linedef_c();
+  linedef_c(int _idx, const raw_linedef_t *raw);
+  linedef_c(int _idx, const raw_hexen_linedef_t *raw);
+  ~linedef_c();
 };
 
 
 class thing_c
 {
 public:
-	int x, y;
-	int type;
-	int options;
+  int x, y;
+  int type;
+  int options;
 
-	// other info (angle, and hexen stuff) omitted.  We don't need to
-	// write the THING lump, only read it.
+  // other info (angle, and hexen stuff) omitted.  We don't need to
+  // write the THING lump, only read it.
 
-	// Always valid (thing indices never change).
-	int index;
+  // Always valid (thing indices never change).
+  int index;
 
-	thing_c(int _idx, const raw_thing_t *raw);
-	thing_c(int _idx, const raw_hexen_thing_t *raw);
-	~thing_c();
+  thing_c(int _idx, const raw_thing_t *raw);
+  thing_c(int _idx, const raw_hexen_thing_t *raw);
+  ~thing_c();
 };
 
 
 class seg_c
 {
 public:
-	// link for list
-	struct seg_c *next;
+  // link for list
+  struct seg_c *next;
 
-	vertex_c *start;   // from this vertex...
-	vertex_c *end;     // ... to this vertex
+  vertex_c *start;   // from this vertex...
+  vertex_c *end;     // ... to this vertex
 
-	// linedef that this seg goes along, or NULL if miniseg
-	linedef_c *linedef;
+  // linedef that this seg goes along, or NULL if miniseg
+  linedef_c *linedef;
 
-	// adjacent sector, or NULL if invalid sidedef or miniseg
-	sector_c *sector;
+  // adjacent sector, or NULL if invalid sidedef or miniseg
+  sector_c *sector;
 
-	// 0 for right, 1 for left
-	int side;
+  // 0 for right, 1 for left
+  int side;
 
-	// seg index.  Only valid once the seg has been added to a
-	// subsector.  A negative value means it is invalid -- there
-	// shouldn't be any of these once the BSP tree has been built.
-	int index;
+  // seg index.  Only valid once the seg has been added to a
+  // subsector.  A negative value means it is invalid -- there
+  // shouldn't be any of these once the BSP tree has been built.
+  int index;
 
-	// precomputed data for faster calculations
-	double psx, psy;
-	double pex, pey;
-	double pdx, pdy;
+  // precomputed data for faster calculations
+  double psx, psy;
+  double pex, pey;
+  double pdx, pdy;
 
-	double p_length, p_angle;
-	double p_para,   p_perp;
+  double p_length, p_angle;
+  double p_para,   p_perp;
 
-	seg_c(int _idx, const raw_gl_seg_t *raw);
-	seg_c(int _idx, const raw_v3_seg_t *raw);
-	~seg_c();
+  seg_c(int _idx, const raw_gl_seg_t *raw);
+  seg_c(int _idx, const raw_v3_seg_t *raw);
+  ~seg_c();
 
-	void precompute_data();
+  void precompute_data();
 };
 
 
 class subsec_c
 {
 public:
-	// list of segs
-	seg_c *seg_list;
+  // list of segs
+  seg_c *seg_list;
 
-	// count of segs
-	int seg_count;
+  // count of segs
+  int seg_count;
 
-	// subsector index.  Always valid, set when the subsector is
-	// initially created.
-	int index;
+  // subsector index.  Always valid, set when the subsector is
+  // initially created.
+  int index;
 
-	// approximate middle point
-	double mid_x;
-	double mid_y;
+  // approximate middle point
+  double mid_x;
+  double mid_y;
 
-	subsec_c(int _idx, const raw_subsec_t *raw);
-	subsec_c(int _idx, const raw_v3_subsec_t *raw);
-	~subsec_c();
+  subsec_c(int _idx, const raw_subsec_t *raw);
+  subsec_c(int _idx, const raw_v3_subsec_t *raw);
+  ~subsec_c();
 
-	void append_seg(seg_c *cur);
-	void build_seg_list(int first, int count);
-	// builds the list of segs, and also determines mid point.
+  void append_seg(seg_c *cur);
+  void build_seg_list(int first, int count);
+  // builds the list of segs, and also determines mid point.
 };
 
 
 typedef struct bbox_s
 {
-	int minx, miny;
-	int maxx, maxy;
+  int minx, miny;
+  int maxx, maxy;
 
-	void from_raw(const raw_bbox_t *raw);
+  void from_raw(const raw_bbox_t *raw);
 }
 bbox_t;
 
 
 typedef struct child_s
 {
-	// child node or subsector (one must be NULL)
-	node_c *node;
-	subsec_c *subsec;
+  // child node or subsector (one must be NULL)
+  node_c *node;
+  subsec_c *subsec;
 
-	// child bounding box
-	bbox_t bounds;
+  // child bounding box
+  bbox_t bounds;
 }
 child_t;
 
@@ -229,19 +229,19 @@ child_t;
 class node_c
 {
 public:
-	int x, y;     // starting point
-	int dx, dy;   // offset to ending point
+  int x, y;     // starting point
+  int dx, dy;   // offset to ending point
 
-	// right & left children
-	child_t r;
-	child_t l;
+  // right & left children
+  child_t r;
+  child_t l;
 
-	// node index.  Only valid once the NODES or GL_NODES lump has been
-	// created.
-	int index;
+  // node index.  Only valid once the NODES or GL_NODES lump has been
+  // created.
+  int index;
 
-	node_c (int _idx, const raw_node_t *raw);
-	~node_c();
+  node_c (int _idx, const raw_node_t *raw);
+  ~node_c();
 };
 
 
@@ -250,69 +250,69 @@ public:
 template <typename TYPE> class container_tp
 {
 public:
-	int num;
+  int num;
 
 private:
-	TYPE ** arr;
+  TYPE ** arr;
 
-	const char *const name;
+  const char *const name;
 
 public:
-	container_tp(const char *type_name) : num(0), arr(NULL), name(type_name)
-	{
-	}
-	
-	~container_tp()
-	{
-		if (arr)
-			FreeAll();
-	}
+  container_tp(const char *type_name) : num(0), arr(NULL), name(type_name)
+  {
+  }
+  
+  ~container_tp()
+  {
+    if (arr)
+      FreeAll();
+  }
 
-	void Allocate(int _num)
-	{
-		if (arr)
-			FreeAll();
+  void Allocate(int _num)
+  {
+    if (arr)
+      FreeAll();
 
-		num = _num;
-		arr = new TYPE* [num];
+    num = _num;
+    arr = new TYPE* [num];
 
-		for (int i = 0; i < num; i++)
-		{
-			arr[i] = NULL;	
-		}
-	}
+    for (int i = 0; i < num; i++)
+    {
+      arr[i] = NULL;  
+    }
+  }
 
-	void FreeAll()
-	{
-		for (int i = 0; i < num; i++)
-		{
-			if (arr[i] != NULL)
-				delete arr[i];	
-		}
+  void FreeAll()
+  {
+    for (int i = 0; i < num; i++)
+    {
+      if (arr[i] != NULL)
+        delete arr[i];  
+    }
 
-		delete[] arr;
+    delete[] arr;
 
-		num = 0;
-		arr = NULL;
-	}
+    num = 0;
+    arr = NULL;
+  }
 
-	void Set(int index, TYPE *cur)
-	{
-		if (arr[index] != NULL)
-			delete arr[index];
+  void Set(int index, TYPE *cur)
+  {
+    if (arr[index] != NULL)
+      delete arr[index];
 
-		arr[index] = cur;
-	}
+    arr[index] = cur;
+  }
 
-	TYPE *Get(int index)
-	{
-		if (index < 0 || index >= num)
-		{
-			FatalError("No such %s number #%d", name, index);
-		}
+  TYPE *Get(int index)
+  {
+    if (index < 0 || index >= num)
+    {
+      FatalError("No such %s number #%d", name, index);
+    }
 
-		return arr[index];
-	}
+    return arr[index];
+  }
 };
 
 #define EXTERN_LEVELARRAY(TYPE, BASEVAR)  \

@@ -22,23 +22,23 @@
 class path_c
 {
 public:
-	path_c();
-	~path_c();
+  path_c();
+  ~path_c();
 
-	int point_num;
-	int *points;  // pairs
+  int point_num;
+  int *points;  // pairs
 
 private:
-	static const int MAX_PTS = 1024;
+  static const int MAX_PTS = 1024;
 
 public:
-	static path_c * ReadFile(const char *filename);
+  static path_c * ReadFile(const char *filename);
 
-	void GetPoint(int index, int *x, int *y)
-	{
-		*x = points[index*2 + 0];
-		*y = points[index*2 + 1];
-	}
+  void GetPoint(int index, int *x, int *y)
+  {
+    *x = points[index*2 + 0];
+    *y = points[index*2 + 1];
+  }
 };
 
 #endif /* __NODEVIEW_PATH_H__ */

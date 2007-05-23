@@ -31,8 +31,8 @@ path_c::path_c() : point_num(0), points(NULL)
 //
 path_c::~path_c()
 {
-	if (points)
-		delete[] points;
+  if (points)
+    delete[] points;
 }
 
 //
@@ -40,28 +40,28 @@ path_c::~path_c()
 //
 path_c * path_c::ReadFile(const char *filename)
 {
-	FILE *fp = fopen(filename, "r");
+  FILE *fp = fopen(filename, "r");
 
-	if (! fp)
-	{
-		PrintWarn("Unable to open path file: %s\n", strerror(errno));
-		return false;
-	}
+  if (! fp)
+  {
+    PrintWarn("Unable to open path file: %s\n", strerror(errno));
+    return false;
+  }
 
-	path_c *P = new path_c();
+  path_c *P = new path_c();
 
-	P->points = new int[MAX_PTS * 2];
+  P->points = new int[MAX_PTS * 2];
 
-	for (P->point_num = 0; P->point_num < MAX_PTS; P->point_num++)
-	{
-		int *cur_pt = P->points + (P->point_num * 2);
+  for (P->point_num = 0; P->point_num < MAX_PTS; P->point_num++)
+  {
+    int *cur_pt = P->points + (P->point_num * 2);
 
-		if (fscanf(fp, " %d %d ", cur_pt, cur_pt+1) != 2)
-			break;
-	}
+    if (fscanf(fp, " %d %d ", cur_pt, cur_pt+1) != 2)
+      break;
+  }
 
-	fclose(fp);
+  fclose(fp);
 
-	return P;
+  return P;
 }
 

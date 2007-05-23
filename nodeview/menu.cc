@@ -26,7 +26,7 @@ static bool menu_want_to_quit;
 #if 0
 static void menu_quit_CB(Fl_Widget *w, void *data)
 {
-	menu_want_to_quit = true;
+  menu_want_to_quit = true;
 }
 #endif
 
@@ -34,7 +34,7 @@ static void menu_quit_CB(Fl_Widget *w, void *data)
 #ifndef MACOSX
 static void menu_do_exit(Fl_Widget *w, void * data)
 {
-	guix_win->want_quit = true;
+  guix_win->want_quit = true;
 }
 #endif
 
@@ -49,7 +49,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-	"By Andrew Apted (C) 2004-2007";
+  "By Andrew Apted (C) 2004-2007";
 
 
 static void menu_do_about(Fl_Widget *w, void * data)
@@ -170,16 +170,16 @@ static Fl_Menu_Item menu_items[] =
 #ifdef MACOSX
 Fl_Sys_Menu_Bar * MenuCreate(int x, int y, int w, int h)
 {
-	Fl_Sys_Menu_Bar *bar = new Fl_Sys_Menu_Bar(x, y, w, h);
-	bar->menu(menu_items);
-	return bar;
+  Fl_Sys_Menu_Bar *bar = new Fl_Sys_Menu_Bar(x, y, w, h);
+  bar->menu(menu_items);
+  return bar;
 }
 #else
 Fl_Menu_Bar * MenuCreate(int x, int y, int w, int h)
 {
-	Fl_Menu_Bar *bar = new Fl_Menu_Bar(x, y, w, h);
-	bar->menu(menu_items);
-	return bar;
+  Fl_Menu_Bar *bar = new Fl_Menu_Bar(x, y, w, h);
+  bar->menu(menu_items);
+  return bar;
 }
 #endif
 

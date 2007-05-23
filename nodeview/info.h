@@ -22,8 +22,8 @@
 class W_Info : public Fl_Group
 {
 public:
-	W_Info(int X, int Y, int W, int H, const char *label = 0);
-	~W_Info();
+  W_Info(int X, int Y, int W, int H, const char *label = 0);
+  ~W_Info();
 
 private:
   Fl_Output *map_name;

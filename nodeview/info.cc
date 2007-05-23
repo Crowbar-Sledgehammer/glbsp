@@ -33,7 +33,7 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   box(FL_FLAT_BOX);
 
-//	color(INFO_BG_COLOR, INFO_BG_COLOR);
+//  color(INFO_BG_COLOR, INFO_BG_COLOR);
 
 
   X += 6;
