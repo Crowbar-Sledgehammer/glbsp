@@ -49,7 +49,7 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   node_type = new Fl_Output(X+88, Y, W-88, 22, "Node Type:");
   node_type->align(FL_ALIGN_LEFT);
-  node_type->value("GL");
+  node_type->value("unknown");
   add(node_type);
 
   Y += map_name->h() + 4;
@@ -79,6 +79,11 @@ void W_Info::SetMap(const char *name)
   map_name->value(upper);
 
   UtilFree(upper);
+}
+
+void W_Info::SetNodes(const char *type)
+{
+  node_type->value(type);
 }
 
 void W_Info::SetZoom(float zoom_mul)
