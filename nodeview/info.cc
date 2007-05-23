@@ -74,6 +74,10 @@ W_Info::~W_Info()
 
 void W_Info::SetMap(const char *name)
 {
-  map_name->value(name);
+  char *upper = UtilStrUpper(name);
+
+  map_name->value(upper);
+
+  UtilFree(upper);
 }
 
