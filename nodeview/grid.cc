@@ -65,6 +65,8 @@ void W_Grid::SetZoom(int new_zoom)
 
   zoom_mul = pow(2.0, (zoom / 2.0 - 9.0));
 
+  guix_win->info->SetZoom(zoom_mul);
+
   //  fprintf(stderr, "Zoom %d  Mul %1.5f\n", zoom, zoom_mul);
 
   redraw();
@@ -95,6 +97,8 @@ void W_Grid::FitBBox(double lx, double ly, double hx, double hy)
   }
 
   zoom_mul = pow(2.0, (zoom / 2.0 - 9.0));
+
+  guix_win->info->SetZoom(zoom_mul);
 
   SetPos(lx + dx / 2.0, ly + dy / 2.0);
 }
@@ -133,28 +137,31 @@ void W_Grid::draw()
   fl_color(FL_BLACK);
   fl_rectf(x(), y(), w(), h());
 
-  if (zoom >= 22)
+  if (zoom >= 21)
   {
-    fl_color(fl_rgb_color(32));
-    draw_grid(1);
+    draw_grid(1,   96);
+    draw_grid(8,   150);
+    draw_grid(64,  200);
+    draw_grid(512, 255);
   }
-
-  if (zoom >= 16)
+  else if (zoom >= 15)
   {
-    fl_color(fl_color_cube(0, 0, 1));
-    draw_grid(8);
+    draw_grid(8,    96);
+    draw_grid(64,   150);
+    draw_grid(512,  200);
+    draw_grid(4096, 255);
   }
-
-  if (zoom >= 9)
+  else if (zoom >= 9)
   {
-    fl_color(fl_color_cube(0, 0, 2));
-    draw_grid(64);
+    draw_grid(64,   150);
+    draw_grid(512,  200);
+    draw_grid(4096, 255);
   }
-
-  if (true)
+  else
   {
-    fl_color(fl_color_cube(0, 0, (zoom >= 6) ? 3 : 2));
-    draw_grid(512);
+    draw_grid(512,   150);
+    draw_grid(4096,  200);
+    draw_grid(32768, 255);
   }
 
   node_c *root = lev_nodes.Get(lev_nodes.num - 1);
@@ -173,10 +180,15 @@ void W_Grid::draw()
   fl_pop_clip();
 }
 
-void W_Grid::draw_grid(int spacing)
+void W_Grid::draw_grid(int spacing, int ity)
 {
   if (grid_MODE == 0)
     return;
+
+  if (ity <= 0)
+    return;
+
+  fl_color(fl_rgb_color(0, 0, ity));
 
   double mlx = mid_x - w() * 0.5 / zoom_mul;
   double mly = mid_y - h() * 0.5 / zoom_mul;

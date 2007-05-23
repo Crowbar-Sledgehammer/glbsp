@@ -58,10 +58,11 @@ private:
   void draw();
   // FLTK virtual method for drawing.
 
-  void draw_grid(int spacing);
+  void draw_grid(int spacing, int ity);
   void draw_partition(const node_c *nd, int ity);
   void draw_bbox(const bbox_t *bbox, int ity);
   void draw_all_partitions();
+
   void draw_node(const node_c *nd, int pos, bool on_route);
   void draw_child(const child_t *ch, int pos, bool on_route);
   void draw_path();
@@ -83,9 +84,9 @@ private:
   double zoom_mul;
   // derived from 'zoom'.
 
-  static const int MIN_GRID_ZOOM = 4;
+  static const int MIN_GRID_ZOOM = 3;
   static const int DEF_GRID_ZOOM = 18;  // 1:1 ratio
-  static const int MAX_GRID_ZOOM = 30;
+  static const int MAX_GRID_ZOOM = 31;
 
   double mid_x;
   double mid_y;
