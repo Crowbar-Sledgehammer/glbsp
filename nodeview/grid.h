@@ -72,6 +72,8 @@ private:
 
   void scroll(int dx, int dy);
 
+  void new_node_or_sub(void);
+
 public:
   int handle_key(int key);
 

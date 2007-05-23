@@ -182,6 +182,8 @@ int main(int argc, char **argv)
     guix_win->info->SetMap(level_name);
     guix_win->info->SetNodes("GL");  // FIXME: node version
 
+    guix_win->info->SetNodeIndex(lev_nodes.num - 1);
+
     // run the GUI until the user quits
     while (! guix_win->want_quit)
       Fl::wait();

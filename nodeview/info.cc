@@ -40,27 +40,37 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
   Y += 6;
   W -= 12;
 
+  // ---- top section ----
+  
   map_name = new Fl_Output(X+88, Y, W-88, 22, "Map Name:");
   map_name->align(FL_ALIGN_LEFT);
-  map_name->value("unknown");
   add(map_name);
 
   Y += map_name->h() + 4;
 
   node_type = new Fl_Output(X+88, Y, W-88, 22, "Node Type:");
   node_type->align(FL_ALIGN_LEFT);
-  node_type->value("unknown");
   add(node_type);
 
-  Y += map_name->h() + 4;
+  Y += node_type->h() + 4;
 
   grid_size = new Fl_Output(X+88, Y, W-88, 22, "Zooming:");
   grid_size->align(FL_ALIGN_LEFT);
-  grid_size->value("unset");
   add(grid_size);
 
-  Y += map_name->h() + 4;
+  Y += grid_size->h() + 4;
 
+  
+  // ---- middle section ----
+ 
+  Y += 12;
+
+  ns_index = new Fl_Output(X+88, Y, W-88, 22, "Node #");
+  ns_index->align(FL_ALIGN_LEFT);
+  add(ns_index);
+
+  Y += ns_index->h() + 4;
+  
   // ETC....
 }
 
@@ -106,5 +116,30 @@ void W_Info::SetZoom(float zoom_mul)
   }
 
   grid_size->value(buffer);
+}
+
+
+void W_Info::SetNodeIndex(int index)
+{
+  char buffer[60];
+
+  sprintf(buffer, "%d", index);
+  
+  ns_index->label("Node #");
+  ns_index->value(buffer);
+
+  redraw();
+}
+
+void W_Info::SetSubsectorIndex(int index)
+{
+  char buffer[60];
+
+  sprintf(buffer, "%d", index);
+  
+  ns_index->label("Subsector #");
+  ns_index->value(buffer);
+
+  redraw();
 }
 

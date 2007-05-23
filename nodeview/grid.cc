@@ -754,12 +754,16 @@ int W_Grid::handle_key(int key)
 
     case 'u': case 'U':
       if (route_len > 0)
+      {
         route_len--;
-      redraw();
+        new_node_or_sub();
+        redraw();
+      }
       return 1;
 
     case 't': case 'T':
       route_len = 0;
+      new_node_or_sub();
       redraw();
       return 1;
 
@@ -799,6 +803,7 @@ bool W_Grid::descend_by_mouse(int wx, int wy)
 
 bool W_Grid::descend_tree(char side)
 {
+  // safety check (should never happen under normal circumstances)
   if (route_len >= MAX_ROUTE)
     return false;
 
@@ -810,11 +815,10 @@ bool W_Grid::descend_tree(char side)
   if (cur_sub)
     return false;
 
-///---  // would it be a subsector ??
-///---  if (((side == RT_LEFT) ? cur_nd->l.node : cur_nd->r.node) == NULL)
-///---    return false;
-
   visit_route[route_len++] = side;
+
+  new_node_or_sub();
+
   return true;
 }
 
@@ -850,5 +854,18 @@ void W_Grid::handle_mouse(int wx, int wy)
   WinToMap(wx, wy, &mx, &my);
 
   // FIXME ....
+}
+
+void W_Grid::new_node_or_sub(void)
+{
+  node_c *cur_nd;
+  subsec_c *cur_sub;
+  
+  lowest_node(&cur_nd, &cur_sub);
+
+  if (cur_sub)
+    guix_win->info->SetSubsectorIndex(cur_sub->index);
+  else
+    guix_win->info->SetNodeIndex(cur_nd->index);
 }
 

@@ -30,6 +30,7 @@ private:
   Fl_Output *node_type;
   Fl_Output *grid_size;
 
+  Fl_Output *ns_index;
 
   Fl_Output *mouse_coord;
 
@@ -37,6 +38,9 @@ public:
   void SetMap(const char *name);
   void SetNodes(const char *type);
   void SetZoom(float zoom_mul);
+
+  void SetNodeIndex(int index);
+  void SetSubsectorIndex(int index);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */
