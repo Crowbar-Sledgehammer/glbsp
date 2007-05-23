@@ -27,7 +27,8 @@
 // W_Info Constructor
 //
 W_Info::W_Info(int X, int Y, int W, int H, const char *label) : 
-    Fl_Group(X, Y, W, H, label)
+    Fl_Group(X, Y, W, H, label),
+    num_segs(0)
 {
   end();  // cancel begin() in Fl_Group constructor
 
@@ -38,7 +39,9 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   X += 6;
   Y += 6;
+
   W -= 12;
+  H -= 12;
 
   // ---- top section ----
   
@@ -59,42 +62,15 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
  
   Y += 12;
 
-  ns_index = new Fl_Output(X+88, Y, W-88, 22, "Node #");
+  ns_index = new Fl_Output(X+74, Y, 80, 22, "Node #    ");
   ns_index->align(FL_ALIGN_LEFT);
   add(ns_index);
 
   Y += ns_index->h() + 4;
 
 
-  pt_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Partition:");
-  pt_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-  add(pt_label);
+  // bounding box
   
-  Y += pt_label->h() + 4;
-
-  pt_x  = new Fl_Output(X+32,   Y, 64, 22, "x");
-  pt_dx = new Fl_Output(X+W-64, Y, 64, 22, "dx");
-
-  pt_x ->align(FL_ALIGN_LEFT);
-  pt_dx->align(FL_ALIGN_LEFT);
-
-  add(pt_x);
-  add(pt_dx);
-
-  Y += pt_x->h() + 4;
-
-  pt_y  = new Fl_Output(X+32,   Y, 64, 22, "y");
-  pt_dy = new Fl_Output(X+W-64, Y, 64, 22, "dy");
-
-  pt_y ->align(FL_ALIGN_LEFT);
-  pt_dy->align(FL_ALIGN_LEFT);
-
-  add(pt_y);
-  add(pt_dy);
-
-  Y += pt_dy->h() + 4;
-
-
   bb_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Bounding Box:");
   bb_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
   add(bb_label);
@@ -123,10 +99,68 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   Y += bb_y2->h() + 4;
 
+
+  // partition line
+
+  int save_Y = Y;
+
+#if 0  // TEMP
+  pt_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Partition:");
+  pt_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(pt_label);
+  
+  Y += pt_label->h() + 4;
+
+  pt_x  = new Fl_Output(X+32,   Y, 64, 22, "x");
+  pt_dx = new Fl_Output(X+W-64, Y, 64, 22, "dx");
+
+  pt_x ->align(FL_ALIGN_LEFT);
+  pt_dx->align(FL_ALIGN_LEFT);
+
+  add(pt_x);
+  add(pt_dx);
+
+  Y += pt_x->h() + 4;
+
+  pt_y  = new Fl_Output(X+32,   Y, 64, 22, "y");
+  pt_dy = new Fl_Output(X+W-64, Y, 64, 22, "dy");
+
+  pt_y ->align(FL_ALIGN_LEFT);
+  pt_dy->align(FL_ALIGN_LEFT);
+
+  add(pt_y);
+  add(pt_dy);
+
+  Y += pt_dy->h() + 4;
+#endif
+
+  // seg list
+
+  Y = save_Y;
+  
+  seg_label = new Fl_Box(FL_NO_BOX, X, Y, W, 22, "Seg List:");
+  seg_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+  add(seg_label);
+
+  Y += seg_label->h() + 4;
+
+  seg_list = new Fl_Multiline_Output(X+6, Y, W-6, 96);
+  add(seg_list);
+
+  Y += seg_list->h() + 4;
+
+
+#if 1
+  // resize control:
+  Fl_Box *resize_control = new Fl_Box(FL_NO_BOX, x(), Y, w(), 4, NULL);
+
+  add(resize_control);
+  resizable(resize_control);
+#endif 
   
   // ---- bottom section ----
 
-  Y = H - 22;
+  Y = y() + H - 22;
 
   mouse_x = new Fl_Output(X+28,   Y, 72, 22, "x");
   mouse_y = new Fl_Output(X+W-72, Y, 72, 22, "y");
@@ -204,7 +238,7 @@ void W_Info::SetNodeIndex(int index)
 
   sprintf(buffer, "%d", index);
   
-  ns_index->label("Node #");
+  ns_index->label("Node #    ");
   ns_index->value(buffer);
 
   redraw();
@@ -244,6 +278,8 @@ void W_Info::SetCurBBox(const bbox_t *bbox)
 
 void W_Info::SetPartition(const node_c *part)
 {
+return; //!!!!!!
+
   if (! part)
   {
     pt_x ->value("");
@@ -282,3 +318,52 @@ void W_Info::SetMouse(double mx, double my)
   mouse_x->value(x_buffer);
   mouse_y->value(y_buffer);
 }
+
+void W_Info::BeginSegList()
+{
+  num_segs = 0;
+}
+
+void W_Info::AddSeg(const seg_c *seg)
+{
+  if (num_segs < SEG_LIST_MAX)
+  {
+    seg_indices[num_segs++] = seg->index;
+  }
+}
+
+void W_Info::EndSegList()
+{
+  char buffer[SEG_LIST_MAX * 32];
+  char *line = buffer;
+
+  buffer[0] = 0;
+
+  for (int n = 0; n < num_segs; n++)
+  {
+    char num_buf[60];
+
+    sprintf(num_buf, "%d", seg_indices[n]);
+
+    int line_len = strlen(line);
+    int num_len  = strlen(num_buf);
+    
+    // fits on the line?
+    if (line_len + 1 + num_len <= 19)
+    {
+      if (*line != 0)
+        strcat(buffer, " ");
+    }
+    else
+    {
+      strcat(buffer, "\n");
+
+      line = buffer + strlen(buffer);
+    }
+
+    strcat(buffer, num_buf);
+  }
+
+  seg_list->value(buffer);
+}
+

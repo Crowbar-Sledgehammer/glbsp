@@ -19,6 +19,8 @@
 #ifndef __NODEVIEW_INFO_H__
 #define __NODEVIEW_INFO_H__
 
+#define SEG_LIST_MAX  16
+
 class W_Info : public Fl_Group
 {
 public:
@@ -38,6 +40,9 @@ private:
   Fl_Output *pt_dx;
   Fl_Output *pt_dy;
 
+  Fl_Box    *seg_label;
+  Fl_Multiline_Output *seg_list;
+
   Fl_Box    *bb_label;
   Fl_Output *bb_x1;
   Fl_Output *bb_y1;
@@ -47,6 +52,10 @@ private:
   Fl_Box    *m_label;
   Fl_Output *mouse_x;
   Fl_Output *mouse_y;
+
+private:
+  int seg_indices[SEG_LIST_MAX];
+  int num_segs;
 
 public:
   void SetMap(const char *name);
@@ -59,6 +68,10 @@ public:
   void SetPartition(const node_c *part);
 
   void SetMouse(double mx, double my);
+
+  void BeginSegList();
+  void EndSegList();
+  void AddSeg(const seg_c *seg);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */

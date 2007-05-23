@@ -881,6 +881,13 @@ void W_Grid::new_node_or_sub(void)
 
   if (cur_sub)
   {
+    guix_win->info->BeginSegList();
+    
+    for (seg_c *seg = cur_sub->seg_list; seg; seg = seg->next)
+      guix_win->info->AddSeg(seg);
+    
+    guix_win->info->EndSegList();
+
     guix_win->info->SetSubsectorIndex(cur_sub->index);
     guix_win->info->SetPartition(NULL);
   }
