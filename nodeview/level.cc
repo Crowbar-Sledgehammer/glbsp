@@ -838,16 +838,8 @@ void LoadLevel(const char *level_name)
 {
 	// ---- Normal stuff ----
 
-	if (level_name)
-	{
-		if (! the_wad->FindLevel(level_name))
-			FatalError("Unable to find level: %s\n", level_name);
-	}
-	else
-	{
-		if (! the_wad->FindFirstLevel())
-			FatalError("Unable to find ANY level in WAD.\n");
-	}
+  if (! the_wad->FindLevel(level_name))
+    FatalError("Unable to find level: %s\n", level_name);
 
 	// -JL- Identify Hexen mode by presence of BEHAVIOR lump
 	lev_doing_hexen = (the_wad->FindLumpInLevel("BEHAVIOR") != NULL);

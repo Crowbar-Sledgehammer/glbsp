@@ -149,6 +149,14 @@ int main(int argc, char **argv)
 
       if (idx >= 0 && params >= 1)
         level_name = arg_list[idx + 1];
+
+      if (! level_name)
+      {
+        level_name = the_wad->FirstLevelName();
+
+        if (! level_name)
+          FatalError("Unable to find ANY level in WAD.\n");
+      }
     }
 
     path_c *path = NULL;
