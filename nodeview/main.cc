@@ -180,6 +180,7 @@ int main(int argc, char **argv)
     guix_win->grid->FitBBox(lx, ly, hx, hy);
 
     guix_win->info->SetMap(level_name);
+    guix_win->info->SetNodes("GL");  // FIXME: node version
 
     // run the GUI until the user quits
     while (! guix_win->want_quit)
