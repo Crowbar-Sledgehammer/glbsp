@@ -37,6 +37,7 @@ private:
 
 public:
   void SetMap(const char *name);
+  void SetZoom(float zoom_mul);
 };
 
 #endif /* __NODEVIEW_INFO_H__ */

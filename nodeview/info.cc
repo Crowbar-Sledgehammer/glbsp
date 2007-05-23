@@ -49,14 +49,14 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
 
   node_type = new Fl_Output(X+88, Y, W-88, 22, "Node Type:");
   node_type->align(FL_ALIGN_LEFT);
-  node_type->value("unknown");
+  node_type->value("GL");
   add(node_type);
 
   Y += map_name->h() + 4;
 
-  grid_size = new Fl_Output(X+88, Y, W-88, 22, "Grid Size:");
+  grid_size = new Fl_Output(X+88, Y, W-88, 22, "Zooming:");
   grid_size->align(FL_ALIGN_LEFT);
-  grid_size->value("0");
+  grid_size->value("unset");
   add(grid_size);
 
   Y += map_name->h() + 4;
@@ -79,5 +79,27 @@ void W_Info::SetMap(const char *name)
   map_name->value(upper);
 
   UtilFree(upper);
+}
+
+void W_Info::SetZoom(float zoom_mul)
+{
+  char buffer[60];
+
+///  if (0.99 < zoom_mul && zoom_mul < 1.01)
+///  {
+///    grid_size->value("1:1");
+///    return;
+///  }
+
+  if (zoom_mul < 0.99)
+  {
+    sprintf(buffer, "1/%1.3f", 1.0/zoom_mul);
+  }
+  else // zoom_mul > 1
+  {
+    sprintf(buffer, "%1.3f", zoom_mul);
+  }
+
+  grid_size->value(buffer);
 }
 
