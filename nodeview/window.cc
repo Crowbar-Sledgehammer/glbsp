@@ -28,7 +28,7 @@ Guix_MainWin *guix_win;
 
 
 #define WINDOW_MIN_W  480
-#define WINDOW_MIN_H  400
+#define WINDOW_MIN_H  440
 
 #define WINDOW_NORM_W  620
 #define WINDOW_NORM_H  460
