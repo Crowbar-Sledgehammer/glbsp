@@ -748,7 +748,7 @@ int W_Grid::handle_key(int key)
       return 1;
 
     case 's': case 'S':
-      shade_MODE = (shade_MODE + 1) % 3;
+      shade_MODE = (shade_MODE + 1) % 2;
       redraw();
       return 1;
 

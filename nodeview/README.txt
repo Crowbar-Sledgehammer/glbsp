@@ -42,8 +42,9 @@ t : go back to Top of BSP tree
 
 p : toggle Partition drawing (below/on-top/none)
 b : toggle Bounding-box drawing
-m : toggle seg Mode (all/normal-only)
-g : toggle Grid
+m : toggle Minisegs (on/off)
+s : toggle Shading mode (dark/no-draw)
+g : toggle Grid (on/off)
 
 +/- : zoom in / out
 
