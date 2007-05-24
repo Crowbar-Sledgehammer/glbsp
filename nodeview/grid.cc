@@ -439,7 +439,7 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
   if (shade_MODE == 2)
     on = true;
 
-  int ity = on ? 255 : 128;
+  int ity = on ? 255 : 144;
 
   if (! seg->linedef)  // miniseg
   {
@@ -477,19 +477,19 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
   }
   if (seg->linedef->flags & 1)  // marked impassable ?
   {
-    fl_color(on ? FL_YELLOW : fl_color_cube(2,2,0));
+    fl_color(fl_rgb_color(ity, ity, 0));
     return true;
   }
   if (floor_max - floor_min > 24)  // unclimbable dropoff ?
   {
-    fl_color(on ? FL_GREEN : fl_color_cube(0,3,0));
+    fl_color(fl_rgb_color(0, ity, 0));
     return true;
   }
 
   if (miniseg_MODE < 1)
     return false;
 
-  fl_color(fl_rgb_color(on ? 160 : 64));  // everything else
+  fl_color(fl_rgb_color(on ? 176 : 96));  // everything else
   return true;
 }
 
