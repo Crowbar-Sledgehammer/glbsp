@@ -446,7 +446,7 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
     if (miniseg_MODE < 2)
       return false;
 
-     fl_color(on ? fl_color_cube(0,4,3) : fl_color_cube(0,2,2));
+     fl_color(0, ity*144/255, ity*192/255);
      return true;
   }
 
@@ -467,7 +467,7 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 
   if (ceil_min <= floor_max)  // closed door ?
   {
-    fl_color(fl_rgb_color(ity, ity*3/6, 0));
+    fl_color(fl_rgb_color(ity, ity/2, 0));
     return true;
   }
   if (ceil_min - floor_max < 56)  // narrow vertical gap ?
