@@ -52,7 +52,7 @@ void InitFLTK(void)
 {
   Fl::scheme(NULL);
 
-  fl_message_font(FL_HELVETICA, 18);
+  fl_message_font(FL_HELVETICA, 16);
 
   Fl_File_Icon::load_system_icons();
 
