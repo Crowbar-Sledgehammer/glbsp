@@ -289,7 +289,7 @@ void W_Grid::draw_partition(const node_c *nd, int ity)
         sy++, ey++;
   }
 
-  fl_color(fl_color_cube(ity, 0, ity));
+  fl_color(fl_rgb_color(ity*80-70, 0, ity*80-70));
   fl_line(sx, sy, ex, ey);
 
   // draw arrow heads along it
@@ -334,7 +334,7 @@ void W_Grid::draw_bbox(const bbox_t *bbox, int ity)
     sx--; sy--; ex++; ey++;
   }
 
-  fl_color(fl_color_cube(MIN(3,ity), ity + 1, 0));
+  fl_color(fl_rgb_color(ity*50, 0, 0));
 
   fl_line(sx, sy, sx, ey);
   fl_line(sx, sy, ex, sy);
@@ -375,10 +375,10 @@ void W_Grid::draw_all_partitions()
   {
     if (bbox_MODE == 1)
       if (bboxs[n_idx])
-        draw_bbox(bboxs[n_idx], (n_idx == 3) ? 4 : n_idx);
+        draw_bbox(bboxs[n_idx], n_idx + 1);
 
     if (nodes[n_idx])
-      draw_partition(nodes[n_idx], (n_idx == 3) ? 4 : n_idx);
+      draw_partition(nodes[n_idx], n_idx + 1);
   }
 }
 
@@ -439,6 +439,8 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
   if (shade_MODE == 2)
     on = true;
 
+  int ity = on ? 255 : 128;
+
   if (! seg->linedef)  // miniseg
   {
     if (miniseg_MODE < 2)
@@ -465,12 +467,12 @@ bool W_Grid::set_seg_color(seg_c *seg, bool on)
 
   if (ceil_min <= floor_max)  // closed door ?
   {
-    fl_color(on ? FL_RED : fl_color_cube(2,0,0));
+    fl_color(fl_rgb_color(ity, ity*3/6, 0));
     return true;
   }
   if (ceil_min - floor_max < 56)  // narrow vertical gap ?
   {
-    fl_color(on ? fl_color_cube(4,4,0) : fl_color_cube(2,2,0));
+    fl_color(fl_rgb_color(0, ity, ity));
     return true;
   }
   if (seg->linedef->flags & 1)  // marked impassable ?

@@ -15,17 +15,19 @@ Currently it only works with GL-Nodes.
 COLORS
 ------
 
-purple   : partition lines / highlighted subsector
+purple   : partition lines
+pink     : highlighted subsector
+red      : bounding boxes
 sky blue : minisegs
 
-bright white  : one-sided line
-bright yellow : 2S line marked impassible
-bright red    : 2S line on a closed door
+white    : one-sided line
+yellow   : 2S line marked impassible
+cyan     : 2S line on a closed door
 
-bright orange : gap too narrow for player to pass
-bright green  : dropoff too big for player to climb
+orange   : gap too narrow for player to pass
+green    : dropoff too big for player to climb
 
-gray : any other two-sided line
+gray     : normal (walkable) two-sided line
 
 
 KEYS
