@@ -202,37 +202,45 @@ void W_Grid::draw_grid(double spacing, int ity)
 
   for (dx = 0; true; dx++)
   {
-    if (gx + dx * spacing < mlx) continue;
-    if (gx + dx * spacing > mhx) break;
+    double xx = gx + dx * spacing;
 
-    MapToWin(gx + dx * spacing, gy, &wx, &wy);
+    if (xx > mhx) break;
+    if (xx < mlx) continue;
+
+    MapToWin(xx, gy, &wx, &wy);
     fl_yxline(wx, y1, y2);
   }
 
   for (dx = -1; true; dx--)
   {
-    if (gx + dx * spacing > mhx) continue;
-    if (gx + dx * spacing < mlx) break;
+    double xx = gx + dx * spacing;
 
-    MapToWin(gx + dx * spacing, gy, &wx, &wy);
+    if (xx < mlx) break;
+    if (xx > mhx) continue;
+
+    MapToWin(xx, gy, &wx, &wy);
     fl_yxline(wx, y1, y2);
   }
 
   for (dy = 0; true; dy++)
   {
-    if (gy + dy * spacing < mly) continue;
-    if (gy + dy * spacing > mhy) break;
+    double yy = gy + dy * spacing;
 
-    MapToWin(gx, gy + dy * spacing, &wy, &wy);
+    if (yy > mhy) break;
+    if (yy < mly) continue;
+
+    MapToWin(gx, yy, &wy, &wy);
     fl_xyline(x1, wy, x2);
   }
 
   for (dy = -1; true; dy--)
   {
-    if (gy + dy * spacing > mhy) continue;
-    if (gy + dy * spacing < mly) break;
+    double yy = gy + dy * spacing;
 
-    MapToWin(gx, gy + dy * spacing, &wy, &wy);
+    if (yy < mly) break;
+    if (yy > mhy) continue;
+
+    MapToWin(gx, yy, &wy, &wy);
     fl_xyline(x1, wy, x2);
   }
 }
