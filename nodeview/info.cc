@@ -60,7 +60,7 @@ W_Info::W_Info(int X, int Y, int W, int H, const char *label) :
   
   // ---- middle section ----
  
-  Y += 12;
+  Y += 16;
 
   ns_index = new Fl_Output(X+74, Y, 80, 22, "Node #    ");
   ns_index->align(FL_ALIGN_LEFT);
