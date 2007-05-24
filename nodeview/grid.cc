@@ -425,17 +425,20 @@ void W_Grid::draw_child(const child_t *ch, int pos, bool on_route)
   }
   else  /* Subsector */
   {
-    subsec_c *sub = ch->subsec;
+    draw_subsector(ch->subsec, pos + 1, on_route);
+  }
+}
 
-    for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
-    {
-      if (on_route && pos == route_len-1)
-        fl_color(fl_color_cube(4,5,4));
-      else if (! set_seg_color(seg, on_route))
-        continue;
+void W_Grid::draw_subsector(const subsec_c *sub, int pos, bool on_route)
+{
+  for (seg_c *seg = sub->seg_list; seg; seg = seg->next)
+  {
+    if (on_route && pos == route_len)
+      fl_color(fl_color_cube(4,5,4));
+    else if (! set_seg_color(seg, on_route))
+      continue;
 
-      draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
-    }
+    draw_line(seg->start->x, seg->start->y, seg->end->x, seg->end->y);
   }
 }
 
@@ -667,6 +670,13 @@ int W_Grid::handle(int event)
       return 1;
 
     case FL_PUSH:
+      if (Fl::focus() != this)
+      {
+        Fl::focus(this);
+        handle(FL_FOCUS);
+        return 1;
+      }
+
       if (Fl::event_state() & FL_CTRL)
       {
         // select new subsector

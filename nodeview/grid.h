@@ -65,6 +65,7 @@ private:
 
   void draw_node(const node_c *nd, int pos, bool on_route);
   void draw_child(const child_t *ch, int pos, bool on_route);
+  void draw_subsector(const subsec_c *sub, int pos, bool on_route);
   void draw_path();
 
   bool set_seg_color(seg_c *seg, bool on);
