@@ -58,6 +58,10 @@ private:
   int num_segs;
 
 public:
+  int handle(int event);
+  // FLTK virtual method for handling input events.
+
+public:
   void SetMap(const char *name);
   void SetNodes(const char *type);
   void SetZoom(float zoom_mul);

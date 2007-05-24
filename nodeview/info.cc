@@ -197,6 +197,13 @@ W_Info::~W_Info()
 {
 }
 
+int W_Info::handle(int event)
+{
+  return Fl_Group::handle(event);
+}
+
+
+//------------------------------------------------------------------------
 
 void W_Info::SetMap(const char *name)
 {
