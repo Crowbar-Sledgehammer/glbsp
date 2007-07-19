@@ -576,7 +576,8 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
     return -1;
   
   /* make sure there is at least one real seg on each side */
-  if ((info.real_left==0 || info.real_right==0) && !info.hit_window)
+  if ((info.real_left  + (info.hit_window ? info.mini_left  : 0) == 0) ||
+      (info.real_right + (info.hit_window ? info.mini_right : 0) == 0))
   {
 #   if DEBUG_PICKNODE
     PrintDebug("Eval : No real segs on %s%sside\n", 
