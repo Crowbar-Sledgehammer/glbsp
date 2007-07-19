@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-Changes in V2.22  (XX May 2007)
+Changes in V2.22  (XX July 2007)
 -------------------------------
 
  - level name detection: allow some variation in the order of
@@ -15,6 +15,16 @@ Changes in V2.22  (XX May 2007)
 
  - added TRICKS.txt document to source package which describes
    various map tricks and how glBSP handles them.
+ 
+ - new option in nodebuildinfo_t 'skip_self_ref' which means no
+   segs are created for self-referencing linedefs.  The default
+   is FALSE (disabled).  When enabled, the engine needs to find
+   self-referencing linedefs and render their middle textures
+   with special code (i.e. treat them similar to sprites).
+ 
+ - another new field 'no_window_fx' in nodebuildinfo_t which
+   prevents the special test for the "One-Sided Window" trick.
+   The test was also made more robust.
  
  - improved directory layout, with main glbsp code in the 'src'
    directory.
