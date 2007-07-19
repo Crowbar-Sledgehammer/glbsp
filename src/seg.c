@@ -72,6 +72,7 @@ typedef struct eval_info_s
   int splits;
   int iffy;
   int near_miss;
+  int hit_window;
 
   int real_left;
   int real_right;
@@ -423,6 +424,12 @@ static int EvalPartitionWorker(superblock_t *seg_list, seg_t *part,
         ADD_RIGHT();
       }
 
+      // -AJA- the 'One Sided Window' trick produces an unnatural
+      //       pairing of a real seg and a miniseg.  The following
+      //       test ensures a partition line can separate them.
+      if (check->linedef && check->linedef->window_effect)
+        info->hit_window++;
+
       continue;
     }
 
@@ -558,6 +565,7 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
   info.splits = 0;
   info.iffy   = 0;
   info.near_miss  = 0;
+  info.hit_window = 0;
 
   info.real_left  = 0;
   info.real_right = 0;
@@ -568,7 +576,7 @@ static int EvalPartition(superblock_t *seg_list, seg_t *part,
     return -1;
   
   /* make sure there is at least one real seg on each side */
-  if (!info.real_left || !info.real_right)
+  if ((info.real_left==0 || info.real_right==0) && !info.hit_window)
   {
 #   if DEBUG_PICKNODE
     PrintDebug("Eval : No real segs on %s%sside\n", 
