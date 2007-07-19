@@ -69,6 +69,7 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // no_prune
   FALSE,   // merge_vert
   FALSE,   // skip_self_ref
+  FALSE,   // no_window_fx
 
   DEFAULT_BLOCK_LIMIT,   // block_limit
 
@@ -268,6 +269,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     HANDLE_BOOLEAN("prunesec",    prune_sect)
     HANDLE_BOOLEAN("noprune",     no_prune)
     HANDLE_BOOLEAN("mergevert",   merge_vert)
+    HANDLE_BOOLEAN("skipself",    skip_self_ref)
+    HANDLE_BOOLEAN("nowinfx",     no_window_fx)
 
     // to err is human...
     HANDLE_BOOLEAN("noprogress",  no_progress)
