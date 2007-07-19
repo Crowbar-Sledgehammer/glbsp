@@ -68,6 +68,7 @@ const nodebuildinfo_t default_buildinfo =
   FALSE,   // prune_sect
   FALSE,   // no_prune
   FALSE,   // merge_vert
+  FALSE,   // skip_self_ref
 
   DEFAULT_BLOCK_LIMIT,   // block_limit
 

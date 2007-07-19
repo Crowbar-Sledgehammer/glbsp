@@ -412,6 +412,10 @@ superblock_t *CreateSegs(void)
     if (line->overlap)
       continue;
 
+    // ignore self-referencing lines (only when explicitly disabled)
+    if (line->self_ref && cur_info->skip_self_ref)
+      continue;
+
     // check for Humungously long lines
     if (ABS(line->start->x - line->end->x) >= 10000 ||
         ABS(line->start->y - line->end->y) >= 10000)

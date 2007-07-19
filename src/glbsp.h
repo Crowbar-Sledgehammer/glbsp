@@ -103,6 +103,7 @@ typedef struct nodebuildinfo_s
   boolean_g prune_sect;
   boolean_g no_prune;
   boolean_g merge_vert;
+  boolean_g skip_self_ref;
 
   int block_limit;
 
