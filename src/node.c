@@ -728,6 +728,11 @@ static void SanityCheckHasRealSeg(subsec_t *sub)
   {
     if (cur->linedef)
       return;
+
+    // another hack for the 'One-Sided Window' effect (argh!!)
+    if (cur->partner && cur->partner->linedef &&
+        cur->partner->linedef->window_effect)
+      return;
   }
 
   InternalError("Subsector #%d near (%1.1f,%1.1f) has no real seg !",
