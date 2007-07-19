@@ -605,6 +605,9 @@ void GetLinedefsHexen(void)
       line->left->on_special |= (line->type > 0) ? 1 : 0;
     }
 
+    line->self_ref = (line->left && line->right &&
+        (line->left->sector == line->right->sector));
+
     line->index = i;
   }
 }
