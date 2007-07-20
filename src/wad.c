@@ -686,7 +686,7 @@ lump_t *CreateGLMarker(void)
 
   if (strlen(level->name) <= 5)
   {
-    snprintf(name_buf, sizeof(name_buf), "GL_%s", level->name);
+    sprintf(name_buf, "GL_%s", level->name);
   }
   else
   {
