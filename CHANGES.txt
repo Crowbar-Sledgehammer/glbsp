@@ -24,7 +24,7 @@ Changes in V2.24  (XX July 2007)
  
  - another new field 'no_window_fx' in nodebuildinfo_t which
    prevents the special test for the "One-Sided Window" trick.
-   The test was also made more robust.
+   The test was also made a bit more robust.
  
  - improved directory layout, with main glbsp code in the 'src'
    directory.
