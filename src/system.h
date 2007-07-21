@@ -24,12 +24,6 @@
 #include "glbsp.h"
 
 
-// consistency check
-#if (!defined(GLBSP_TEXT) && !defined(GLBSP_GUI) && !defined(GLBSP_PLUGIN))
-#error Must define one of GLBSP_TEXT, GLBSP_GUI or GLBSP_PLUGIN 
-#endif
-
-
 // use this for inlining.  Usually defined in the makefile.
 #ifndef INLINE_G
 #define INLINE_G  /* nothing */

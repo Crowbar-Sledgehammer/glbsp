@@ -18,7 +18,7 @@
 //
 //------------------------------------------------------------------------
 
-#include "../glbsp.h"
+#include "glbsp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,12 +32,6 @@
 #include "display.h"
 
 
-// consistency check
-#ifndef GLBSP_TEXT
-#error GLBSP_TEXT should be defined when compiling this file
-#endif
-
-
 static nodebuildinfo_t info;
 static volatile nodebuildcomms_t comms;
 
@@ -48,7 +42,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "**** GL BSP Node Builder " GLBSP_VER " (C) 2005 Andrew Apted ****\n\n"
+    "**** GLBSP Node Builder " GLBSP_VER " (C) 2005 Andrew Apted ****\n\n"
   );
 }
 

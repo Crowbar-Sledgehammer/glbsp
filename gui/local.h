@@ -22,11 +22,6 @@
 #define __GLBSP_LOCAL_H__
 
 
-// consistency check
-#ifndef GLBSP_GUI
-#error GLBSP_GUI should be defined when compiling this file
-#endif
-
 // use this for inlining.  Usually defined in the makefile.
 #ifndef INLINE_G
 #define INLINE_G  /* nothing */
@@ -37,7 +32,7 @@
 //  INCLUDES
 //
 
-#include "../src/glbsp.h"
+#include "glbsp.h"
 
 #include <stdio.h>
 #include <stdlib.h>

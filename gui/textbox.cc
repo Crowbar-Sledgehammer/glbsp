@@ -22,12 +22,6 @@
 #include "local.h"
 
 
-// consistency check
-#ifndef GLBSP_GUI
-#error GLBSP_GUI should be defined when compiling this file
-#endif
-
-
 //
 // TextBox Constructor
 //

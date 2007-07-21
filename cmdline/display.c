@@ -18,7 +18,7 @@
 //
 //------------------------------------------------------------------------
 
-#include "../glbsp.h"
+#include "glbsp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,12 +39,6 @@
 #endif
 
 #include "display.h"
-
-
-// consistency check
-#ifndef GLBSP_TEXT
-#error GLBSP_TEXT should be defined when compiling this file
-#endif
 
 
 #define FATAL_COREDUMP  0
