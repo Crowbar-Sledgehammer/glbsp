@@ -31,9 +31,9 @@ BASE_FLAGS=-Wall -O2 -I. -DUNIX -DINLINE_G=inline
 all:    $(LIB_NAME) $(CMD_NAME)
 
 clean:
-	rm -f $(PROGNAME) $(MAIN)/*.o $(SYSDIR)/*.o
-	rm -f $(MAIN)/core $(SYSDIR)/core $(MAIN)/glbsp.txt
-	rm -f $(MAIN)/gb_debug.txt $(SYSDIR)/gb_debug.txt
+	rm -f $(LIB_NAME) $(CMD_NAME) $(GUI_NAME) $(DOC_NAME)
+	rm -f src/*.o cmdline/*.o gui/*.o
+	rm -f ./core ./ERRS ./gb_debug.txt 
 
 .PHONY: all clean
 
