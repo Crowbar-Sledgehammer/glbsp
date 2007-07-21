@@ -16,7 +16,7 @@ FLTK_LIBS=$(FLTK_DIR)/lib/libfltk_images.a \
 
 CXX=i586-mingw32msvc-g++
 
-CXXFLAGS=-O -g3 -Wall -DWIN32 $(FLTK_FLAGS)
+CXXFLAGS=-O -Wall -DWIN32 $(FLTK_FLAGS)
 LDFLAGS=
 LIBS=-lm $(FLTK_LIBS) \
      -mwindows -lcomdlg32 -lole32 -luuid -lgdi32 \
@@ -47,10 +47,10 @@ clean:
 $(PROGRAM): $(OBJS)
 	$(CXX) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
-bin: all
+stripped: all
 	i586-mingw32msvc-strip --strip-unneeded $(PROGRAM)
 
-.PHONY: all clean bin
+.PHONY: all clean stripped
 
 #--- editor settings ------------
 # vi:ts=8:sw=8:noexpandtab
