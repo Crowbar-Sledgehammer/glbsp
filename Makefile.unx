@@ -1,6 +1,6 @@
-##############################
+####################################
 #
-# glBSP Makefile for UNIX
+# glBSP Makefile for UNIX and GCC
 #
 # Targets:
 #    libglbsp.a
@@ -23,6 +23,8 @@ CXX=g++
 AR=ar rc
 RANLIB=ranlib
 
+BASE_FLAGS=-Wall -O2 -I. -DUNIX -DINLINE_G=inline
+
 
 # ----- GENERAL STUFF ----------------------------------------------
 
@@ -38,7 +40,7 @@ clean:
 
 # ----- LIBRARY ----------------------------------------------------
 
-LIB_FLAGS=-O2 -Wall -DUNIX -DINLINE_G=inline
+LIB_FLAGS=$(BASE_FLAGS)
 
 LIB_OBJS=\
 	src/analyze.o  \
@@ -62,7 +64,7 @@ $(LIB_NAME): $(LIB_OBJS)
 
 # ----- CMDLINE PROGRAM ---------------------------------------------
 
-CMD_FLAGS=-O2 -Wall -I. -DUNIX -DINLINE_G=inline
+CMD_FLAGS=$(BASE_FLAGS)
 CMD_LIBS=-lm -lz
 
 CMD_OBJS=cmdline/main.o cmdline/display.o  
@@ -86,8 +88,13 @@ install: bin
 
 # ----- GUI PROGRAM ---------------------------------------------
 
-GUI_FLAGS=-O2 -Wall -I. -DUNIX -DINLINE_G=inline
-GUI_LIBS=-lm -lz
+FLTK_PREFIX=../fltk-1.1.7
+FLTK_CFLAGS=-I$(FLTK_PREFIX) -I$(FLTK_PREFIX)/zlib
+FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lpng -lz -ljpeg \
+          -lfltk -lX11 -lXext
+
+GUI_FLAGS=$(BASE_FLAGS) $(FLTK_CFLAGS)
+GUI_LIBS=$(FLTK_LIBS) -lm
 
 GUI_OBJS=\
 	gui/main.o     \
