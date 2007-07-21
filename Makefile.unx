@@ -18,12 +18,12 @@ CMD_NAME=glbsp
 GUI_NAME=glBSPX
 DOC_NAME=glbsp.txt
 
-CC=cc
+CC=gcc
 CXX=g++
 AR=ar rc
 RANLIB=ranlib
 
-BASE_FLAGS=-Wall -O2 -I. -DUNIX -DINLINE_G=inline
+BASE_FLAGS=-Wall -O2 -I./src -DUNIX -DINLINE_G=inline
 
 
 # ----- GENERAL STUFF ----------------------------------------------
@@ -74,7 +74,7 @@ cmdline/%.o: cmdline/%.c
 
 $(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
 	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
-	strip --strip-unneeded $(PROGNAME)
+	strip --strip-unneeded $@
 
 install: bin
 	cp $(PROGNAME) /usr/bin/$(PROGNAME)
