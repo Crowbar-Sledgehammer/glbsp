@@ -1,37 +1,78 @@
+##############################
 #
-# glBSP Makefile for UNIX/Cmdline
+# glBSP Makefile for UNIX
+#
+# Targets:
+#    libglbsp.a
+#    glbsp
+#    glBSPX
+#    glbsp.txt
+#
+#    all     : makes libglbsp.a + glbsp
+#    install : installs glbsp program
+#    clean   : removes targets and intermediate files
 #
 
-MAIN=src
-SYSDIR=cmdline
-SRC_DIR=glbsp-2.20
-
-PROGNAME=glbsp
-LIBNAME=libglbsp.a
+LIB_NAME=libglbsp.a
+CMD_NAME=glbsp
+GUI_NAME=glBSPX
+DOC_NAME=glbsp.txt
 
 CC=cc
-CFLAGS=-O2 -Wall -I$(MAIN) -DGLBSP_TEXT -DUNIX -DINLINE_G=inline
-LIBS=-lm -lz
+CXX=g++
+AR=ar rc
+RANLIB=ranlib
 
-OBJS=$(SYSDIR)/main.o $(SYSDIR)/display.o  
 
+# ----- GENERAL STUFF ----------------------------------------------
 
-# ----- TARGETS ------------------------------------------------------
-
-all:    $(PROGNAME)
+all:    $(LIB_NAME) $(CMD_NAME)
 
 clean:
 	rm -f $(PROGNAME) $(MAIN)/*.o $(SYSDIR)/*.o
 	rm -f $(MAIN)/core $(SYSDIR)/core $(MAIN)/glbsp.txt
 	rm -f $(MAIN)/gb_debug.txt $(SYSDIR)/gb_debug.txt
 
-$(PROGNAME): $(OBJS)
-	$(MAKE) -f Plugin_unx.mak
-	$(CC) $(CFLAGS) $(OBJS) -o $(PROGNAME) $(LIBNAME) $(LIBS)
+.PHONY: all clean
 
-bin: all
+
+# ----- LIBRARY ----------------------------------------------------
+
+LIB_FLAGS=-O2 -Wall -DUNIX -DINLINE_G=inline
+
+LIB_OBJS=\
+	src/analyze.o  \
+	src/blockmap.o \
+	src/glbsp.o    \
+	src/level.o    \
+	src/node.o     \
+	src/reject.o   \
+	src/seg.o      \
+	src/system.o   \
+	src/util.o     \
+	src/wad.o
+
+src/%.o: src/%.c
+	$(CC) $(LIB_FLAGS) -c $^ -o $@
+
+$(LIB_NAME): $(LIB_OBJS)
+	$(AR) $@ $(LIB_OBJS)
+	$(RANLIB) $@
+
+
+# ----- CMDLINE PROGRAM ---------------------------------------------
+
+CMD_FLAGS=-O2 -Wall -I. -DUNIX -DINLINE_G=inline
+CMD_LIBS=-lm -lz
+
+CMD_OBJS=cmdline/main.o cmdline/display.o  
+
+cmdline/%.o: cmdline/%.c
+	$(CC) $(CMD_FLAGS) -c $^ -o $@
+
+$(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
+	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
 	strip --strip-unneeded $(PROGNAME)
-	cat $(MAIN)/README.txt $(MAIN)/USAGE.txt $(MAIN)/CHANGES.txt > $(MAIN)/glbsp.txt
 
 install: bin
 	cp $(PROGNAME) /usr/bin/$(PROGNAME)
@@ -40,50 +81,46 @@ install: bin
 	cp $(MAIN)/glbsp.1 /usr/share/man/man1/glbsp.1
 	chmod 644 /usr/share/man/man1/glbsp.1
 
-.PHONY: all clean bin install
+.PHONY: install
 
 
-# ----- RELEASE CRUD -----------------------------------------------
+# ----- GUI PROGRAM ---------------------------------------------
 
-TEXT_LIST=$(SRC_DIR)/*.[ch]*   \
-          $(SRC_DIR)/*.txt     \
-          $(SRC_DIR)/*.[1-9]   \
-          $(SRC_DIR)/Make*     \
-          $(SRC_DIR)/Cmdline*  \
-          $(SRC_DIR)/Plugin*   \
-          $(SRC_DIR)/GUI*      \
-          $(SRC_DIR)/cmdline/*.[ch]*    \
-          $(SRC_DIR)/fltk/*.[ch]*   \
-          $(SRC_DIR)/fltk/*.r       \
-          $(SRC_DIR)/fltk/*.r[ch]   \
-          $(SRC_DIR)/fltk/*.desktop  \
-          $(SRC_DIR)/fltk/*.xpm  \
-          $(SRC_DIR)/fltk/glBSPX.app/Contents/Info.plist
+GUI_FLAGS=-O2 -Wall -I. -DUNIX -DINLINE_G=inline
+GUI_LIBS=-lm -lz
 
-BIN_LIST=$(SRC_DIR)/fltk/*.ico  \
-         $(SRC_DIR)/fltk/glBSPX.app/Contents/PkgInfo  \
-         $(SRC_DIR)/fltk/glBSPX.app/Contents/Resources/glbspx.icns
+GUI_OBJS=\
+	gui/main.o     \
+	gui/about.o    \
+	gui/book.o     \
+	gui/booktext.o \
+	gui/cookie.o   \
+	gui/dialog.o   \
+	gui/files.o    \
+	gui/helper.o   \
+	gui/images.o   \
+	gui/license.o  \
+	gui/menu.o     \
+	gui/options.o  \
+	gui/prefs.o    \
+	gui/progress.o \
+	gui/textbox.o  \
+	gui/window.o
 
-DIR_LIST=$(SRC_DIR)/cmdline   \
-         $(SRC_DIR)/cmdline/obj  \
-         $(SRC_DIR)/plugin    \
-         $(SRC_DIR)/fltk  \
-         $(SRC_DIR)/fltk/glBSPX.app  \
-         $(SRC_DIR)/fltk/glBSPX.app/Contents  \
-         $(SRC_DIR)/fltk/glBSPX.app/Contents/Resources
+gui/%.o: gui/%.cc
+	$(CXX) $(GUI_FLAGS) -c $^ -o $@
 
-tar: clean
-	cd $(MAIN)/..;  \
-        tar czf ~/glbspsrc.tgz $(TEXT_LIST) $(BIN_LIST) --exclude=CVS
+$(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
+	$(CXX) $(GUI_FLAGS) $(GUI_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
 
-zip: clean
-	cd $(MAIN)/..;  \
-        zip ~/glbspsrc.zip $(DIR_LIST) $(BIN_LIST);  \
-        zip -l ~/glbspsrc.zip $(TEXT_LIST)
 
-testlist:
-	cd $(MAIN)/..;  \
-	echo -e TEXT: $(TEXT_LIST) "\n" BIN:  $(BIN_LIST)
+# ----- DOCUMENTATION ---------------------------------------------
 
-.PHONY: tar zip testlist
+DOC_FILES=README.txt USAGE.txt CHANGES.txt
 
+$(DOC_NAME): $(DOC_FILES)
+	cat $(DOC_FILES) > $@
+
+
+#--- editor settings ------------
+# vi:ts=8:sw=8:noexpandtab
