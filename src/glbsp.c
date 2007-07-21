@@ -505,7 +505,8 @@ glbsp_ret_e GlbspBuildNodes(const nodebuildinfo_t *info,
  
   if (info->missing_output)
     PrintMsg("* No output file specified. Using: %s\n\n", info->output_file);
-  else if (info->same_filenames)
+
+  if (info->same_filenames)
     PrintMsg("* Output file is same as input file. Using -loadall\n\n");
 
   // opens and reads directory from the input wad
