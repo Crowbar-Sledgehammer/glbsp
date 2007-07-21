@@ -4,6 +4,9 @@
 # (Note: requires GNU make)
 # 
 
+MAIN=src
+SYSDIR=cmdline
+
 # SHELL=bash.exe
 
 BIN=glbsp.exe
@@ -21,18 +24,18 @@ LIBS=-lm $(ZLIB_LIBS)
 # ----- OBJECTS ------------------------------------------------------
 
 OBJS= \
-    cmdline/main.o     \
-    cmdline/display.o  \
-    analyze.o \
-    blockmap.o \
-    glbsp.o \
-    level.o \
-    node.o \
-    reject.o \
-    seg.o \
-    system.o \
-    util.o \
-    wad.o
+    $(SYSDIR)/main.o     \
+    $(SYSDIR)/display.o  \
+    $(MAIN)/analyze.o \
+    $(MAIN)/blockmap.o \
+    $(MAIN)/glbsp.o \
+    $(MAIN)/level.o \
+    $(MAIN)/node.o \
+    $(MAIN)/reject.o \
+    $(MAIN)/seg.o \
+    $(MAIN)/system.o \
+    $(MAIN)/util.o \
+    $(MAIN)/wad.o
 
 # ----- TARGETS ------------------------------------------------------
 
