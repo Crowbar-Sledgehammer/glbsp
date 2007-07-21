@@ -2,7 +2,7 @@
 // MENU : Unix/FLTK Menu handling
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2005 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2007 Andrew Apted
 //
 //  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -60,7 +60,7 @@ static void menu_do_prefs(Fl_Widget *w, void * data)
 //------------------------------------------------------------------------
 
 static const char *about_Info =
-  "By Andrew Apted (C) 2000-2005\n"
+  "By Andrew Apted (C) 2000-2007\n"
   "\n"
   "Based on BSP 2.3 (C) 1998 Colin Reed, Lee Killough\n"
   "\n"
