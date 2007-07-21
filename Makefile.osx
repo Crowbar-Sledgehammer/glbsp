@@ -2,7 +2,7 @@
 # glBSP Makefile for MacOS X/Cmdline
 #
 
-MAIN=.
+MAIN=src
 SYSDIR=cmdline
 SRC_DIR=glbsp
 

@@ -2,28 +2,18 @@
 # glBSP Makefile for UNIX/Cmdline
 #
 
-MAIN=.
+MAIN=src
 SYSDIR=cmdline
 SRC_DIR=glbsp-2.20
 
 PROGNAME=glbsp
+LIBNAME=libglbsp.a
 
 CC=cc
-CFLAGS=-O2 -Wall -DGLBSP_TEXT -DUNIX -DINLINE_G=inline
+CFLAGS=-O2 -Wall -I$(MAIN) -DGLBSP_TEXT -DUNIX -DINLINE_G=inline
 LIBS=-lm -lz
 
-OBJS=$(SYSDIR)/main.o     \
-     $(SYSDIR)/display.o  \
-     $(MAIN)/analyze.o    \
-     $(MAIN)/blockmap.o   \
-     $(MAIN)/glbsp.o      \
-     $(MAIN)/level.o      \
-     $(MAIN)/node.o       \
-     $(MAIN)/reject.o     \
-     $(MAIN)/seg.o        \
-     $(MAIN)/system.o     \
-     $(MAIN)/util.o       \
-     $(MAIN)/wad.o
+OBJS=$(SYSDIR)/main.o $(SYSDIR)/display.o  
 
 
 # ----- TARGETS ------------------------------------------------------
@@ -36,7 +26,8 @@ clean:
 	rm -f $(MAIN)/gb_debug.txt $(SYSDIR)/gb_debug.txt
 
 $(PROGNAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(PROGNAME) $(LIBS)
+	$(MAKE) -f Plugin_unx.mak
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROGNAME) $(LIBNAME) $(LIBS)
 
 bin: all
 	strip --strip-unneeded $(PROGNAME)

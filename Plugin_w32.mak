@@ -22,16 +22,16 @@ RANLIB=ranlib
 # ----- OBJECTS ------------------------------------------------------
 
 OBJS= \
-    analyze.o \
-    blockmap.o \
-    glbsp.o \
-    level.o \
-    node.o \
-    reject.o \
-    seg.o \
-    system.o \
-    util.o \
-    wad.o
+    src/analyze.o \
+    src/blockmap.o \
+    src/glbsp.o \
+    src/level.o \
+    src/node.o \
+    src/reject.o \
+    src/seg.o \
+    src/system.o \
+    src/util.o \
+    src/wad.o
 
 # ----- TARGETS ------------------------------------------------------
 

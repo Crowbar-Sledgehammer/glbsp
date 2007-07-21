@@ -3,7 +3,7 @@
 # (Note: hasn't been tested for a long time)
 #
 
-MAIN=.
+MAIN=src
 SYSDIR=cmdline
 
 PROGNAME=glbsp.exe
