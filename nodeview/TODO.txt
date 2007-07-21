@@ -2,29 +2,14 @@
 NodeView TODO list
 ==================
 
-
 + info panel:
-
-  # map name
 
   >> node type (normal | GL V2 | GL V3 | GL V5 )
 
-  # zooming
+  # mouse coords:
 
-
-  # index of current node/subsector
-    
-  # partition coords
-  
-  # bounding box
-
-  # subsector seg list
-
-
-  # mouse coords
-
-    -  sector,
-    -  linedef,
+    -  sector
+    -  linedef
     -  vertex
 
     -  subsector
@@ -35,12 +20,9 @@ NodeView TODO list
 
 + process multiple WAD / GWA files
 
+- seg list: only need to show start and end numbers.
 
-DONE: + information panel, with lots of useful info.
-DONE: - show node bounding boxes.
-DONE: - partition line: draw arrow heads along it.
-DONE: - allow zooming with the mouse-wheel.
-DONE: - grid colors: smoother zoom transitions.
-DONE: - replace fl_color_cube with better colors.
-FIXED: if click on info-panel widget, cannot refocus grid widget.
+- RSCRIPT editor / browser.
+
+- REJECT browser.
 
