@@ -810,7 +810,7 @@ void GetGLNodes(wad_c *base)
     count = lump->length / sizeof(raw_node_t);
   }
 
-  if (!lump || count < 5)
+  if (!lump || count < 1)
     return;
 
 # if DEBUG_LOAD
