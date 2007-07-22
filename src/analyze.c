@@ -760,11 +760,11 @@ void TestForWindowEffect(linedef_t *L)
   int cast_horiz = fabs(dx) < fabs(dy) ? 1 : 0;
 
   float_g back_dist = 999999.0;
-  boolean_g back_open = FALSE;
+  sector_t * back_open = NULL;
   int back_line = -1;
 
   float_g front_dist = 999999.0;
-  boolean_g front_open = FALSE;
+  sector_t * front_open = NULL;
   int front_line = -1;
 
   for (i=0; i < num_linedefs; i++)
@@ -831,7 +831,7 @@ void TestForWindowEffect(linedef_t *L)
       if (dist < front_dist)
       {
         front_dist = dist;
-        front_open = (hit_side && hit_side->sector) ? TRUE : FALSE;
+        front_open = hit_side ? hit_side->sector : NULL;
         front_line = i;
       }
     }
@@ -840,7 +840,7 @@ void TestForWindowEffect(linedef_t *L)
       if (dist < back_dist)
       {
         back_dist = dist;
-        back_open = (hit_side && hit_side->sector) ? TRUE : FALSE;
+        back_open = hit_side ? hit_side->sector : NULL;
         back_line = i;
       }
     }
@@ -853,10 +853,10 @@ void TestForWindowEffect(linedef_t *L)
       front_line, front_dist, front_open ? "OPEN" : "CLOSED");
 #endif
 
-  if (back_open && front_open)
+  if (back_open && front_open && L->right->sector == front_open)
   {
-    L->window_effect = 1;
-    PrintMiniWarn("Linedef %d is one-sided but faces into a sector.\n", L->index);
+    L->window_effect = back_open;
+    PrintMiniWarn("Linedef #%d seems to be a One-Sided Window (back faces sector #%d).\n", L->index, back_open->index);
   }
 }
 

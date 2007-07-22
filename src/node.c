@@ -468,8 +468,8 @@ superblock_t *CreateSegs(void)
         left->start   = line->end;
         left->end     = line->start;
         left->side    = 1;
-        left->linedef = NULL; // miniseg
-        left->sector  = NULL; //
+        left->linedef = right->linedef;
+        left->sector  = line->window_effect;
 
         left->source_line = line;
         left->index = -1;
@@ -478,8 +478,6 @@ superblock_t *CreateSegs(void)
 
         AddSegToSuper(block, left);
 
-        // setup partner info (it's very strange to have a miniseg
-        // and a normal seg partnered together).
         left->partner = right;
         right->partner = left;
       }
@@ -587,12 +585,14 @@ static void ClockwiseOrder(subsec_t *sub)
   // referencing linedefs (they are often used for deep-water effects).
   for (i=0; i < total; i++)
   {
-    int cur_score = 2;
+    int cur_score = 3;
 
     if (! array[i]->linedef)
       cur_score = 0;
-    else if (array[i]->linedef->self_ref)
+    else if (array[i]->linedef->window_effect)
       cur_score = 1;
+    else if (array[i]->linedef->self_ref)
+      cur_score = 2;
 
     if (cur_score > score)
     {
@@ -727,11 +727,6 @@ static void SanityCheckHasRealSeg(subsec_t *sub)
   for (cur=sub->seg_list; cur; cur=cur->next)
   {
     if (cur->linedef)
-      return;
-
-    // another hack for the 'One-Sided Window' effect (argh!!)
-    if (cur->partner && cur->partner->linedef &&
-        cur->partner->linedef->window_effect)
       return;
   }
 
