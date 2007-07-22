@@ -1615,7 +1615,7 @@ void LoadLevel(void)
 
   DetectOverlappingLines();
 
-  if (!cur_info->no_window_fx)
+  if (cur_info->window_fx)
     DetectWindowEffects();
 }
 

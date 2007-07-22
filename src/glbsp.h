@@ -104,7 +104,7 @@ typedef struct nodebuildinfo_s
   boolean_g no_prune;
   boolean_g merge_vert;
   boolean_g skip_self_ref;
-  boolean_g no_window_fx;
+  boolean_g window_fx;
 
   int block_limit;
 
