@@ -24,7 +24,7 @@
 #include "structs.h"
 #include "level.h"
 
-#define DEFAULT_BLOCK_LIMIT  44000
+#define DEFAULT_BLOCK_LIMIT  16000
 
 // compute blockmap origin & size (the block_x/y/w/h variables)
 // based on the set of loaded linedefs.
