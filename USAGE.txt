@@ -156,7 +156,8 @@ These options are rarely needed:
                 duplicate vertices to stay separate for special effect.
 
   -y -windowfx  Lets glBSP detect and handle the "One-Sided Window"
-                mapping trick.  @@@@
+                mapping trick.  This can cause problems in some engines
+                so it is disabled by default.
  
   -u -prunesec  Removes any unused sectors found in the level.  Only
                 works when normal nodes are being built.  This is
