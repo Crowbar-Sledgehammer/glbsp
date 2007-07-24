@@ -124,7 +124,7 @@ $(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
 
 # ----- DOCUMENTATION ---------------------------------------------
 
-DOC_FILES=README.txt USAGE.txt CHANGES.txt
+DOC_FILES=README.txt USAGE.txt TRICKS.txt CHANGES.txt
 
 $(DOC_NAME): $(DOC_FILES)
 	cat $(DOC_FILES) > $@

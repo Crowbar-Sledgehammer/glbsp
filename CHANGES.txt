@@ -22,8 +22,8 @@ Changes in V2.24  (XX July 2007)
    hence the absolute minimum is around 65535/3 = 21845, assuming
    no compression).
 
- - added TRICKS.txt document to source package which describes
-   various map tricks and how glBSP handles them.
+ - added TRICKS.txt document which describes various map tricks
+   and how glBSP handles them.
  
  - added new option "-windowfx" to enable the test for the
    One-Sided Window trick, which is now disabled by default.

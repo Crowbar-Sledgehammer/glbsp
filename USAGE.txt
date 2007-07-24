@@ -197,8 +197,9 @@ ZDBSP Format Nodes
 ------------------
 
 When the normal nodes overflow, older versions of glBSP would simply
-write out the invalid node data.  glBSP 2.20 will write out the node
-data in the ZDBSP format (originally created for the ZDoom engine).
+write out the invalid node data.  glBSP 2.20 and higher will write
+out the node data in the ZDBSP format (originally created for the
+ZDoom engine).
 
 
 Interaction with other tools
@@ -283,7 +284,7 @@ were changed or abandoned.  Features that are different:
 
   +  glBSP has Hexen support.
 
-  +  glBSP packs the blockmap, and can merge identical sidedefs.
+  +  glBSP compresses the blockmap, and can pack sidedefs.
 
   +  glBSP has a much more modular architecture, and can even serve as
      a plug-in for other programs.
