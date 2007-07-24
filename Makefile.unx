@@ -25,6 +25,8 @@ RANLIB=ranlib
 
 BASE_FLAGS=-Wall -O2 -I./src -DUNIX -DINLINE_G=inline
 
+FLTK_DIR=./fltk-1.1.7
+
 
 # ----- GENERAL STUFF ----------------------------------------------
 
@@ -88,12 +90,11 @@ install: bin
 
 # ----- GUI PROGRAM ---------------------------------------------
 
-FLTK_PREFIX=../fltk-1.1.7
-FLTK_CFLAGS=-I$(FLTK_PREFIX) -I$(FLTK_PREFIX)/zlib
-FLTK_LIBS=-L$(FLTK_PREFIX)/lib -lfltk_images -lpng -lz -ljpeg \
+FLTK_FLAGS=-I$(FLTK_DIR) -I$(FLTK_DIR)/zlib
+FLTK_LIBS=-L$(FLTK_DIR)/lib -lfltk_images -lpng -lz -ljpeg \
           -lfltk -lX11 -lXext
 
-GUI_FLAGS=$(BASE_FLAGS) $(FLTK_CFLAGS)
+GUI_FLAGS=$(BASE_FLAGS) $(FLTK_FLAGS)
 GUI_LIBS=$(FLTK_LIBS) -lm
 
 GUI_OBJS=\
