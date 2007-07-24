@@ -94,6 +94,8 @@ FLTK_FLAGS=-I$(FLTK_DIR) -I$(FLTK_DIR)/zlib
 FLTK_LIBS=-L$(FLTK_DIR)/lib -lfltk_images -lpng -lz -ljpeg \
           -lfltk -lX11 -lXext
 
+## may need: -L/usr/X11R6/lib
+
 GUI_FLAGS=$(BASE_FLAGS) $(FLTK_FLAGS)
 GUI_LIBS=$(FLTK_LIBS) -lm
 
@@ -120,6 +122,7 @@ gui/%.o: gui/%.cc
 
 $(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
 	$(CXX) $(GUI_FLAGS) $(GUI_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
+	strip --strip-unneeded $@
 
 
 # ----- DOCUMENTATION ---------------------------------------------
