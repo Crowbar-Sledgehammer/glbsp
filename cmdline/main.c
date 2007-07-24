@@ -67,7 +67,7 @@ static void ShowInfo(void)
     "accompanying documentation for more details.\n"
     "\n"
     "Usage: glbsp [options] input.wad ... [-o output.wad]\n"
-    "       glbsp @arg_file.rsp\n"
+    "Or:    glbsp @arg_file.rsp\n"
     "\n"
     "For a list of the available options, type: glbsp -help\n"
   );
@@ -83,7 +83,7 @@ static void ShowOptions(void)
     "  -f  -fast          Reuse original nodes to build faster\n"
     "  -w  -warn          Show extra warning messages\n"
     "  -n  -normal        Forces the normal nodes to be rebuilt\n"
-    "  -c  -factor ###    Changes the cost assigned to SEG splits\n"
+    "  -c  -factor ###    Sets the cost assigned to SEG splits\n"
     "  -p  -pack          Pack sidedefs (remove duplicates)\n"
     "  -xr -noreject      Don't clobber the REJECT map\n"
     "\n");
@@ -97,7 +97,7 @@ static void ShowOptions(void)
     "  -b  -maxblock ###  Sets the BLOCKMAP truncation limit\n"
     "  -xn -nonormal      Don't add (if missing) the normal nodes\n"
     "  -xp -noprog        Don't show progress indicator\n"
-    "  -xu -noprune       Never prune anything from the map\n"
+    "  -xu -noprune       Never prune linedefs or sidedefs\n"
   );
 }
 
