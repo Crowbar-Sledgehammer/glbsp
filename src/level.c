@@ -1637,6 +1637,30 @@ void FreeLevel(void)
 }
 
 //
+// PutGLOptions
+//
+void PutGLOptions(void)
+{
+  char option_buf[128];
+
+  sprintf(option_buf, "-v%d -factor %d", cur_info->spec_version, cur_info->factor);
+
+  if (cur_info->fast         ) strcat(option_buf, " -f");
+  if (cur_info->force_normal ) strcat(option_buf, " -n");
+  if (cur_info->merge_vert   ) strcat(option_buf, " -m");
+  if (cur_info->pack_sides   ) strcat(option_buf, " -p");
+  if (cur_info->prune_sect   ) strcat(option_buf, " -u");
+  if (cur_info->skip_self_ref) strcat(option_buf, " -s");
+  if (cur_info->window_fx    ) strcat(option_buf, " -y");
+
+  if (cur_info->no_normal) strcat(option_buf, " -xn");
+  if (cur_info->no_reject) strcat(option_buf, " -xr");
+  if (cur_info->no_prune ) strcat(option_buf, " -xu");
+
+  AddGLTextLine("OPTIONS", option_buf);
+}
+
+//
 // PutGLChecksum
 //
 void PutGLChecksum(void)
@@ -1768,6 +1792,7 @@ void SaveLevel(node_t *root_node)
 
   // keyword support (v5.0 of the specs)
   AddGLTextLine("BUILDER", "glBSP " GLBSP_VER);
+  PutGLOptions();
   {
     char *time_str = UtilTimeString();
 
