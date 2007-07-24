@@ -130,6 +130,10 @@ static void AddExtraFile(nodebuildinfo_t *info, const char *str)
       continue;  \
     }
 
+#define HANDLE_BOOLEAN2(abbrev, name, field)  \
+    HANDLE_BOOLEAN(abbrev, field)  \
+    HANDLE_BOOLEAN(name, field)
+
 glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info, 
     volatile nodebuildcomms_t *comms,
     const char ** argv, int argc)
@@ -217,7 +221,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
-    if (UtilStrCaseCmp(opt_str, "factor") == 0)
+    if (UtilStrCaseCmp(opt_str, "factor") == 0 ||
+        UtilStrCaseCmp(opt_str, "c") == 0)
     {
       if (argc < 2)
       {
@@ -240,7 +245,8 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
-    if (UtilStrCaseCmp(opt_str, "maxblock") == 0)
+    if (UtilStrCaseCmp(opt_str, "maxblock") == 0 ||
+        UtilStrCaseCmp(opt_str, "b") == 0)
     {
       if (argc < 2)
       {
@@ -255,26 +261,23 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
       continue;
     }
 
-    HANDLE_BOOLEAN("q",           quiet)
-    HANDLE_BOOLEAN("fast",        fast)
-    HANDLE_BOOLEAN("noreject",    no_reject)
-    HANDLE_BOOLEAN("noprog",      no_progress)
-    HANDLE_BOOLEAN("warn",        mini_warnings)
-    HANDLE_BOOLEAN("pack",        pack_sides)
-    HANDLE_BOOLEAN("normal",      force_normal)
+    HANDLE_BOOLEAN2("q",  "quiet",      quiet)
+    HANDLE_BOOLEAN2("f",  "fast",       fast)
+    HANDLE_BOOLEAN2("w",  "warn",       mini_warnings)
+    HANDLE_BOOLEAN2("p",  "pack",       pack_sides)
+    HANDLE_BOOLEAN2("n",  "normal",     force_normal)
+    HANDLE_BOOLEAN2("xr", "noreject",   no_reject)
+    HANDLE_BOOLEAN2("xp", "noprog",     no_progress)
 
-    HANDLE_BOOLEAN("loadall",     load_all)
-    HANDLE_BOOLEAN("nonormal",    no_normal)
-    HANDLE_BOOLEAN("forcegwa",    gwa_mode)
-    HANDLE_BOOLEAN("prunesec",    prune_sect)
-    HANDLE_BOOLEAN("noprune",     no_prune)
-    HANDLE_BOOLEAN("mergevert",   merge_vert)
-    HANDLE_BOOLEAN("windowfx",    window_fx)
-    HANDLE_BOOLEAN("skipself",    skip_self_ref)
+    HANDLE_BOOLEAN2("m",  "mergevert",   merge_vert)
+    HANDLE_BOOLEAN2("u",  "prunesec",    prune_sect)
+    HANDLE_BOOLEAN2("y",  "windowfx",    window_fx)
+    HANDLE_BOOLEAN2("s",  "skipselfref", skip_self_ref)
+    HANDLE_BOOLEAN2("xu", "noprune",     no_prune)
+    HANDLE_BOOLEAN2("xn", "nonormal",    no_normal)
 
     // to err is human...
     HANDLE_BOOLEAN("noprogress",  no_progress)
-    HANDLE_BOOLEAN("quiet",       quiet)
     HANDLE_BOOLEAN("packsides",   pack_sides)
     HANDLE_BOOLEAN("prunesect",   prune_sect)
 
@@ -289,7 +292,9 @@ glbsp_ret_e GlbspParseArgs(nodebuildinfo_t *info,
     }
 
     // backwards compatibility
+    HANDLE_BOOLEAN("forcegwa",    gwa_mode)
     HANDLE_BOOLEAN("forcenormal", force_normal)
+    HANDLE_BOOLEAN("loadall",     load_all)
 
     // The -hexen option is only kept for backwards compatibility
     HANDLE_BOOLEAN("hexen", force_hexen)
