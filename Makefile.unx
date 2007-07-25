@@ -8,8 +8,8 @@
 #    glBSPX
 #    glbsp.txt
 #
-#    all     : makes libglbsp.a + glbsp
-#    install : installs glbsp program
+#    all     : makes the library and cmdline program
+#    install : installs cmdline program
 #    clean   : removes targets and intermediate files
 #
 
