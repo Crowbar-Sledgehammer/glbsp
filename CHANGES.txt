@@ -36,11 +36,13 @@ Changes in V2.24  (XX July 2007)
    segs are created for self-referencing linedefs.  The default
    is FALSE (disabled).  When enabled, the engine needs to find
    self-referencing linedefs and render their middle textures
-   with special code (i.e. treat them similar to sprites).
+   with special code (e.g. treat them similar to sprites).
  
  - improved directory layout, with main glbsp code in the 'src'
-   directory.
-@@@ MAKEFILE JUGGLE
+   directory.  Unfortunately this made all of the IDE Project
+   files invalid, so they have been removed.  The existing
+   Makefiles have been fixed and consolidated, so each type of
+   target (lib/cmdline/gui) is handled in the same makefile.
  
 
 Changes in V2.20  (14th September 2005)
