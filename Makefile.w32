@@ -16,7 +16,7 @@ CMD_NAME=glbsp.exe
 DOC_NAME=glbsp.txt
 
 PREFIX=
-## PREFIX=mingw32-
+# PREFIX=mingw32-
 
 CC=$(PREFIX)gcc
 CXX=$(PREFIX)g++
