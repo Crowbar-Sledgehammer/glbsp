@@ -9,7 +9,6 @@
 #    glbsp.txt
 #
 #    all     : makes the library and cmdline program
-#    install : installs glbsp program
 #    clean   : removes targets and intermediate files
 #
 
@@ -78,15 +77,6 @@ cmdline/%.o: cmdline/%.c
 $(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
 	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(CMD_LIBS)
 
-install: bin
-	cp $(PROGNAME) /usr/bin/$(PROGNAME)
-	chown root /usr/bin/$(PROGNAME)
-	chmod 755 /usr/bin/$(PROGNAME)
-	cp $(MAIN)/glbsp.1 /usr/share/man/man1/glbsp.1
-	chmod 644 /usr/share/man/man1/glbsp.1
-
-.PHONY: install
-
 
 # ----- GUI PROGRAM ---------------------------------------------
 
@@ -130,7 +120,9 @@ $(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
 DOC_FILES=README.txt USAGE.txt TRICKS.txt CHANGES.txt
 
 $(DOC_NAME): $(DOC_FILES)
-	cat $(DOC_FILES) > $@
+	cat $(DOC_FILES) > glbsp_doc.tmp
+	awk 'sub("$$", "\r")' glbsp_doc.tmp > $@
+	rm -f glbsp_doc.tmp
 
 
 #--- editor settings ------------
