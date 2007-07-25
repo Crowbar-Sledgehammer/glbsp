@@ -7,7 +7,7 @@
 #    glbsp.exe
 #    glbsp.txt
 #
-#    all     : makes the library and cmdline program
+#    all     : makes the library, cmdline program and docs
 #    clean   : removes targets and intermediate files
 #
 
@@ -33,7 +33,7 @@ ZLIB_DIR=./zlib-1.2.3
 
 # ----- GENERAL STUFF ----------------------------------------------
 
-all:    $(LIB_NAME) $(CMD_NAME)
+all:    $(LIB_NAME) $(CMD_NAME) $(DOC_NAME)
 
 clean:
 	-del $(LIB_NAME)

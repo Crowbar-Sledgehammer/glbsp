@@ -8,7 +8,7 @@
 #    glBSPX
 #    glbsp.txt
 #
-#    all     : makes the library and cmdline program
+#    all     : makes the library, cmdline program and docs
 #    install : installs cmdline program
 #    clean   : removes targets and intermediate files
 #
@@ -31,7 +31,7 @@ FLTK_DIR=./fltk-1.1.7
 
 # ----- GENERAL STUFF ----------------------------------------------
 
-all:    $(LIB_NAME) $(CMD_NAME)
+all:    $(LIB_NAME) $(CMD_NAME) $(DOC_NAME)
 
 clean:
 	rm -f $(LIB_NAME) $(CMD_NAME) $(GUI_NAME) $(DOC_NAME)
