@@ -75,7 +75,7 @@ cmdline/%.o: cmdline/%.c
 	$(CC) $(CMD_FLAGS) -c $^ -o $@
 
 $(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
-	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
+	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(CMD_LIBS)
 	strip --strip-unneeded $@
 
 install: bin
