@@ -27,7 +27,7 @@ NOTE WELL: glBSP is under the GNU General Public License (GPL),
 
            The file COPYING.txt contains a copy of the GPL
            license, and there is a lot of useful information
-           at this website: http://www.gnu.org/licenses/
+           at this web page: http://www.gnu.org/licenses/
 
 
 Linux / Unix Builds
@@ -36,7 +36,7 @@ Linux / Unix Builds
 The makefile is called "Makefile.unx".  You may need to open it
 in an editor and edit some stuff near the top, especially if you
 want to use another compiler (only GNU GCC has been well tested)
-or to set the directory where FLTK can be found.
+or to change the directory where FLTK can be found.
 
 To build the library and command-line program:
 
@@ -46,7 +46,7 @@ To build the GUI version:
 
    > make -f Makefile.unx glBSPX
 
-To install the command-line program:
+To install the command-line program and manual page:
 
    > make -f Makefile.unx install
 
@@ -54,10 +54,17 @@ To install the command-line program:
 Windows Builds
 --------------
 
+The makefile is called "Makefile.w32" and uses the MinGW tools
+(see the link below) for compiling, and you may need MSYS too.
+You will also need the ZLIB library (version 1.2.3) and should
+compile it first.
 
 To build the library and command-line program:
 
    > mingw32-make -f Makefile.w32
+
+There is no support yet for building the GUI binary natively
+under Windows (sorry).
 
 
 Cross-Compiling Win32 Binaries
@@ -75,49 +82,6 @@ To build the library and command-line program:
 To build the GUI version:
 
    > make -f Makefile.xming glBSPX.exe
-
-
-
-@@@
-
-
-Command-line glBSP
-------------------
-
-Linux/Unix: make -f Makefile.unx
-
-Windows with MinGW: mingw32-make -f Makefile.w32
-
-
-Plugin Library
---------------
-
-The plugin version of glBSP is a special version that can be used
-within other programs, e.g. a DOOM engine.  The result of the build 
-is a library file: libglbsp.a (libglbsp.lib for VC++ under Win32).
-
-Unix/Linux: make -f Plugin_unx.mak
-MacOS X:    make -f Plugin_osx.mak
-
-Windows with MinGW: mingw32-make -f Plugin_w32.mak
-
-Windows with Dev-C++:  open the Plugin.dev project file.
-Windows with MSVC.NET: open the Plugin.vcproj project file.
-
-
-Graphical version: glBSPX
--------------------------
-
-glBSPX is the GUI version of glBSP, written in C++ and requires the
-FLTK toolkit, version 1.1.7.  FLTK needs to be built before trying
-to build glBSPX.
-
-Unix/Linux: make -f Makefile.unx glBSPX
-MacOS X:    make -f GUI_osx.mak
-
-Windows with MinGW: mingw32-make -f GUI_w32.mak
-
-Windows with Dev-C++: open the GUI.dev project file.
 
 
 Links
