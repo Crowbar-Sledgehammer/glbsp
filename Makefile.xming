@@ -13,8 +13,8 @@
 #
 
 LIB_NAME=libglbsp.a
-CMD_NAME=glbsp
-GUI_NAME=glBSPX
+CMD_NAME=glbsp.exe
+GUI_NAME=glBSPX.exe
 DOC_NAME=glbsp.txt
 
 CC=i586-mingw32msvc-gcc
