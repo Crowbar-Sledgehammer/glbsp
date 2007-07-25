@@ -4,8 +4,8 @@
 #
 # Targets:
 #    libglbsp.a
-#    glbsp
-#    glBSPX
+#    glbsp.exe
+#    glBSPX.exe
 #    glbsp.txt
 #
 #    all     : makes the library and cmdline program
@@ -21,6 +21,8 @@ CC=i586-mingw32msvc-gcc
 CXX=i586-mingw32msvc-g++
 AR=i586-mingw32msvc-ar rc
 RANLIB=i586-mingw32msvc-ranlib
+STRIP=i586-mingw32msvc-strip --strip-unneeded
+WINDRES=i586-mingw32msvc-windres
 
 BASE_FLAGS=-Wall -O2 -I./src -DWIN32 -DINLINE_G=inline
 
@@ -76,6 +78,7 @@ cmdline/%.o: cmdline/%.c
 
 $(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
 	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(CMD_LIBS)
+	$(STRIP) $@
 
 
 # ----- GUI PROGRAM ---------------------------------------------
@@ -106,13 +109,18 @@ GUI_OBJS=\
 	gui/prefs.o    \
 	gui/progress.o \
 	gui/textbox.o  \
-	gui/window.o
+	gui/window.o   \
+	gui/glbsp_res.o
 
 gui/%.o: gui/%.cc
 	$(CXX) $(GUI_FLAGS) -c $^ -o $@
 
+gui/glbsp_res.o: gui/glBSPX.rc
+	$(WINDRES) -i $^ --input-format=rc -o $@ -O coff
+
 $(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
 	$(CXX) $(GUI_FLAGS) $(GUI_OBJS) -o $@ $(LIB_NAME) $(GUI_LIBS)
+	$(STRIP) $@
 
 
 # ----- DOCUMENTATION ---------------------------------------------
