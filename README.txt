@@ -44,7 +44,7 @@ License
 -------
 
 Thanks to Lee Killough and André Majorel (former maintainer of BSP,
-and devil-may-care flying French fool, respectively), glBSP is under
+and devil-may-care French flying ace, respectively), glBSP is under
 the GNU General Public License (GPL).  See the file 'COPYING.txt' in
 the source package (or go to http://www.gnu.org) for the full text,
 but to summarise:
