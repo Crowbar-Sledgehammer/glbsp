@@ -28,6 +28,9 @@ BASE_FLAGS=-Wall -O2 -I./src -DUNIX -DINLINE_G=inline
 
 FLTK_DIR=./fltk-1.1.7
 
+INSTALL_PREFIX=/usr
+MAN_PREFIX=$(INSTALL_PREFIX)/share/man
+
 
 # ----- GENERAL STUFF ----------------------------------------------
 
@@ -79,12 +82,12 @@ $(CMD_NAME): $(LIB_NAME) $(CMD_OBJS)
 	$(CC) $(CMD_FLAGS) $(CMD_OBJS) -o $@ $(LIB_NAME) $(CMD_LIBS)
 	$(STRIP) $@
 
-install: bin
-	cp $(PROGNAME) /usr/bin/$(PROGNAME)
-	chown root /usr/bin/$(PROGNAME)
-	chmod 755 /usr/bin/$(PROGNAME)
-	cp $(MAIN)/glbsp.1 /usr/share/man/man1/glbsp.1
-	chmod 644 /usr/share/man/man1/glbsp.1
+install: $(CMD_NAME)
+	cp $(CMD_NAME) $(INSTALL_PREFIX)/bin/
+	chown root $(INSTALL_PREFIX)/bin/$(CMD_NAME)
+	chmod 755 $(INSTALL_PREFIX)/bin/$(CMD_NAME)
+	cp glbsp.1 $(MAN_PREFIX)/man1/
+	chmod 644 $(MAN_PREFIX)/man1/glbsp.1
 
 .PHONY: install
 
