@@ -8,9 +8,9 @@ Changes in V2.24  (XX July 2007)
  - level name detection: allow some variation in the order of
    the level lumps (thanks to Darren Salt for the patch).
 
- - fixed potential crash in GlbspParseArgs() and GlbspCheckInfo()
-   (it depended on the compiler).
- 
+ - fixed potential crash passing NULL to the SetErrorMsg()
+   function (it depended on the compiler).
+
  - avoid some potential buffer overflows in printf calls.
 
  - abbreviations for most cmdline options, generally using single
