@@ -2,15 +2,7 @@
 TODO
 ====
 
-- make xming makefiles
-
-- make w32 (mingw) makefiles ?
-
-- update INSTALL.txt for makefile rework
-
-- update CHANGELOG for makefile rework
-
-- test test test
+- testing testing testing
 
 - RELEASE!
 
