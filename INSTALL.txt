@@ -48,7 +48,7 @@ To build the GUI version:
 
 To install the command-line program and manual page:
 
-   > make -f Makefile.unx install
+   > sudo make -f Makefile.unx install
 
 
 Windows Builds
