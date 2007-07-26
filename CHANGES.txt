@@ -2,8 +2,8 @@
 CHANGELOG
 =========
 
-Changes in V2.24  (XX July 2007)
--------------------------------
+Changes in V2.24  (26th July 2007)
+----------------------------------
 
  - level name detection: allow some variation in the order of
    the level lumps (thanks to Darren Salt for the patch).
