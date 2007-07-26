@@ -2,7 +2,3 @@
 TODO
 ====
 
-- testing testing testing
-
-- RELEASE!
-
