@@ -28,7 +28,7 @@ BASE_FLAGS=-Wall -O2 -I./src -DUNIX -DINLINE_G=inline
 
 FLTK_DIR=./fltk-1.1.7
 
-INSTALL_PREFIX=/usr
+INSTALL_PREFIX=/usr/local
 MAN_PREFIX=$(INSTALL_PREFIX)/share/man
 
 
