@@ -71,9 +71,73 @@ static void WriteThing_Q3A(FILE *fp, thing_t *th)
   }
 }
 
+static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
+                           subsec_t *sub, sector_t *sector)
+{
+  // TODO WriteFlatPlane
+}
+
+static void WriteWallPlane(FILE *fp, seg_t *seg, float_g z1, float_g z2,
+                           const char *backup_tex, subsec_t *sub, sector_t *sector)
+{
+  // TODO WriteWallPlane
+}
+
 static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
 {
-  // TODO
+  int pass;
+  int is_void;
+
+  if (sub->seg_count <= 2)
+    return;
+  
+  sector_t *sector = sub->seg_list->sector;
+  if (! sector)
+    sector = LookupSector(0);
+
+  is_void = (sector->ceil_h < -29000) ? TRUE : FALSE;
+
+  // first pass  : floors or void space
+  // second pass : ceilings
+  for (pass = 0; pass < (is_void ? 1 : 2); pass++)
+  {
+    seg_t *seg;
+    float_g bottom, top;
+    const char *flat_name;
+
+    fprintf(fp, " {\n");
+    fprintf(fp, "  BrushDef\n");
+    fprintf(fp, "  {\n");
+        
+    if (is_void)
+    {
+      bottom = -30000.0;
+      top = +30000.0;
+      flat_name = sector->floor_tex;
+    }
+    else if (pass == 0)
+    {
+      bottom = -30000.0;
+      top = sector->floor_h;
+      flat_name = sector->floor_tex;
+    }
+    else // pass == 1
+    {
+      bottom = sector->ceil_h - 0.5;
+      top = +30000.0;
+      
+      flat_name = sector->ceil_tex;
+    }
+
+    WriteFlatPlane(fp, bottom, flat_name, -1, sub, sector);
+    WriteFlatPlane(fp, top,    flat_name, +1, sub, sector);
+
+    for (seg = sub->seg_list; seg; seg = seg->next)
+      WriteWallPlane(fp, seg, bottom, top, flat_name, sub, sector);
+
+    fprintf(fp, "  }\n");
+    fprintf(fp, " }\n");
+  }
 }
 
 
