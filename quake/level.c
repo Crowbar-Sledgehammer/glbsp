@@ -313,8 +313,8 @@ void GetSectors(void)
   {
     sector_t *void_sec = NewSector();
 
-    void_sec->floor_h = -30000;
-    void_sec->ceil_h  = -30000;
+    void_sec->floor_h = 0; //@ Updated later
+    void_sec->ceil_h  = 0;
 
     strcpy(void_sec->floor_tex, "void");
     strcpy(void_sec->ceil_tex, "void");
@@ -1683,6 +1683,17 @@ void LoadLevel(void)
 
   AddSurroundingLines();
  
+  //@ Get height range for the Void
+  {
+    sector_t *void_sec = LookupSector(0);
+    int z1, z2;
+    
+    GetHeightBounds(&z1, &z2);
+
+    void_sec->floor_h = (float_g)z1 - 20;
+    void_sec->ceil_h  = (float_g)z2 + 30;
+  }
+
   if (lev_doing_normal)
   {
     // NOTE: order here is critical

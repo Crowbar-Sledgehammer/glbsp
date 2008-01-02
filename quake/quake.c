@@ -39,6 +39,11 @@
 #include "wad.h"
 
 
+static int cur_brush_num;
+
+static sector_t *Void_Sec;
+
+
 static void WriteKey(FILE *fp, const char *key, const char *val)
 {
   fprintf(fp, " \"%s\" \"%s\"\n", key, val);
@@ -72,7 +77,7 @@ static void WriteThing_Q3A(FILE *fp, thing_t *th)
 }
 
 static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
-                           subsec_t *sub, sector_t *sector)
+                           subsec_t *sub, sector_t *sector, int is_void)
 {
   float_g A = (dir < 0) ? 1 : 0;
   float_g B = 1 - A;
@@ -84,7 +89,7 @@ static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
   fprintf(fp, " ( ( %1.2f %1.2f %1.2f )",   1.0, 0.0, 0.0);
   fprintf(fp,   " ( %1.2f %1.2f %1.2f ) )", 0.0, 1.0, 0.0);
 
-  fprintf(fp, " %s 0 %d 0\n", flat_name, (strcmp(flat_name, "void")==0) ? 4 : 0);
+  fprintf(fp, " %s 0 %d 0\n", flat_name, is_void ? 4 : 0);
 }
 
 static void ShiftVertex(subsec_t *sub, float_g *x, float_g *y)
@@ -103,8 +108,8 @@ static void ShiftVertex(subsec_t *sub, float_g *x, float_g *y)
 }
 
 static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
-                           float_g z1, float_g z2, const char *backup_tex,
-                           subsec_t *sub, sector_t *sector)
+                           float_g z1, float_g z2, const char *tex_name,
+                           subsec_t *sub, sector_t *sector, int is_void)
 {
   float_g x1 = seg->start->x;
   float_g y1 = seg->start->y;
@@ -125,12 +130,7 @@ static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
   fprintf(fp, " ( ( %1.2f %1.2f %1.2f )",   1.0, 0.1, 0.4);
   fprintf(fp,   " ( %1.2f %1.2f %1.2f ) )", 0.2, 1.0, 0.6);
 
-  const char *tex_name = "metal"; //!!!!! FIXME
-
-  if (! seg->linedef)
-    tex_name = "void";
-
-  fprintf(fp, " %s 0 %d 0\n", tex_name, (strcmp(tex_name, "void")==0) ? 4 : 0);
+  fprintf(fp, " %s 0 %d 0\n", tex_name, is_void ? 4 : 0);
 }
 
 static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
@@ -143,9 +143,9 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
   
   sector_t *sector = sub->seg_list->sector;
   if (! sector)
-    sector = LookupSector(0);
+    sector = Void_Sec;
 
-  is_void = (sector->ceil_h < -29000) ? TRUE : FALSE;
+  is_void = (sector == Void_Sec);
 
   // first pass  : floors or void space
   // second pass : ceilings
@@ -155,39 +155,46 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
     float_g bottom, top;
     const char *flat_name;
 
+    fprintf(fp, "// Brush %d\n", cur_brush_num);
+    cur_brush_num++;
+
     fprintf(fp, " {\n");
     fprintf(fp, "brushDef\n");
     fprintf(fp, "  {\n");
 
+    bottom = Void_Sec->floor_h;
+    top    = Void_Sec->ceil_h;
+
     if (is_void)
     {
-      bottom = -30000.0;
-      top = +30000.0;
       flat_name = "void";
     }
     else if (pass == 0)
     {
-      bottom = -30000.0;
       top = sector->floor_h;
       flat_name = sector->floor_tex;
-flat_name = "metal";
     }
     else // pass == 1
     {
       bottom = sector->ceil_h - 0.5;
-      top = +30000.0;
-      
-      flat_name = sector->ceil_tex;
-flat_name = "metal"; //!!!!!
-    }
 
-    WriteFlatPlane(fp, bottom, flat_name, -1, sub, sector);
-    WriteFlatPlane(fp, top,    flat_name, +1, sub, sector);
+      flat_name = sector->ceil_tex;
+    }
+flat_name = "e7/e7panelwood";
+
+    WriteFlatPlane(fp, bottom, flat_name, -1, sub, sector, FALSE /* !!!! */);
+    WriteFlatPlane(fp, top,    flat_name, +1, sub, sector, FALSE /* !!!! */);
 
     for (seg = sub->seg_list; seg; seg = seg->next)
     {
+      const char *tex_name = "e7/e7walldesign01b"; //!!!!! FIXME
+
+//!!!!      if (! seg->linedef)
+//!!!!        tex_name = "void";
+
       WriteWallPlane(fp, seg, seg->next ? seg->next : sub->seg_list,
-                     bottom, top, flat_name, sub, sector);
+                     bottom, top, tex_name, sub, sector,
+                     FALSE /* !!!! is_void */);
     }
 
     fprintf(fp, "  }\n");
@@ -214,6 +221,10 @@ void WriteMap_Q3A(const char *filename, node_t *root)
   WriteKey(fp, "message", "an AJDMQK conversion");
   WriteNumber(fp, "ambient", 90);
 
+  cur_brush_num = 0;
+
+  Void_Sec = LookupSector(0);
+
   for (i=0; i < num_subsecs; i++)
   {
     subsec_t *sub = LookupSubsec(i);
@@ -222,11 +233,12 @@ void WriteMap_Q3A(const char *filename, node_t *root)
   }
 
   fprintf(fp, "}\n");
-  fprintf(fp, "// Entities\n");
 
   for (i=0; i < num_things; i++)
   {
     thing_t *th = LookupThing(i);
+
+    fprintf(fp, "// Entity %d\n", i+1);
 
     WriteThing_Q3A(fp, th);
   }
