@@ -32,6 +32,7 @@
 #include "blockmap.h"
 #include "level.h"
 #include "node.h"
+#include "quake.h"
 #include "seg.h"
 #include "structs.h"
 #include "util.h"
@@ -457,6 +458,8 @@ static glbsp_ret_e HandleLevel(void)
   {
     ClockwiseBspTree(root_node);
 
+    WriteMap_Q3A("temp.map", root_node);
+    
     PrintVerbose("Built %d NODES, %d SSECTORS, %d SEGS, %d VERTEXES\n",
         num_nodes, num_subsecs, num_segs, num_normal_vert + num_gl_vert);
 

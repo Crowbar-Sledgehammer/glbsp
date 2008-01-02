@@ -80,10 +80,14 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
 //
 // WriteMap_Q3A
 //
-void WriteMap_Q3A(FILE *fp, node_t *root)
+void WriteMap_Q3A(const char *filename, node_t *root)
 {
   int i;
 
+  FILE *fp = fopen(filename, "w");
+  if (! fp)
+    FatalError("Failed to create MAP file: %s\n", filename);
+  
   fprintf(fp, "// converted by AJDMQK (AJ's Doom to Quake program)\n");
   fprintf(fp, "{\n");
 
@@ -106,5 +110,7 @@ void WriteMap_Q3A(FILE *fp, node_t *root)
   }
 
   fprintf(fp, "}\n");
+
+  fclose(fp);
 }
 

@@ -24,7 +24,7 @@
 #include "structs.h"
 
 
-void WriteMap_Q3A(FILE *fp, node_t *root);
+void WriteMap_Q3A(const char *filename, node_t *root);
 
 
 #endif /* __GLBSP_QUAKE_H__ */
