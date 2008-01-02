@@ -22,8 +22,8 @@
 #define __GLBSP_GLBSP_H__
 
 
-#define AJQ2DM_VER  "0.1"
-#define AJQ2DM_VER_HEX  0x010
+#define AJDMQK_VER  "0.1"
+#define AJDMQK_VER_HEX  0x010
 
 
 // certain GCC attributes can be useful

@@ -3,13 +3,13 @@
 # Makefile for UNIX and GCC
 #
 # Targets:
-#    ajq2dm
+#    ajdmqk
 #
 #    all     : makes the library, cmdline program and docs
 #    clean   : removes targets and intermediate files
 #
 
-CMD_NAME=ajq2dm
+CMD_NAME=ajdmqk
 
 CC=gcc
 CXX=g++

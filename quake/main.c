@@ -42,7 +42,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "**** AJ's Quake to Doom " AJQ2DM_VER " (C) 2008 Andrew Apted ****\n\n"
+    "**** AJ's Doom to Quake " AJDMQK_VER " (C) 2008 Andrew Apted ****\n\n"
   );
 }
 

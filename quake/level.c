@@ -1820,7 +1820,7 @@ void SaveLevel(node_t *root_node)
   }
 
   // keyword support (v5.0 of the specs)
-  AddGLTextLine("BUILDER", "ajq2dm " AJQ2DM_VER);
+  AddGLTextLine("BUILDER", "ajdmqk " AJDMQK_VER);
   PutGLOptions();
   {
     char *time_str = UtilTimeString();
