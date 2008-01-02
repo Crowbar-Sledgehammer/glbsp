@@ -45,6 +45,8 @@ static int block_x, block_y;
 static int block_w, block_h;
 static int block_count;
 
+static int block_z1, block_z2;
+
 static int block_mid_x = 0;
 static int block_mid_y = 0;
 
@@ -66,6 +68,12 @@ void GetBlockmapBounds(int *x, int *y, int *w, int *h)
 {
   *x = block_x; *y = block_y;
   *w = block_w; *h = block_h;
+}
+
+void GetHeightBounds(int *z1, int *z2)
+{
+  *z1 = block_z1;
+  *z2 = block_z2;
 }
 
 //
@@ -530,6 +538,22 @@ static void FindBlockmapLimits(bbox_t *bbox)
 # endif
 }
 
+static void FindHeightLimits(void)
+{
+  int i;
+
+  block_z1 = SHRT_MAX;
+  block_z2 = SHRT_MIN;
+
+  for (i=0; i < num_sectors; i++)
+  {
+    sector_t *S = LookupSector(i);
+
+    if (S->floor_h < block_z1) block_z1 = S->floor_h;
+    if (S-> ceil_h > block_z2) block_z2 = S-> ceil_h;
+  }
+}
+
 //
 // TruncateBlockmap
 //
@@ -566,6 +590,7 @@ void InitBlockmap(void)
 
   /* find limits of linedefs, and store as map limits */
   FindBlockmapLimits(&map_bbox);
+  FindHeightLimits();
 
   PrintVerbose("Map goes from (%d,%d) to (%d,%d)\n",
       map_bbox.minx, map_bbox.miny, map_bbox.maxx, map_bbox.maxy);

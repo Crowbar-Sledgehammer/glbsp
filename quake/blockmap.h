@@ -36,6 +36,7 @@ void PutBlockmap(void);
 
 // utility routines...
 void GetBlockmapBounds(int *x, int *y, int *w, int *h);
+void GetHeightBounds(int *z1, int *z2);
 
 int CheckLinedefInsideBox(int xmin, int ymin, int xmax, int ymax,
     int x1, int y1, int x2, int y2);
