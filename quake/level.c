@@ -390,6 +390,7 @@ void GetThings(void)
 
     thing->type = UINT16(raw->type);
     thing->options = UINT16(raw->options);
+    thing->angle = SINT16(raw->angle);
 
     thing->index = i;
   }
@@ -433,6 +434,7 @@ void GetThingsHexen(void)
 
     thing->type = UINT16(raw->type);
     thing->options = UINT16(raw->options);
+    thing->angle = SINT16(raw->angle);
 
     thing->index = i;
   }

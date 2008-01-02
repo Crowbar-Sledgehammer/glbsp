@@ -207,6 +207,7 @@ typedef struct thing_s
   int x, y, dz;
   int type;
   int options;
+  int angle;
 
   // other info (angle, and hexen stuff) omitted.  We don't need to
   // write the THING lump, only read it.
