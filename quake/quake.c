@@ -74,13 +74,60 @@ static void WriteThing_Q3A(FILE *fp, thing_t *th)
 static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
                            subsec_t *sub, sector_t *sector)
 {
-  // TODO WriteFlatPlane
+  float_g A = (dir < 0) ? 1 : 0;
+  float_G B = 1 - A;
+  
+  fprintf(fp, "    ( %1.2f %1.2f %1.2f )", 0, 0, z);
+  fprintf(fp,    " ( %1.2f %1.2f %1.2f )", A, B, z);
+  fprintf(fp,    " ( %1.2f %1.2f %1.2f )", B, A, z);
+  
+  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1, 0, 0);
+  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0, 1, 0);
+
+  fprintf(fp, " %s 0 %d 0\n", flat_name, (strcmp(flat_name, "void")==0) ? 4 : 0);
 }
 
-static void WriteWallPlane(FILE *fp, seg_t *seg, float_g z1, float_g z2,
-                           const char *backup_tex, subsec_t *sub, sector_t *sector)
+static void ShiftVertex(subsec_t *sub, float_g *x, float_g *y)
 {
-  // TODO WriteWallPlane
+  float_g dx = *x - sub->mid_x;
+  float_g dy = *y - sub->mid_y;
+
+  float_g len = sqrt(dx*dx + dy*dy);
+  
+  // this shouldn't happen, but just in case we avoid the div-by-zero
+  if (len < 0.1)
+    return;
+
+  (*x) += 0.5 * dx / len;
+  (*y) += 0.5 * dy / len;
+}
+
+static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
+                           float_g z1, float_g z2, const char *backup_tex,
+                           subsec_t *sub, sector_t *sector)
+{
+  float_g x1 = seg->start->x;
+  float_g y1 = seg->start->y;
+  float_g x2 = seg->end->x;
+  float_g y2 = seg->end->y;
+
+  // when writing a quake brush, most vertices are shifted out a
+  // little bit so that brushes intersect (rather than touch,
+  // which leads to leaks).
+
+  ShiftVertex(sub, &x1, &y1);
+  ShiftVertex(sub, &x2, &y2);
+
+  fprintf(fp, "    ( %1.2f %1.2f %1.2f )", x1, y1, z1);
+  fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x2, y2, z1);
+  fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x1, y1, z2);
+
+  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1, 0.1, 0.4);
+  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.2, 1, 0.6);
+
+  const char *tex_name = "metal"; //!!!!! FIXME
+
+  fprintf(fp, " %s 0 %d 0\n", tex_name, (strcmp(tex_name, "void")==0) ? 4 : 0);
 }
 
 static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
@@ -133,7 +180,10 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
     WriteFlatPlane(fp, top,    flat_name, +1, sub, sector);
 
     for (seg = sub->seg_list; seg; seg = seg->next)
-      WriteWallPlane(fp, seg, bottom, top, flat_name, sub, sector);
+    {
+      WriteWallPlane(fp, seg, seg->next ? seg->next : sub->seg_list,
+                     bottom, top, flat_name, sub, sector);
+    }
 
     fprintf(fp, "  }\n");
     fprintf(fp, " }\n");
