@@ -204,7 +204,7 @@ linedef_t;
 
 typedef struct thing_s
 {
-  int x, y;
+  int x, y, dz;
   int type;
   int options;
 

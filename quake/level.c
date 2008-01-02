@@ -384,8 +384,9 @@ void GetThings(void)
   {
     thing_t *thing = NewThing();
 
-    thing->x = SINT16(raw->x);
-    thing->y = SINT16(raw->y);
+    thing->x  = SINT16(raw->x);
+    thing->y  = SINT16(raw->y);
+    thing->dz = 0;
 
     thing->type = UINT16(raw->type);
     thing->options = UINT16(raw->options);
@@ -426,8 +427,9 @@ void GetThingsHexen(void)
   {
     thing_t *thing = NewThing();
 
-    thing->x = SINT16(raw->x);
-    thing->y = SINT16(raw->y);
+    thing->x  = SINT16(raw->x);
+    thing->y  = SINT16(raw->y);
+    thing->dz = SINT16(raw->height);
 
     thing->type = UINT16(raw->type);
     thing->options = UINT16(raw->options);
