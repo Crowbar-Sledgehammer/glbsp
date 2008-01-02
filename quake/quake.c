@@ -103,12 +103,10 @@ static void ShiftVertex(subsec_t *sub, float_g *x, float_g *y)
 
   float_g len = sqrt(dx*dx + dy*dy);
   
-  // this shouldn't happen, but just in case we avoid the div-by-zero
-  if (len < 0.1)
-    return;
+  if (len < 1.0) len = 1.0;
 
-  (*x) += 8 * dx / len;
-  (*y) += 8 * dy / len;
+  (*x) += 2 * dx / len;
+  (*y) += 2 * dy / len;
 }
 
 static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
