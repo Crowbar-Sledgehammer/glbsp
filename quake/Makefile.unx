@@ -1,0 +1,64 @@
+####################################
+#
+# Makefile for UNIX and GCC
+#
+# Targets:
+#    ajq2dm
+#
+#    all     : makes the library, cmdline program and docs
+#    clean   : removes targets and intermediate files
+#
+
+CMD_NAME=ajq2dm
+
+CC=gcc
+CXX=g++
+AR=ar rc
+RANLIB=ranlib
+STRIP=strip --strip-unneeded
+
+BASE_FLAGS=-Wall -O2 -I./src -DUNIX -DINLINE_G=inline
+
+INSTALL_PREFIX=/usr/local
+MAN_PREFIX=$(INSTALL_PREFIX)/share/man
+
+
+# ----- GENERAL STUFF ----------------------------------------------
+
+all:    $(CMD_NAME)
+
+clean:
+	rm -f $(CMD_NAME) *.o
+	rm -f ./core ./ERRS ./gb_debug.txt 
+
+.PHONY: all clean
+
+
+# ----- CMDLINE PROGRAM ---------------------------------------------
+
+FLAGS=$(BASE_FLAGS)
+LIBS=-lm -lz
+
+OBJS=   main.o  \
+	display.o  \
+	analyze.o  \
+	blockmap.o \
+	glbsp.o    \
+	level.o    \
+	node.o     \
+	reject.o   \
+	seg.o      \
+	system.o   \
+	util.o     \
+	wad.o
+
+%.o: %.c
+	$(CC) $(FLAGS) -c $^ -o $@
+
+$(CMD_NAME): $(OBJS)
+	$(CC) $(FLAGS) $(OBJS) -o $@ $(LIBS)
+	$(STRIP) $@
+
+
+#--- editor settings ------------
+# vi:ts=8:sw=8:noexpandtab
