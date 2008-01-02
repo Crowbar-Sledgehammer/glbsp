@@ -55,6 +55,83 @@ extern sector_t  ** lev_sectors;
 extern boolean_g lev_doing_normal;
 
 
+sector_t *ThingFindSector(thing_t *th)
+{
+  int i;
+ 
+  float_g best_dist = 999999;
+  linedef_t *best_match = NULL;
+  sector_t *sector = NULL;
+
+  float_g x = th->x;
+  float_g y = th->y;
+
+  float_g x1, y1;
+  float_g x2, y2;
+
+  // -AJA- Algorithm is just like in DEU: we cast a line horizontally
+  //       from the given (x,y) position and find all linedefs that
+  //       intersect it, choosing the one with the closest distance.
+
+  for (i = 0; i < num_linedefs; i++)
+  {
+    linedef_t *L = lev_linedefs[i];
+
+    float_g x_cut;
+
+    x1 = L->start->x;  y1 = L->start->y;
+    x2 = L->end->x;    y2 = L->end->y;
+
+    /* check vertical range */
+    if (fabs(y2 - y1) < DIST_EPSILON)
+      continue;
+
+    if ((y > (y1 + DIST_EPSILON) && y > (y2 + DIST_EPSILON)) || 
+        (y < (y1 - DIST_EPSILON) && y < (y2 - DIST_EPSILON)))
+      continue;
+
+    x_cut = x1 + (x2 - x1) * (y - y1) / (y2 - y1) - x;
+
+    if (fabs(x_cut) < fabs(best_dist))
+    {
+      /* found a closer linedef */
+
+      best_match = L;
+      best_dist = x_cut;
+    }
+  }
+
+  if (! best_match)
+  {
+    PrintWarn("Thing @ (%1.0f,%1.0f) sitting in the void\n", x, y);
+    return LookupSector(1);
+  }
+
+  y1 = best_match->start->y;
+  y2 = best_match->end->y;
+
+  /* check orientation of line, to determine which side the polyobj is
+   * actually on.
+   */
+  if ((y1 > y2) == (best_dist > 0))
+    sector = best_match->right ? best_match->right->sector : NULL;
+  else
+    sector = best_match->left ? best_match->left->sector : NULL;
+
+  if (! sector)
+  {
+    PrintWarn("thing @ (%1.0f,%1.0f) in the void (back of line #%d).\n", x, y, best_match->index);
+
+    if (best_match->right)
+      sector = best_match->right->sector;
+    else if (best_match->left)
+      sector = best_match->left->sector;
+  }
+
+  return sector ? sector : LookupSector(1);
+}
+
+
 /* ----- polyobj handling ----------------------------- */
 
 static void MarkPolyobjSector(sector_t *sector)

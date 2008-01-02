@@ -58,4 +58,7 @@ vertex_t *NewVertexDegenerate(vertex_t *start, vertex_t *end);
 //
 sector_t * VertexCheckOpen(vertex_t *vert, float_g dx, float_g dy);
 
+// determine sector containing the thing.
+sector_t * ThingFindSector(thing_t *th);
+
 #endif /* __GLBSP_ANALYZE_H__ */
