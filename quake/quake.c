@@ -75,14 +75,14 @@ static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
                            subsec_t *sub, sector_t *sector)
 {
   float_g A = (dir < 0) ? 1 : 0;
-  float_G B = 1 - A;
+  float_g B = 1 - A;
   
-  fprintf(fp, "    ( %1.2f %1.2f %1.2f )", 0, 0, z);
+  fprintf(fp, "    ( %1.2f %1.2f %1.2f )", 0.0, 0.0, z);
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", A, B, z);
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", B, A, z);
   
-  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1, 0, 0);
-  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0, 1, 0);
+  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1.0, 0.0, 0.0);
+  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.0, 1.0, 0.0);
 
   fprintf(fp, " %s 0 %d 0\n", flat_name, (strcmp(flat_name, "void")==0) ? 4 : 0);
 }
@@ -122,8 +122,8 @@ static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x2, y2, z1);
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x1, y1, z2);
 
-  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1, 0.1, 0.4);
-  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.2, 1, 0.6);
+  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1.0, 0.1, 0.4);
+  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.2, 1.0, 0.6);
 
   const char *tex_name = "metal"; //!!!!! FIXME
 
