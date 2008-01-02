@@ -657,16 +657,25 @@ void GetLinedefsHexen(void)
 void AddSurroundingLines(void)
 {
   int i;
-  int bx, by, bw, bh;
+  int bx1, by1, bw, bh;
+  int bx2, by2, padding;
 
-  GetBlockmapBounds(&bx, &by, &bw, &bh);
+  GetBlockmapBounds(&bx1, &by1, &bw, &bh);
+
+  padding = 24;
+
+  bx2 = bx1 + bw * 128 + padding;
+  by2 = by1 + bh * 128 + padding;
+
+  bx1 -= padding;
+  by1 -= padding;
 
   for (i=0; i < 4; i++)
   {
     vertex_t *vert = LookupVertex(i);
 
-    vert->x = (float_g) ((i < 2) ? bx-20 : bx+bw+20);
-    vert->y = (float_g) ((i==1 || i==2) ? by-20 : by+bh+20);
+    vert->x = (float_g) ((i < 2) ? bx1 : bx2);
+    vert->y = (float_g) ((i==0 || i==3) ? by1 : by2);
   }
 
   for (i=0; i < 4; i++)
@@ -687,10 +696,9 @@ void AddSurroundingLines(void)
     line->two_sided = FALSE;
 
     line->right = LookupSidedef(0);
-    line->left  = LookupSidedef(0);
+    line->left  = NULL;
 
     line->right->ref_count++;
-    line->left->ref_count++;
 
     line->self_ref = FALSE;
 
