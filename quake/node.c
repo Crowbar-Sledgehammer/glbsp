@@ -380,6 +380,7 @@ static seg_t *CreateOneSeg(linedef_t *line, vertex_t *start, vertex_t *end,
 superblock_t *CreateSegs(void)
 {
   int i;
+  int bx, by;
   int bw, bh;
 
   seg_t *left, *right;
@@ -389,7 +390,10 @@ superblock_t *CreateSegs(void)
 
   block = NewSuperBlock();
  
-  GetBlockmapBounds(&block->x1, &block->y1, &bw, &bh);
+  GetBlockmapBounds(&bx, &by, &bw, &bh);
+
+  block->x1 = bx;
+  block->y1 = by;
 
   block->x2 = block->x1 + 128 * UtilRoundPOW2(bw);
   block->y2 = block->y1 + 128 * UtilRoundPOW2(bh);
