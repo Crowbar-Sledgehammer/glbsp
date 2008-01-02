@@ -40,6 +40,7 @@
 
 
 static int cur_brush_num;
+static int cur_entity_num;
 
 static sector_t *Void_Sec;
 
@@ -66,11 +67,14 @@ static void WriteThing_Q3A(FILE *fp, thing_t *th)
   {
     sector_t *sec = ThingFindSector(th);
 
+    fprintf(fp, "// Entity %d\n", cur_entity_num);
+    cur_entity_num++;
+
     fprintf(fp, "{\n");
 
     WriteKey(fp, "classname", "info_player_deathmatch");
     WriteNumber(fp, "angle", th->angle);
-    WriteTriplet(fp, "origin", th->x, th->y, sec->floor_h + 1 + th->dz);
+    WriteTriplet(fp, "origin", th->x, th->y, sec->floor_h + 31 + th->dz);
 
     fprintf(fp, "}\n");
   }
@@ -103,8 +107,8 @@ static void ShiftVertex(subsec_t *sub, float_g *x, float_g *y)
   if (len < 0.1)
     return;
 
-  (*x) += 0.5 * dx / len;
-  (*y) += 0.5 * dy / len;
+  (*x) += 8 * dx / len;
+  (*y) += 8 * dy / len;
 }
 
 static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
@@ -176,7 +180,7 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
     }
     else // pass == 1
     {
-      bottom = sector->ceil_h - 0.5;
+      bottom = sector->ceil_h - 2;
 
       flat_name = sector->ceil_tex;
     }
@@ -221,7 +225,8 @@ void WriteMap_Q3A(const char *filename, node_t *root)
   WriteKey(fp, "message", "an AJDMQK conversion");
   WriteNumber(fp, "ambient", 90);
 
-  cur_brush_num = 0;
+  cur_brush_num  = 0;
+  cur_entity_num = 0;
 
   Void_Sec = LookupSector(0);
 
@@ -237,8 +242,6 @@ void WriteMap_Q3A(const char *filename, node_t *root)
   for (i=0; i < num_things; i++)
   {
     thing_t *th = LookupThing(i);
-
-    fprintf(fp, "// Entity %d\n", i+1);
 
     WriteThing_Q3A(fp, th);
   }
