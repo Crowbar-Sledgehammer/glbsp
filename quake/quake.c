@@ -81,8 +81,8 @@ static void WriteFlatPlane(FILE *fp, float_g z, const char *flat_name, int dir,
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", A, B, z);
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", B, A, z);
   
-  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1.0, 0.0, 0.0);
-  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.0, 1.0, 0.0);
+  fprintf(fp, " ( ( %1.2f %1.2f %1.2f )",   1.0, 0.0, 0.0);
+  fprintf(fp,   " ( %1.2f %1.2f %1.2f ) )", 0.0, 1.0, 0.0);
 
   fprintf(fp, " %s 0 %d 0\n", flat_name, (strcmp(flat_name, "void")==0) ? 4 : 0);
 }
@@ -122,10 +122,13 @@ static void WriteWallPlane(FILE *fp, seg_t *seg, seg_t *seg2,
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x2, y2, z1);
   fprintf(fp,    " ( %1.2f %1.2f %1.2f )", x1, y1, z2);
 
-  fprintf(fp, "( ( %1.2f %1.2f %1.2f )", 1.0, 0.1, 0.4);
-  fprintf(fp, "  ( %1.2f %1.2f %1.2f )", 0.2, 1.0, 0.6);
+  fprintf(fp, " ( ( %1.2f %1.2f %1.2f )",   1.0, 0.1, 0.4);
+  fprintf(fp,   " ( %1.2f %1.2f %1.2f ) )", 0.2, 1.0, 0.6);
 
   const char *tex_name = "metal"; //!!!!! FIXME
+
+  if (! seg->linedef)
+    tex_name = "void";
 
   fprintf(fp, " %s 0 %d 0\n", tex_name, (strcmp(tex_name, "void")==0) ? 4 : 0);
 }
@@ -153,20 +156,21 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
     const char *flat_name;
 
     fprintf(fp, " {\n");
-    fprintf(fp, "  BrushDef\n");
+    fprintf(fp, "brushDef\n");
     fprintf(fp, "  {\n");
-        
+
     if (is_void)
     {
       bottom = -30000.0;
       top = +30000.0;
-      flat_name = sector->floor_tex;
+      flat_name = "void";
     }
     else if (pass == 0)
     {
       bottom = -30000.0;
       top = sector->floor_h;
       flat_name = sector->floor_tex;
+flat_name = "metal";
     }
     else // pass == 1
     {
@@ -174,6 +178,7 @@ static void WriteSubsec_Q3A(FILE *fp, subsec_t *sub)
       top = +30000.0;
       
       flat_name = sector->ceil_tex;
+flat_name = "metal"; //!!!!!
     }
 
     WriteFlatPlane(fp, bottom, flat_name, -1, sub, sector);
@@ -216,14 +221,15 @@ void WriteMap_Q3A(const char *filename, node_t *root)
     WriteSubsec_Q3A(fp, sub);
   }
 
+  fprintf(fp, "}\n");
+  fprintf(fp, "// Entities\n");
+
   for (i=0; i < num_things; i++)
   {
     thing_t *th = LookupThing(i);
 
     WriteThing_Q3A(fp, th);
   }
-
-  fprintf(fp, "}\n");
 
   fclose(fp);
 }
