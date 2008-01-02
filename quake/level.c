@@ -258,6 +258,19 @@ void GetVertices(void)
   if (!lump || count == 0)
     FatalError("Couldn't find any Vertices");
 
+  //@ Need four vertices for edge of map
+  //@ (Coordinates are updated later).
+  {
+    for (i=0; i < 4; i++)
+    {
+      vertex_t *vert = NewVertex();
+
+      vert->index = i;
+
+      vert->x = vert->y = 0;
+    }
+  }
+  
   raw = (raw_vertex_t *) lump->data;
 
   for (i=0; i < count; i++, raw++)
@@ -267,7 +280,7 @@ void GetVertices(void)
     vert->x = (float_g) SINT16(raw->x);
     vert->y = (float_g) SINT16(raw->y);
 
-    vert->index = i;
+    vert->index = i+4;
   }
 
   num_normal_vert = num_vertices;
@@ -520,8 +533,8 @@ void GetLinedefs(void)
   {
     linedef_t *line;
 
-    vertex_t *start = LookupVertex(UINT16(raw->start));
-    vertex_t *end   = LookupVertex(UINT16(raw->end));
+    vertex_t *start = LookupVertex(4+UINT16(raw->start));
+    vertex_t *end   = LookupVertex(4+UINT16(raw->end));
 
     start->ref_count++;
     end->ref_count++;
@@ -592,8 +605,8 @@ void GetLinedefsHexen(void)
   {
     linedef_t *line;
 
-    vertex_t *start = LookupVertex(UINT16(raw->start));
-    vertex_t *end   = LookupVertex(UINT16(raw->end));
+    vertex_t *start = LookupVertex(4+UINT16(raw->start));
+    vertex_t *end   = LookupVertex(4+UINT16(raw->end));
 
     start->ref_count++;
     end->ref_count++;
@@ -638,6 +651,50 @@ void GetLinedefsHexen(void)
         (line->left->sector == line->right->sector));
 
     line->index = i;
+  }
+}
+
+void AddSurroundingLines(void)
+{
+  int i;
+  int bx, by, bw, bh;
+
+  GetBlockmapBounds(&bx, &by, &bw, &bh);
+
+  for (i=0; i < 4; i++)
+  {
+    vertex_t *vert = LookupVertex(i);
+
+    vert->x = (float_g) ((i < 2) ? bx-20 : bx+bw+20);
+    vert->y = (float_g) ((i==1 || i==2) ? by-20 : by+bh+20);
+  }
+
+  for (i=0; i < 4; i++)
+  {
+    linedef_t *line;
+
+    vertex_t *start = LookupVertex(i);
+    vertex_t *end   = LookupVertex((i+1) % 4);
+
+    start->ref_count++;
+    end->ref_count++;
+
+    line = NewLinedef();
+
+    line->start = start;
+    line->end   = end;
+
+    line->two_sided = FALSE;
+
+    line->right = LookupSidedef(0);
+    line->left  = LookupSidedef(0);
+
+    line->right->ref_count++;
+    line->left->ref_count++;
+
+    line->self_ref = FALSE;
+
+    line->index = num_linedefs-1;
   }
 }
 
@@ -1609,6 +1666,10 @@ void LoadLevel(void)
     PrintVerbose("Using original nodes to speed things up\n");
     GetStaleNodes();
   }
+
+  InitBlockmap();
+
+  AddSurroundingLines();
  
   if (lev_doing_normal)
   {
