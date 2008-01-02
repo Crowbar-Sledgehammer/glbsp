@@ -443,8 +443,6 @@ static glbsp_ret_e HandleLevel(void)
 
   LoadLevel();
 
-  InitBlockmap();
-
   // create initial segs
   seg_list = CreateSegs();
 
