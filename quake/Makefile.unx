@@ -46,6 +46,7 @@ OBJS=   main.o  \
 	glbsp.o    \
 	level.o    \
 	node.o     \
+	quake.o    \
 	reject.o   \
 	seg.o      \
 	system.o   \
