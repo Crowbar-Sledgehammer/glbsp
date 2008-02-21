@@ -20,6 +20,9 @@
 #include "defs.h"
 
 
+FILE *map_fp;
+
+
 static void ShowTitle(void)
 {
   printf(
@@ -110,7 +113,7 @@ int main(int argc, char **argv)
   LevelGetBounds(&lx, &ly, &hx, &hy);
 
 
-  FILE *map_fp = fopen("out.map", "w");
+  map_fp = fopen("out.map", "w");
   if (! map_fp)
     FatalError("Unable to create output file: out.map\n");
 
@@ -118,8 +121,6 @@ int main(int argc, char **argv)
   fprintf(map_fp, "{\n");
 
   Brush_WriteField("classname", "worldspawn");
-
-  fprintf(map_fp, "}\n");
 
   Brush_ConvertWalls();
   Brush_ConvertSectors();
@@ -131,9 +132,6 @@ int main(int argc, char **argv)
   Brush_ConvertThings();
 
   fclose(map_fp);
-
-  delete the_wad;
-  delete the_gwa;
 
   TermDebug();
 
