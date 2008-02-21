@@ -99,6 +99,43 @@ static void FindSectorExtents(void)
   }
 }
 
+static void CollectExtraFloors(void)
+{
+  for (int i = 0; i < lev_linedefs.num; i++)
+  {
+    linedef_c *L = lev_linedefs.Get(i);
+
+    if (L->zero_len || ! L->right || ! L->right->sector)
+      continue;
+
+    if (L->type == 400 && L->tag > 0)
+    {
+      for (int k = 0; k < lev_sectors.num; k++)
+      {
+        sector_c *S = lev_sectors.Get(k);
+
+        if (S->tag != L->tag)
+          continue;
+
+        S->extrafloors.push_back(L->right->sector);
+      }
+    }
+
+    if (L->type == 405 && L->tag > 0)
+    {
+      for (int k = 0; k < lev_sectors.num; k++)
+      {
+        sector_c *S = lev_sectors.Get(k);
+
+        if (S->tag != L->tag)
+          continue;
+
+        S->liquids.push_back(L->right->sector);
+      }
+    }
+  }
+}
+
 static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
 {
   // find longest seg on the brush side
@@ -151,6 +188,8 @@ void Brush_ConvertSectors(void)
 {
   FindSectorExtents();
 
+  CollectExtraFloors();
+
   std::vector<brush_side_c> sides;
 
   for (int i = 0; i < lev_subsecs.num; i++)
@@ -174,16 +213,58 @@ void Brush_ConvertSectors(void)
       continue;
     }
 
-    for (int is_ceil = 0; is_ceil < 2; is_ceil++)
-    {
-      double z1 = is_ceil ? S->ceil_h    : S->floor_under;
-      double z2 = is_ceil ? S->ceil_over : S->floor_h;
+    int num_pass = 3 + (int)S->extrafloors.size();
 
-      const char *flat_name = Texture_Convert(is_ceil ? S->ceil_tex : S->floor_tex,
-                                              true /* is_flat */);
+    for (int pass = 0; pass < num_pass; pass++)
+    {
+      double z1, z2;
+      const char *flat_name = NULL;
+
+      if (pass == 0)
+      {
+        z1 = S->floor_under;
+        z2 = S->floor_h;
+
+        flat_name = S->floor_tex;
+      }
+      else if (pass == 1)
+      {
+        z1 = S->ceil_h;
+        z2 = S->ceil_over;
+
+        flat_name = S->ceil_tex;
+      }
+      else if (pass == 2)  // liquid
+      {
+        if (S->liquids.size() == 0)
+          continue;
+
+        sector_c *liq = S->liquids[0];
+
+        z1 = S->floor_under;
+        z2 = liq->floor_h;
+
+        flat_name = liq->floor_tex;
+      }
+      else  // extrafloor
+      {
+        unsigned int e_idx = pass - 3;
+        SYS_ASSERT(e_idx < S->extrafloors.size());
+
+        sector_c *EF = S->extrafloors[e_idx];
+
+        z1 = EF->floor_h;
+        z2 = EF->ceil_h;
+
+        flat_name = EF->ceil_tex;
+      }
+
+      flat_name = Texture_Convert(flat_name, true /* is_flat */);
 
       fprintf(map_fp, "// %s sector:%d subsec:%d\n",
-              is_ceil ? "ceiling" : "floor", S->index, i);
+              (pass == 0) ? "floor" : (pass == 1) ? "ceiling" :
+              (pass == 2) ? "liquid" : "extrafloor",
+              S->index, i);
 
       fprintf(map_fp, "{\n");
 
@@ -202,7 +283,11 @@ void Brush_ConvertSectors(void)
       {
         brush_side_c& b = sides[k];
 
-        const char *side_tex = DetermineSideTex(sub, b, is_ceil);
+        const char *side_tex = NULL;
+        
+        if (pass < 2)
+          side_tex = DetermineSideTex(sub, b, pass == 1);
+
         if (! side_tex)
           side_tex = flat_name;
 
