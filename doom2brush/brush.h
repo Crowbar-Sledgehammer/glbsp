@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//  DEFINITIONS
+//  BRUSH Creation
 //------------------------------------------------------------------------
 //
 //  Doom-2-Brush (C) 2008 Andrew Apted
@@ -16,41 +16,14 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef __DM2BR_DEFS_H__
-#define __DM2BR_DEFS_H__
-
-#define PROG_NAME  "Doom2Brush"
-
-//
-//  SYSTEM INCLUDES
-//
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-
-#include <math.h>
-#include <limits.h>
-
-#ifndef WIN32
-#include <sys/time.h>
-#endif
-
-#include <vector>
+#ifndef __DM2BR_BRUSH_H__
+#define __DM2BR_BRUSH_H__
 
 
-//
-//  LOCAL INCLUDES
-//
-#include "system.h"
-#include "asserts.h"
-#include "structs.h"
-#include "util.h"
-#include "wad.h"
-#include "level.h"
-#include "brush.h"
+void Brush_ConvertSectors(void);
+void Brush_ConvertExtraFloors(void);
+void Brush_ConvertLiquids(void);
+void Brush_ConvertWalls(void);
 
-#endif /* __DM2BR_DEFS_H__ */
+
+#endif /* __DM2BR_BRUSH_H__ */

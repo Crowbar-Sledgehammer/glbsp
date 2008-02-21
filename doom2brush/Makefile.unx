@@ -15,6 +15,7 @@ LIBS=-lm
 
 OBJS=./main.o     \
      ./asserts.o  \
+     ./brush.o    \
      ./level.o    \
      ./system.o   \
      ./util.o     \
