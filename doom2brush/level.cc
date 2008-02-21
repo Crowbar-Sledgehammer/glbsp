@@ -71,9 +71,7 @@ vertex_c::~vertex_c()
 {
 }
 
-//
-// GetVertices
-//
+
 void GetVertices(wad_c *base)
 {
   lump_c *lump = base->FindLumpInLevel("VERTEXES");
@@ -102,9 +100,7 @@ void GetVertices(wad_c *base)
   }
 }
 
-//
-// GetV2Verts
-//
+
 void GetV2Verts(const uint8_g *data, int length)
 {
   int count = length / sizeof(raw_v2_vertex_t);
@@ -119,9 +115,7 @@ void GetV2Verts(const uint8_g *data, int length)
   }
 }
 
-//
-// GetGLVerts
-//
+
 void GetGLVerts(wad_c *base)
 {
   lump_c *lump = base->FindLumpInLevel("GL_VERT");
@@ -172,9 +166,7 @@ sector_c::~sector_c()
 {
 }
 
-//
-// GetSectors
-//
+
 void GetSectors(wad_c *base)
 {
   int count = -1;
@@ -229,9 +221,7 @@ thing_c::~thing_c()
 {
 }
 
-//
-// GetThings
-//
+
 void GetThings(wad_c *base)
 {
   if (lev_doing_hexen)
@@ -271,9 +261,7 @@ void GetThings(wad_c *base)
   }
 }
 
-//
-// GetThingsHexen
-//
+
 void GetThingsHexen(wad_c *base)
 {
   int count = -1;
@@ -307,6 +295,7 @@ void GetThingsHexen(wad_c *base)
   }
 }
 
+
 sidedef_c::sidedef_c(int _idx, const raw_sidedef_t *raw)
 {
   index = _idx;
@@ -326,9 +315,6 @@ sidedef_c::~sidedef_c()
 {
 }
 
-//
-// GetSidedefs
-//
 void GetSidedefs(wad_c *base)
 {
   int count = -1;
@@ -367,6 +353,7 @@ static sidedef_c *SafeLookupSidedef(uint16_g num)
 
   return lev_sidedefs.Get(num);
 }
+
 
 linedef_c::linedef_c(int _idx, const raw_linedef_t *raw)
 {
@@ -419,9 +406,7 @@ linedef_c::~linedef_c()
 {
 }
 
-//
-// GetLinedefs
-//
+
 void GetLinedefs(wad_c *base)
 {
   if (lev_doing_hexen)
@@ -456,9 +441,6 @@ void GetLinedefs(wad_c *base)
   }
 }
 
-//
-// GetLinedefsHexen
-//
 void GetLinedefsHexen(wad_c *base)
 {
   int count = -1;
@@ -487,6 +469,7 @@ void GetLinedefsHexen(wad_c *base)
   }
 }
 
+
 static vertex_c *FindVertex16(uint16_g index)
 {
   if (index & 0x8000)
@@ -502,6 +485,7 @@ static vertex_c *FindVertex32(int index)
 
   return lev_vertices.Get(index);
 }
+
 
 seg_c::seg_c(int _idx, const raw_gl_seg_t *raw)
 {
@@ -586,9 +570,6 @@ void seg_c::precompute_data()
   p_para = -psx * pdx - psy * pdy;
 }
 
-//
-// GetV3Segs
-//
 void GetV3Segs(const uint8_g *data, int length)
 {
   int count = length / sizeof(raw_v3_seg_t);
@@ -603,9 +584,6 @@ void GetV3Segs(const uint8_g *data, int length)
   }
 }
 
-//
-// GetGLSegs
-//
 void GetGLSegs(wad_c *base)
 {
   lump_c *lump = base->FindLumpInLevel("GL_SEGS");
@@ -704,9 +682,6 @@ void subsec_c::build_seg_list(int first, int count)
   mid_y /= count;
 }
 
-//
-// GetV3Subsecs
-//
 void GetV3Subsecs(const uint8_g *data, int length)
 {
   int count = length / sizeof(raw_v3_subsec_t);
@@ -721,9 +696,6 @@ void GetV3Subsecs(const uint8_g *data, int length)
   }
 }
 
-//
-// GetGLSubsecs
-//
 void GetGLSubsecs(wad_c *base)
 {
   lump_c *lump = base->FindLumpInLevel("GL_SSECT");
@@ -754,6 +726,7 @@ void GetGLSubsecs(wad_c *base)
     lev_subsecs.Set(i, new subsec_c(i, raw));
   }
 }
+
 
 void bbox_t::from_raw(const raw_bbox_t *raw)
 {
@@ -796,9 +769,6 @@ node_c::~node_c()
 {
 }
 
-//
-// GetGLNodes
-//
 void GetGLNodes(wad_c *base)
 {
   int count = -1;
@@ -831,9 +801,6 @@ void GetGLNodes(wad_c *base)
 
 /* ----- whole-level routines --------------------------- */
 
-//
-// LoadLevel
-//
 void LoadLevel(const char *level_name)
 {
   // ---- Normal stuff ----
@@ -876,9 +843,6 @@ void LoadLevel(const char *level_name)
 
 }
 
-//
-// FreeLevel
-//
 void FreeLevel(void)
 {
   lev_vertices.FreeAll();
@@ -892,9 +856,6 @@ void FreeLevel(void)
   lev_nodes.FreeAll();
 }
 
-//
-// LevelGetBounds
-//
 void LevelGetBounds(double *lx, double *ly, double *hx, double *hy)
 {
   node_c *root = lev_nodes.Get(lev_nodes.num - 1);
