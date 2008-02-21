@@ -141,9 +141,6 @@ public:
 class seg_c
 {
 public:
-  // link for list
-  struct seg_c *next;
-
   vertex_c *start;   // from this vertex...
   vertex_c *end;     // ... to this vertex
 
@@ -181,7 +178,7 @@ class subsec_c
 {
 public:
   // list of segs
-  seg_c *seg_list;
+  std::vector<seg_c *> seg_list;
 
   // count of segs
   int seg_count;

@@ -491,8 +491,6 @@ seg_c::seg_c(int _idx, const raw_gl_seg_t *raw)
 {
   index = _idx;
 
-  next = NULL;
-
 /// fprintf(stderr, "SEG %d  V %d..%d line %d side %d\n",
 /// index, UINT16(raw->start), UINT16(raw->end), SINT16(raw->linedef), SINT16(raw->side));
 
@@ -519,8 +517,6 @@ seg_c::seg_c(int _idx, const raw_gl_seg_t *raw)
 seg_c::seg_c(int _idx, const raw_v3_seg_t *raw)
 {
   index = _idx;
-
-  next = NULL;
 
   start = FindVertex32(UINT32(raw->start));
   end   = FindVertex32(UINT32(raw->end));
@@ -616,7 +612,7 @@ void GetGLSegs(wad_c *base)
 }
 
 
-subsec_c::subsec_c(int _idx, const raw_subsec_t *raw)
+subsec_c::subsec_c(int _idx, const raw_subsec_t *raw) : seg_list()
 {
   index = _idx;
 
@@ -626,7 +622,7 @@ subsec_c::subsec_c(int _idx, const raw_subsec_t *raw)
   build_seg_list(first, seg_count);
 }
 
-subsec_c::subsec_c(int _idx, const raw_v3_subsec_t *raw)
+subsec_c::subsec_c(int _idx, const raw_v3_subsec_t *raw) : seg_list()
 {
   index = _idx;
 
@@ -649,25 +645,12 @@ void subsec_c::append_seg(seg_c *cur)
   mid_y += (cur->start->y + cur->end->y) / 2.0;
 
   // add it to the tail
-
-  if (! seg_list)
-  {
-    seg_list = cur;
-    return;
-  }
-
-  seg_c *tail = seg_list;
-
-  while (tail->next)
-    tail = tail->next;
-  
-  tail->next = cur;
+  seg_list.push_back(cur);
 }
 
 void subsec_c::build_seg_list(int first, int count)
 {
-  seg_list = NULL;
-  sector   = NULL;
+  sector = NULL;
 
   mid_x = 0;
   mid_y = 0;
