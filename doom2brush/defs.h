@@ -39,6 +39,8 @@
 #include <sys/time.h>
 #endif
 
+#include <map>
+#include <string>
 #include <vector>
 
 

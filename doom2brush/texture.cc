@@ -20,14 +20,85 @@
 #include "defs.h"
 
 
-void Texture_Load(const char *filename)
+typedef std::map<std::string, std::string> texture_map_t;
+
+static texture_map_t tex_DB;
+
+
+typedef std::map<int, std::string> entity_map_t;
+
+static entity_map_t ent_DB;
+
+
+static void ParseTexture(const char *pos)
 {
   // TODO
 }
+
+static void ParseEntity(const char *pos)
+{
+  // TODO
+}
+
+void Texture_Load(const char *filename)
+{
+  FILE *fp = fopen(filename, "r");
+  if (! fp)
+    FatalError("Cannot open definitions file: %s\n", filename);
+
+  char line_buf[1024];
+
+  while (fgets(line_buf, sizeof(line_buf)-10, fp) != NULL)
+  {
+    const char *pos = line_buf;
+
+    while (*pos && isspace(*pos))
+      pos++;
+
+    // skip blank lines and comments
+    if (*pos == 0 || *pos == '/' || *pos == '#')
+      continue;
+
+    if (strncmp(pos, "texture", 7) == 0)
+    {
+      ParseTexture(pos+7);
+    }
+    else if (strncmp(pos, "entity", 6) == 0)
+    {
+      ParseEntity(pos+6);
+    }
+    else
+    {
+      fprintf(stderr, "Warning: unrecognised line in %s:\n%s\n\n",
+              filename, line_buf);
+    }
+  }
+
+  fclose(fp);
+}
+
 
 const char * Texture_Convert(const char *old_name, bool is_flat)
 {
   // TODO
   return "error";
+}
+
+
+const char * Entity_Convert(int id_number)
+{
+  if (ent_DB.find(id_number) != ent_DB.end())
+  {
+    return ent_DB[id_number].c_str();
+  }
+
+  // built-in values
+  if (id_number == 1)
+    return "info_player_start";
+
+  if (id_number == 11)
+    return "info_player_deathmatch";
+
+  return NULL; // not found
 }
 
