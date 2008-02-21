@@ -107,6 +107,9 @@ int main(int argc, char **argv)
     }
   }
 
+
+  Texture_Load("convdefs.txt");
+
   LoadLevel(level_name);
 
   double lx, ly, hx, hy;
