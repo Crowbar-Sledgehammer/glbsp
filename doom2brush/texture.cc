@@ -24,6 +24,8 @@ typedef std::map<std::string, std::string> texture_map_t;
 
 static texture_map_t tex_DB;
 
+static const char *default_tex_name;
+
 
 typedef std::map<int, std::string> entity_map_t;
 
@@ -75,13 +77,24 @@ void Texture_Load(const char *filename)
   }
 
   fclose(fp);
+
+  if (! default_tex_name)
+    FatalError("No 'DEFAULT' texture entry!\n");
 }
 
 
 const char * Texture_Convert(const char *old_name, bool is_flat)
 {
-  // TODO
-  return "error";
+  if (tex_DB.find(old_name) == tex_DB.end())
+  {
+    fprintf(stderr, "Warning: unspecified texture '%s'\n", old_name);
+
+    SYS_ASSERT(default_tex_name);
+
+    tex_DB[old_name] = default_tex_name;
+  }
+
+  return tex_DB[old_name].c_str();
 }
 
 
