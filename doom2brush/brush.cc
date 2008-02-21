@@ -76,8 +76,34 @@ static void GetBrushSides(subsec_c *sub, std::vector<brush_side_c>& sides)
 }
 
 
+static void FindSectorExtents(void)
+{
+  for (int i = 0; i < lev_linedefs.num; i++)
+  {
+    linedef_c *L = lev_linedefs.Get(i);
+
+    if (! (L->left  && L->left->sector))
+      continue;
+
+    if (! (L->right && L->right->sector))
+      continue;
+
+    sector_c *B = L->left->sector;
+    sector_c *F = L->right->sector;
+
+    B->floor_under = MIN(B->floor_under, F->floor_under);
+    B->ceil_over   = MAX(B->ceil_over  , F->ceil_over  );
+
+    F->floor_under = B->floor_under;
+    B->ceil_over   = B->ceil_over;
+  }
+}
+
+
 void Brush_ConvertSectors(void)
 {
+  FindSectorExtents();
+
   std::vector<brush_side_c> sides;
 
   for (int i = 0; i < lev_subsecs.num; i++)
@@ -103,8 +129,8 @@ void Brush_ConvertSectors(void)
 
     for (int is_ceil = 0; is_ceil < 2; is_ceil++)
     {
-      double z1 = is_ceil ? S->ceil_h        : S->floor_h - 64.0;
-      double z2 = is_ceil ? S->ceil_h + 64.0 : S->floor_h;
+      double z1 = is_ceil ? S->ceil_h    : S->floor_under;
+      double z2 = is_ceil ? S->ceil_over : S->floor_h;
 
       fprintf(map_fp, "// %s sector:%d subsec:%d\n",
               is_ceil ? "ceiling" : "floor", S->index, i);
@@ -112,12 +138,12 @@ void Brush_ConvertSectors(void)
       fprintf(map_fp, "{\n");
 
       // Top
-      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
           DUMMY_TEX);
 
       // Bottom
-      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
           DUMMY_TEX);
 
@@ -126,7 +152,7 @@ void Brush_ConvertSectors(void)
       {
         brush_side_c& b = sides[k];
 
-        fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+        fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
             b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
             DUMMY_TEX);
       }
@@ -173,19 +199,19 @@ void Brush_ConvertWalls(void)
     x[3] = x[0] - nx * 16;
     y[3] = y[0] - ny * 16;
 
-    double z1 = L->right->sector->floor_h - 64.0;
-    double z2 = L->right->sector->ceil_h  + 64.0;
+    double z1 = L->right->sector->floor_under;
+    double z2 = L->right->sector->ceil_over;
 
     fprintf(map_fp, "// wall line:%d sector:%d\n", i, L->right->sector->index);
     fprintf(map_fp, "{\n");
 
     // Top
-    fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
         0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
         DUMMY_TEX);
 
     // Bottom
-    fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
         0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
         DUMMY_TEX);
 
@@ -194,7 +220,7 @@ void Brush_ConvertWalls(void)
     {
       int k2 = (k1+1) % 4;
 
-      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           x[k1], y[k1], z1,  x[k1], y[k1], z2,  x[k2], y[k2], z2,
           DUMMY_TEX);
     }

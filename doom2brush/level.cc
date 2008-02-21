@@ -154,6 +154,10 @@ sector_c::sector_c(int _idx, const raw_sector_t *raw)
   floor_h = SINT16(raw->floor_h);
   ceil_h  = SINT16(raw->ceil_h);
 
+  // these are updated by FindSectorExtents
+  floor_under = floor_h - 64;
+  ceil_over   = ceil_h  + 64;
+
   memcpy(floor_tex, raw->floor_tex, sizeof(floor_tex));
   memcpy(ceil_tex,  raw->ceil_tex,  sizeof(ceil_tex));
 
@@ -553,8 +557,8 @@ void seg_c::precompute_data()
   pdx = pex - psx;
   pdy = pey - psy;
 
-  p_length = UtilComputeDist(pdx, pdy);
-  p_angle  = UtilComputeAngle(pdx, pdy);
+  p_length = ComputeDist(pdx, pdy);
+  p_angle  = ComputeAngle(pdx, pdy);
 
 /// fprintf(stderr, "|  (%1.0f,%1.0f)->(%1.0f,%1.0f)  Delta (%1.6f, %1.6f)\n",
 /// psx, psy, pex, pey, pdx, pdy);

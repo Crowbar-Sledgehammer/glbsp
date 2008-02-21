@@ -51,6 +51,8 @@ public:
   // heights
   int floor_h, ceil_h;
 
+  int floor_under, ceil_over;
+
   // textures
   char floor_tex[8];
   char ceil_tex[8];
