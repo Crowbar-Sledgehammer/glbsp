@@ -20,20 +20,95 @@
 #include "defs.h"
 
 
+class brush_side_c
+{
+public:
+  double x1, y1;
+  double x2, y2;
+
+public:
+   brush_side_c();
+  ~brush_side_c();
+};
+
+static void GetBrushSides(subsec_c *sub, std::vector<brush_side_c>& sides)
+{
+  sides.clear();
+
+  for (unsigned int k = 0; k < sub->seg_list.size(); k++)
+  {
+    seg_c * seg = sub->seg_list[k];
+
+    // check if already present (co-linear segs)
+    bool already = false;
+    for (unsigned int n = 0; n < sides.size(); n++)
+    {
+      brush_side_c& b = sides[n];
+
+      double ps = PerpDist(seg->start->x, seg->start->y,
+                           b.x1, b.y1, b.x2, b.y2);
+
+      double pe = PerpDist(seg->end->x, seg->end->y,
+                           b.x1, b.y1, b.x2, b.y2);
+
+      if (fabs(ps) < 0.02 && fabs(pe) < 0.02)
+      {
+        already = true; break;
+      }
+    }
+
+    if (already)
+      continue;
+
+    brush_side_c new_b;
+
+    // make the brush_side face OUTWARDS (segs face inwards)
+    new_b.x1 = seg->end->x;
+    new_b.y1 = seg->end->y;
+    new_b.x2 = seg->start->x;
+    new_b.y2 = seg->start->y;
+
+    sides.push_back(new_b);
+  }
+}
+
+
 void Brush_ConvertSectors(void)
 {
-  // TODO
+  std::vector<brush_side_c> sides;
+
+  for (int i = 0; i < lev_subsecs.num; i++)
+  {
+    subsec_c *sub = lev_subsecs.Get(i);
+
+    sector_c *S = sub->sector;
+
+    if (! sub->sector)
+    {
+      fprintf(stderr, "Warning: subsec:%d has no sector\n", i);
+      continue;
+    }
+
+    GetBrushSides(sub, sides);
+
+    if (sides.size() < 3)
+    {
+      fprintf(stderr, "Warning: subsec:%d invalid (only %d sides)\n", i, (int)sides.size());
+      continue;
+    }
+
+    for (int is_ceil = 0; is_ceil < 2; is_ceil++)
+    {
+      double z1 = is_ceil ? S->ceil_h        : S->floor_h - 64.0;
+      double z2 = is_ceil ? S->ceil_h + 64.0 : S->floor_h;
+
+      // TODO
+    }
+  }
 }
 
-void Brush_ConvertExtraFloors(void)
-{
-  // TODO
-}
 
-void Brush_ConvertLiquids(void)
-{
-  // TODO
-}
+//------------------------------------------------------------------------
 
 void Brush_ConvertWalls(void)
 {
@@ -47,11 +122,11 @@ void Brush_WriteField(const char *field, const char *val_str, ...)
 {
   fprintf(map_fp, "  \"%s\"  \"", field);
 
-  va_list args;
+  va_list arg_ptr;
 
-  va_start(args, val_str);
-  vfprintf(map_fp, val_str, args);
-  va_end(args);
+  va_start(arg_ptr, val_str);
+  vfprintf(map_fp, val_str, arg_ptr);
+  va_end(arg_ptr);
 
   fprintf(map_fp, "\"\n");
 }
@@ -72,7 +147,7 @@ void Brush_ConvertThings(void)
     fprintf(map_fp, "{\n");
 
     Brush_WriteField("classname", "info_player_start");
-    Brush_WriteField("origin", "%d %d %d", T->x, T->y, z);
+    Brush_WriteField("origin", "%d %d %d", T->x, T->y, z + 25);
 
     // FIXME: Brush_WriteField("angle", "%d", T->angle);
 
