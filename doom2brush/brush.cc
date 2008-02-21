@@ -107,7 +107,7 @@ void Brush_ConvertSectors(void)
       double z2 = is_ceil ? S->ceil_h + 64.0 : S->floor_h;
 
       fprintf(map_fp, "// %s sector:%d subsec:%d\n",
-              is_ceil ? "Ceiling" : "Floor", S->index, i);
+              is_ceil ? "ceiling" : "floor", S->index, i);
 
       fprintf(map_fp, "{\n");
 
@@ -143,9 +143,63 @@ void Brush_ConvertWalls(void)
 {
   for (int i = 0; i < lev_linedefs.num; i++)
   {
-    linedef_c *L = lev_linedefs[i];
+    linedef_c *L = lev_linedefs.Get(i);
 
-    @@@
+    // we only do one-sided linedefs
+    if (L->left || ! L->right || ! L->right->sector)
+      continue;
+
+    if (L->zero_len)
+      continue;
+
+    double x[4], y[4];
+
+    x[0] = L->start->x;  y[0] = L->start->y;
+    x[1] = L->end  ->x;  y[1] = L->end  ->y;
+
+    // FIXME: compute back coordinates properly !!!!
+
+    double nx = y[1] - y[0];
+    double ny = x[0] - x[1];
+
+    double n_len = ComputeDist(nx, ny);
+
+    nx /= n_len;
+    ny /= n_len;
+
+    x[2] = x[1] - nx * 16;
+    y[2] = y[1] - ny * 16;
+
+    x[3] = x[0] - nx * 16;
+    y[3] = y[0] - ny * 16;
+
+    double z1 = L->right->sector->floor_h - 64.0;
+    double z2 = L->right->sector->ceil_h  + 64.0;
+
+    fprintf(map_fp, "// wall line:%d sector:%d\n", i, L->right->sector->index);
+    fprintf(map_fp, "{\n");
+
+    // Top
+    fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+        0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
+        DUMMY_TEX);
+
+    // Bottom
+    fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+        0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
+        DUMMY_TEX);
+
+    // Sides
+    for (int k1 = 0; k1 < 4; k1++)
+    {
+      int k2 = (k1+1) % 4;
+
+      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+          x[k1], y[k1], z1,  x[k1], y[k1], z2,  x[k2], y[k2], z2,
+          DUMMY_TEX);
+    }
+
+    fprintf(map_fp, "}\n");
   }
 }
 
