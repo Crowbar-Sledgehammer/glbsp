@@ -211,7 +211,9 @@ thing_c::thing_c(int _idx, const raw_thing_t *raw)
 
   type    = UINT16(raw->type);
   options = UINT16(raw->options);
-  angle   = UINT16(raw->angle);
+
+  angle   = SINT16(raw->angle);
+  height  = 0;
 }
 
 thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
@@ -223,7 +225,9 @@ thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
 
   type    = UINT16(raw->type);
   options = UINT16(raw->options);
-  angle   = UINT16(raw->angle);
+
+  angle   = SINT16(raw->angle);
+  height  = SINT16(raw_>height);
 }
 
 thing_c::~thing_c()

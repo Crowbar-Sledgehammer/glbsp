@@ -132,6 +132,8 @@ public:
   int options;
   int angle;
 
+  int height;  // Hexen field, height above ground
+
   // other info (hexen stuff) omitted. 
 
   // Always valid (thing indices never change).
