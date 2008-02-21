@@ -269,12 +269,12 @@ void Brush_ConvertSectors(void)
       fprintf(map_fp, "{\n");
 
       // Top
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
           0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
           flat_name);
 
       // Bottom
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
           0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
           flat_name);
 
@@ -294,7 +294,7 @@ void Brush_ConvertSectors(void)
         if (pass == 2)
           side_tex = "common/caulk";
 
-        fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+        fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
             b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
             side_tex);
       }
@@ -350,12 +350,12 @@ void Brush_ConvertWalls(void)
     fprintf(map_fp, "{\n");
 
     // Top
-    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
         0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
         tex_name);
 
     // Bottom
-    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
         0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
         tex_name);
 
@@ -364,7 +364,7 @@ void Brush_ConvertWalls(void)
     {
       int k2 = (k1+1) % 4;
 
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
+      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
           x[k1], y[k1], z1,  x[k1], y[k1], z2,  x[k2], y[k2], z2,
           tex_name);
     }
