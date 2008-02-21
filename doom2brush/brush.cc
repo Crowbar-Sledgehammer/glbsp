@@ -291,6 +291,9 @@ void Brush_ConvertSectors(void)
         if (! side_tex)
           side_tex = flat_name;
 
+        if (pass == 2)
+          side_tex = "common/caulk";
+
         fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
             b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
             side_tex);
@@ -386,6 +389,47 @@ void Brush_WriteField(const char *field, const char *val_str, ...)
   fprintf(map_fp, "\"\n");
 }
 
+
+static sector_c *PointInSector(double x, double y)
+{
+  // we have a BSP tree, may as well use it
+
+  if (lev_nodes.num == 0)
+  {
+    // no nodes means a very simple level (one convex sector)
+    return lev_sectors.Get(0);
+  }
+
+  // begin at the root node
+  node_c *nd = lev_nodes.Get(lev_nodes.num - 1);
+
+  for (int loop_limit = 0; loop_limit < 9000; loop_limit++)
+  {
+    double d = PerpDist(x, y, nd->x, nd->y, nd->x + nd->dx, nd->y + nd->dy);
+
+    if (d < 0)
+    {
+      if (nd->l.subsec)
+        return nd->l.subsec->sector;
+
+      nd = nd->l.node;
+    }
+    else
+    {
+      if (nd->r.subsec)
+        return nd->r.subsec->sector;
+
+      nd = nd->r.node;
+    }
+
+    SYS_ASSERT(nd);
+  }
+
+  FatalError("PointInSector: infinite node loop?\n");
+  return NULL; /* NOT REACHED */
+}
+
+
 void Brush_ConvertThings(void)
 {
   for (int i = 0; i < lev_things.num; i++)
@@ -397,7 +441,18 @@ void Brush_ConvertThings(void)
     if (! ent_name)
       continue;
 
-    int z = 128;  // FIXME !!!!
+    sector_c *sec = PointInSector(T->x, T->y);
+    SYS_ASSERT(sec);
+
+    int z;
+
+    // use "Ambush" flag to mean "place on 2nd extrafloor"
+    if ((T->options & 8) && sec->extrafloors.size() > 0)
+      z = sec->extrafloors[0]->floor_h;
+    else
+      z = sec->floor_h;
+
+    z += T->height;
 
     fprintf(map_fp, "// thing #%d type:%d\n", i, T->type);
     fprintf(map_fp, "{\n");
