@@ -227,7 +227,7 @@ thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
   options = UINT16(raw->options);
 
   angle   = SINT16(raw->angle);
-  height  = SINT16(raw_>height);
+  height  = SINT16(raw->height);
 }
 
 thing_c::~thing_c()
