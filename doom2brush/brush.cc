@@ -122,7 +122,8 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
     if (! (fabs(ps) < 0.02 && fabs(pe) < 0.02))
       continue;
 
-    sidedef_c *side = (seg->side == 0) ? seg->linedef->right : seg->linedef->left;
+    // use opposite side (brushes face out, but segs face in)
+    sidedef_c *side = seg->side ? seg->linedef->left : seg->linedef->right;
 
     if (! side)
       continue;
@@ -142,7 +143,7 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
     best_len = len;
   }
 
-  return best;
+  return best ? Texture_Convert(best, false) : NULL;
 }
 
 
