@@ -68,19 +68,14 @@ int UtilStrCaseCmp(const char *A, const char *B);
 int UtilRoundPOW2(int x);
 
 // compute angle & distance from (0,0) to (dx,dy)
-angle_g UtilComputeAngle(double dx, double dy);
-#define UtilComputeDist(dx,dy)  sqrt((dx) * (dx) + (dy) * (dy))
+double ComputeAngle(double dx, double dy);
+double ComputeDist(double dx, double dy);
 
-// compute the parallel and perpendicular distances from a partition
-// line to a point.
-//
-#define UtilParallelDist(part,x,y)  \
-    (((x) * (part)->pdx + (y) * (part)->pdy + (part)->p_para)  \
-     / (part)->p_length)
+double  PerpDist(double x, double y,
+                 double x1, double y1, double x2, double y2);
+double AlongDist(double x, double y,
+                 double x1, double y1, double x2, double y2);
 
-#define UtilPerpDist(part,x,y)  \
-    (((x) * (part)->pdy - (y) * (part)->pdx + (part)->p_perp)  \
-     / (part)->p_length)
 
 // return the millisecond counter.  Note: it WILL overflow.
 unsigned int UtilGetMillis();

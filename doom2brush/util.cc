@@ -21,8 +21,6 @@
 
 
 //
-// UtilCalloc
-//
 // Allocate memory with error checking.  Zeros the memory.
 //
 void *UtilCalloc(int size)
@@ -35,8 +33,6 @@ void *UtilCalloc(int size)
   return ret;
 }
 
-//
-// UtilRealloc
 //
 // Reallocate memory with error checking.
 //
@@ -51,8 +47,6 @@ void *UtilRealloc(void *old, int size)
 }
 
 //
-// UtilFree
-//
 // Free the memory with error checking.
 //
 void UtilFree(void *data)
@@ -63,8 +57,6 @@ void UtilFree(void *data)
   free(data);
 }
 
-//
-// UtilStrDup
 //
 // Duplicate a string with error checking.
 //
@@ -83,8 +75,6 @@ char *UtilStrDup(const char *str)
   return result;
 }
 
-//
-// UtilStrNDup
 //
 // Duplicate a limited length string.
 //
@@ -130,8 +120,6 @@ char *UtilStrUpper(const char *name)
 }
 
 //
-// UtilRoundPOW2
-//
 // Rounds the value _up_ to the nearest power of two.
 //
 int UtilRoundPOW2(int x)
@@ -151,11 +139,9 @@ int UtilRoundPOW2(int x)
 
 
 //
-// UtilComputeAngle
-//
 // Translate (dx, dy) into an angle value (degrees)
 //
-angle_g UtilComputeAngle(double dx, double dy)
+double ComputeAngle(double dx, double dy)
 {
   double angle;
 
@@ -170,9 +156,40 @@ angle_g UtilComputeAngle(double dx, double dy)
   return angle;
 }
 
+double ComputeDist(double dx, double dy)
+{
+  return sqrt((dx) * (dx) + (dy) * (dy));
+}
 
-//
-// UtilGetMillis
+
+double PerpDist(double x, double y,
+                double x1, double y1, double x2, double y2)
+{
+  x  -= x1; y  -= y1;
+  x2 -= x1; y2 -= y1;
+
+  double len = sqrt(x2*x2 + y2*y2);
+
+  SYS_ASSERT(len > 0);
+
+  return (x * y2 - y * x2) / len;
+}
+
+double AlongDist(double x, double y,
+                 double x1, double y1, double x2, double y2)
+{
+  x  -= x1; y  -= y1;
+  x2 -= x1; y2 -= y1;
+
+  double len = sqrt(x2*x2 + y2*y2);
+
+  SYS_ASSERT(len > 0);
+
+  return (x * x2 + y * y2) / len;
+}
+
+
+
 //
 // Be sure to handle the result overflowing (it WILL happen !).
 //
@@ -195,9 +212,6 @@ unsigned int UtilGetMillis()
 //  FILE UTILITIES
 //------------------------------------------------------------------------
 
-//
-// FileExists
-//
 bool FileExists(const char *filename)
 {
   FILE *fp = fopen(filename, "rb");
@@ -211,9 +225,6 @@ bool FileExists(const char *filename)
   return false;
 }
 
-//
-// HasExtension
-//
 bool HasExtension(const char *filename)
 {
   int A = (int)strlen(filename) - 1;
@@ -239,8 +250,6 @@ bool HasExtension(const char *filename)
 }
 
 //
-// CheckExtension
-//
 // When ext is NULL, checks if the file has no extension.
 //
 bool CheckExtension(const char *filename, const char *ext)
@@ -263,8 +272,6 @@ bool CheckExtension(const char *filename, const char *ext)
   return (A >= 1) && (filename[A] == '.');
 }
 
-//
-// ReplaceExtension
 //
 // When ext is NULL, any existing extension is removed.
 // NOTE: returned string is static storage.
@@ -313,8 +320,6 @@ const char *ReplaceExtension(const char *filename, const char *ext)
   return buffer;
 }
 
-//
-// FileBaseName
 //
 // Find the base name of the file (i.e. without any path).
 // The result always points within the given string.
