@@ -121,9 +121,10 @@ int main(int argc, char **argv)
   fprintf(map_fp, "{\n");
 
   Brush_WriteField("classname", "worldspawn");
+  fprintf(map_fp, "\n");
 
-  Brush_ConvertWalls();
   Brush_ConvertSectors();
+  Brush_ConvertWalls();
 
   fprintf(map_fp, "}\n");
 
