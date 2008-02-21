@@ -124,8 +124,6 @@ int main(int argc, char **argv)
 
   Brush_ConvertWalls();
   Brush_ConvertSectors();
-  Brush_ConvertExtraFloors();
-  Brush_ConvertLiquids();
 
   fprintf(map_fp, "}\n");
 

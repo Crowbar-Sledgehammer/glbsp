@@ -23,8 +23,6 @@
 void Brush_WriteField(const char *field, const char *val_str, ...);
 
 void Brush_ConvertSectors(void);
-void Brush_ConvertExtraFloors(void);
-void Brush_ConvertLiquids(void);
 void Brush_ConvertWalls(void);
 void Brush_ConvertThings(void);
 
