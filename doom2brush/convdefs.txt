@@ -1,17 +1,32 @@
 // sample convdefs.txt file for OpenArena
 
 texture DEFAULT   e7/e7panelwood2
+texture F_SKY1    skies/skybox
 texture GRASS1    czest3ctf/grass_lush
-texture GRAY1     stone/pjrock1
-texture FLAT18    stone/pjrock1
-texture FLAT19    stone/pjrock1
+texture GRAY1     base_wall/concrete
+texture FLAT18    base_wall/concrete
+texture FLAT19    base_wall/concrete
+texture FLAT1     gothic_floor/largeblockfloor4
 texture STARTAN3  gothic_block/blocks18c_3
 texture FLOOR4_8  gothic_floor/largeblockfloor4
 texture CEIL3_5   gothic_floor/largeblockfloor4
+texture CEMENT1   base_wall/concrete
+texture CEMENT9   base_wall/concretepipe01
+texture METAL     base_trim/dirty_pewter
 
 entity  1    info_player_start
 entity  2    info_player_start
 entity  3    info_player_start
 entity  4    info_player_start
 entity  11   info_player_deathmatch
+
+entity  2001 weapon_shotgun
+entity  2002 weapon_lightning
+entity  2003 weapon_rocketlauncher
+entity    82 weapon_railgun
+entity  2004 weapon_plasmagun
+entity  2005 weapon_grenadelauncher
+
+entity  2013 item_health_mega
+entity  2019 item_armor_body
 
