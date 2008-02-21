@@ -667,6 +667,7 @@ void subsec_c::append_seg(seg_c *cur)
 void subsec_c::build_seg_list(int first, int count)
 {
   seg_list = NULL;
+  sector   = NULL;
 
   mid_x = 0;
   mid_y = 0;
@@ -676,6 +677,9 @@ void subsec_c::build_seg_list(int first, int count)
     seg_c *seg = lev_segs.Get(first);
 
     append_seg(seg);
+
+    if (!sector && seg->sector)
+      sector = seg->sector;
   }
 
   mid_x /= count;

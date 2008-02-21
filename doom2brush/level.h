@@ -193,13 +193,15 @@ public:
   double mid_x;
   double mid_y;
 
+  sector_c *sector;
+
   subsec_c(int _idx, const raw_subsec_t *raw);
   subsec_c(int _idx, const raw_v3_subsec_t *raw);
   ~subsec_c();
 
   void append_seg(seg_c *cur);
   void build_seg_list(int first, int count);
-  // builds the list of segs, and also determines mid point.
+  // builds the list of segs, and also determines mid point and sector.
 };
 
 
@@ -238,7 +240,7 @@ public:
   // node index in lump
   int index;
 
-  node_c (int _idx, const raw_node_t *raw);
+   node_c(int _idx, const raw_node_t *raw);
   ~node_c();
 };
 
