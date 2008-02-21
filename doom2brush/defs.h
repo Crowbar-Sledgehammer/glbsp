@@ -54,4 +54,6 @@
 #include "texture.h"
 #include "brush.h"
 
+extern FILE *map_fp;
+
 #endif /* __DM2BR_DEFS_H__ */
