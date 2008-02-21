@@ -123,7 +123,7 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
       continue;
 
     // use opposite side (brushes face out, but segs face in)
-    sidedef_c *side = seg->side ? seg->linedef->left : seg->linedef->right;
+    sidedef_c *side = seg->side ? seg->linedef->right : seg->linedef->left;
 
     if (! side)
       continue;
