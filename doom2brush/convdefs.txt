@@ -1,0 +1,17 @@
+// sample convdefs.txt file for OpenArena
+
+texture DEFAULT   e7/e7panelwood2
+texture GRASS1    czest3ctf/grass_lush
+texture GRAY1     stone/pjrock1
+texture FLAT18    stone/pjrock1
+texture FLAT19    stone/pjrock1
+texture STARTAN3  gothic_block/blocks18c_3
+texture FLOOR4_8  gothic_floor/largeblockfloor4
+texture CEIL3_5   gothic_floor/largeblockfloor4
+
+entity  1    info_player_start
+entity  2    info_player_start
+entity  3    info_player_start
+entity  4    info_player_start
+entity  11   info_player_deathmatch
+
