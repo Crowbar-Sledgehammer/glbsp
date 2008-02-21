@@ -20,6 +20,9 @@
 #include "defs.h"
 
 
+#define DUMMY_TEX  "e7/e7panelwood2"
+
+
 class brush_side_c
 {
 public:
@@ -27,8 +30,8 @@ public:
   double x2, y2;
 
 public:
-   brush_side_c();
-  ~brush_side_c();
+   brush_side_c() { }
+  ~brush_side_c() { }
 };
 
 static void GetBrushSides(subsec_c *sub, std::vector<brush_side_c>& sides)
@@ -93,7 +96,8 @@ void Brush_ConvertSectors(void)
 
     if (sides.size() < 3)
     {
-      fprintf(stderr, "Warning: subsec:%d invalid (only %d sides)\n", i, (int)sides.size());
+      fprintf(stderr, "Warning: subsec:%d in sector:%d invalid (only %d sides)\n",
+              i, S->index, (int)sides.size());
       continue;
     }
 
@@ -102,7 +106,32 @@ void Brush_ConvertSectors(void)
       double z1 = is_ceil ? S->ceil_h        : S->floor_h - 64.0;
       double z2 = is_ceil ? S->ceil_h + 64.0 : S->floor_h;
 
-      // TODO
+      fprintf(map_fp, "// %s sector:%d subsec:%d\n",
+              is_ceil ? "Ceiling" : "Floor", S->index, i);
+
+      fprintf(map_fp, "{\n");
+
+      // Top
+      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+          0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
+          DUMMY_TEX);
+
+      // Bottom
+      fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+          0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
+          DUMMY_TEX);
+
+      // Sides
+      for (unsigned int k = 0; k < sides.size(); k++)
+      {
+        brush_side_c& b = sides[k];
+
+        fprintf(map_fp, "  ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) ( %1.1f %1.1f %1.1f ) %s 0 0 0 1 1\n",
+            b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
+            DUMMY_TEX);
+      }
+
+      fprintf(map_fp, "}\n");
     }
   }
 }
@@ -112,7 +141,12 @@ void Brush_ConvertSectors(void)
 
 void Brush_ConvertWalls(void)
 {
-  // TODO
+  for (int i = 0; i < lev_linedefs.num; i++)
+  {
+    linedef_c *L = lev_linedefs[i];
+
+    @@@
+  }
 }
 
 
