@@ -32,15 +32,67 @@ typedef std::map<int, std::string> entity_map_t;
 static entity_map_t ent_DB;
 
 
-static void ParseTexture(const char *pos)
+static void ParseTexture(char *pos)
 {
-  // TODO
+  char *old_name = strtok(pos, " \t");
+
+  if (! old_name)
+  {
+    fprintf(stderr, "Bad texture line in convdefs\n");
+    return;
+  }
+
+  char *new_name = strtok(NULL, " \t");
+
+  if (! new_name)
+  {
+    fprintf(stderr, "Bad texture line in convdefs\n");
+    return;
+  }
+
+  // make source texture name uppercase
+  for (char *s = old_name; *s; s++)
+    *s = toupper(*s);
+
+  if (strcmp(old_name, "DEFAULT") == 0)
+  {
+    default_tex_name = strdup(new_name);
+    return;
+  }
+
+  tex_DB[old_name] = std::string(new_name);
 }
 
-static void ParseEntity(const char *pos)
+
+static void ParseEntity(char *pos)
 {
-  // TODO
+  const char *old_name = strtok(pos, " \t");
+
+  if (! old_name)
+  {
+    fprintf(stderr, "Bad entity line in convdefs\n");
+    return;
+  }
+
+  const char *new_name = strtok(NULL, " \t");
+
+  if (! new_name)
+  {
+    fprintf(stderr, "Bad entity line in convdefs\n");
+    return;
+  }
+
+  int id_number = atoi(old_name);
+
+  if (id_number <= 0)
+  {
+    fprintf(stderr, "Bad entity number '%s' in convdefs\n", old_name);
+    return;
+  }
+
+  ent_DB[id_number] = std::string(new_name);
 }
+
 
 void Texture_Load(const char *filename)
 {
@@ -52,7 +104,7 @@ void Texture_Load(const char *filename)
 
   while (fgets(line_buf, sizeof(line_buf)-10, fp) != NULL)
   {
-    const char *pos = line_buf;
+    char *pos = line_buf;
 
     while (*pos && isspace(*pos))
       pos++;
@@ -91,7 +143,7 @@ const char * Texture_Convert(const char *old_name, bool is_flat)
 
     SYS_ASSERT(default_tex_name);
 
-    tex_DB[old_name] = default_tex_name;
+    tex_DB[old_name] = std::string(default_tex_name);
   }
 
   return tex_DB[old_name].c_str();
