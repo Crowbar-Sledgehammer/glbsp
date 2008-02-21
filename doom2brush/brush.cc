@@ -307,8 +307,9 @@ void Brush_ConvertThings(void)
   {
     thing_c *T = lev_things.Get(i);
 
-    // FIXME: thing --> entity conversion
-    if (T->type != 1)
+    const char *ent_name = Entity_Convert(T->type);
+
+    if (! ent_name)
       continue;
 
     int z = 128;  // FIXME !!!!
@@ -316,10 +317,13 @@ void Brush_ConvertThings(void)
     fprintf(map_fp, "// thing #%d type:%d\n", i, T->type);
     fprintf(map_fp, "{\n");
 
-    Brush_WriteField("classname", "info_player_start");
+    Brush_WriteField("classname", ent_name);
     Brush_WriteField("origin", "%d %d %d", T->x, T->y, z + 25);
 
-    // FIXME: Brush_WriteField("angle", "%d", T->angle);
+    if (T->angle != 0)
+    {
+      Brush_WriteField("angle", "%d", T->angle);
+    }
 
     fprintf(map_fp, "}\n");
   }

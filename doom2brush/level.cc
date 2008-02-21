@@ -147,7 +147,7 @@ void GetGLVerts(wad_c *base)
   }
 }
 
-sector_c::sector_c(int _idx, const raw_sector_t *raw)
+sector_c::sector_c(int _idx, const raw_sector_t *raw) : extrafloors(), liquids()
 {
   index = _idx;
 
@@ -211,6 +211,7 @@ thing_c::thing_c(int _idx, const raw_thing_t *raw)
 
   type    = UINT16(raw->type);
   options = UINT16(raw->options);
+  angle   = UINT16(raw->angle);
 }
 
 thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
@@ -222,6 +223,7 @@ thing_c::thing_c(int _idx, const raw_hexen_thing_t *raw)
 
   type    = UINT16(raw->type);
   options = UINT16(raw->options);
+  angle   = UINT16(raw->angle);
 }
 
 thing_c::~thing_c()

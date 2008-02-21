@@ -62,6 +62,9 @@ public:
   int special;
   int tag;
 
+  std::vector<sector_c *> extrafloors;
+  std::vector<sector_c *> liquids;
+
   sector_c(int _idx, const raw_sector_t *raw);
   ~sector_c();
 };
@@ -127,9 +130,9 @@ public:
   int x, y;
   int type;
   int options;
+  int angle;
 
-  // other info (angle, and hexen stuff) omitted.  We don't need to
-  // write the THING lump, only read it.
+  // other info (hexen stuff) omitted. 
 
   // Always valid (thing indices never change).
   int index;
