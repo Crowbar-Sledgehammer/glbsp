@@ -20,10 +20,13 @@
 #define __DM2BR_BRUSH_H__
 
 
+void Brush_WriteField(const char *field, const char *val_str, ...);
+
 void Brush_ConvertSectors(void);
 void Brush_ConvertExtraFloors(void);
 void Brush_ConvertLiquids(void);
 void Brush_ConvertWalls(void);
+void Brush_ConvertThings(void);
 
 
 #endif /* __DM2BR_BRUSH_H__ */
