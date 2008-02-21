@@ -99,6 +99,52 @@ static void FindSectorExtents(void)
   }
 }
 
+static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
+{
+  // find longest seg on the brush side
+  const char *best = NULL;
+
+  double best_len = -1;
+
+  for (unsigned int k = 0; k < sub->seg_list.size(); k++)
+  {
+    seg_c * seg = sub->seg_list[k];
+
+    if (! seg->linedef)
+      continue;
+
+    double ps = PerpDist(seg->start->x, seg->start->y,
+                         b.x1, b.y1, b.x2, b.y2);
+
+    double pe = PerpDist(seg->end->x, seg->end->y,
+                         b.x1, b.y1, b.x2, b.y2);
+
+    if (! (fabs(ps) < 0.02 && fabs(pe) < 0.02))
+      continue;
+
+    sidedef_c *side = (seg->side == 0) ? seg->linedef->right : seg->linedef->left;
+
+    if (! side)
+      continue;
+
+    const char *tex_name = is_ceil ? side->upper_tex : side->lower_tex;
+
+    if (strlen(tex_name) == 0 || tex_name[0] == '-')
+      continue;
+
+    double len = ComputeDist(seg->start->x - seg->end->x,
+                             seg->start->y - seg->end->y);
+
+    if (best && len < best_len)
+      continue;
+
+    best = tex_name;
+    best_len = len;
+  }
+
+  return best;
+}
+
 
 void Brush_ConvertSectors(void)
 {
@@ -132,6 +178,9 @@ void Brush_ConvertSectors(void)
       double z1 = is_ceil ? S->ceil_h    : S->floor_under;
       double z2 = is_ceil ? S->ceil_over : S->floor_h;
 
+      const char *flat_name = Texture_Convert(is_ceil ? S->ceil_tex : S->floor_tex,
+                                              true /* is_flat */);
+
       fprintf(map_fp, "// %s sector:%d subsec:%d\n",
               is_ceil ? "ceiling" : "floor", S->index, i);
 
@@ -140,21 +189,25 @@ void Brush_ConvertSectors(void)
       // Top
       fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
-          DUMMY_TEX);
+          flat_name);
 
       // Bottom
       fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
-          DUMMY_TEX);
+          flat_name);
 
       // Sides
       for (unsigned int k = 0; k < sides.size(); k++)
       {
         brush_side_c& b = sides[k];
 
+        const char *side_tex = DetermineSideTex(sub, b, is_ceil);
+        if (! side_tex)
+          side_tex = flat_name;
+
         fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
             b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
-            DUMMY_TEX);
+            side_tex);
       }
 
       fprintf(map_fp, "}\n");
@@ -202,18 +255,20 @@ void Brush_ConvertWalls(void)
     double z1 = L->right->sector->floor_under;
     double z2 = L->right->sector->ceil_over;
 
+    const char *tex_name = Texture_Convert(L->right->mid_tex, false /* is_flat */);
+
     fprintf(map_fp, "// wall line:%d sector:%d\n", i, L->right->sector->index);
     fprintf(map_fp, "{\n");
 
     // Top
     fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
         0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
-        DUMMY_TEX);
+        tex_name);
 
     // Bottom
     fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
         0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
-        DUMMY_TEX);
+        tex_name);
 
     // Sides
     for (int k1 = 0; k1 < 4; k1++)
@@ -222,7 +277,7 @@ void Brush_ConvertWalls(void)
 
       fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 1 1\n",
           x[k1], y[k1], z1,  x[k1], y[k1], z2,  x[k2], y[k2], z2,
-          DUMMY_TEX);
+          tex_name);
     }
 
     fprintf(map_fp, "}\n");
