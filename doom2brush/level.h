@@ -54,8 +54,8 @@ public:
   int floor_under, ceil_over;
 
   // textures
-  char floor_tex[8];
-  char ceil_tex[8];
+  char floor_tex[10];
+  char ceil_tex[10];
 
   // attributes
   int light;
@@ -77,9 +77,9 @@ public:
   int x_offset, y_offset;
 
   // texture names
-  char upper_tex[8];
-  char lower_tex[8];
-  char mid_tex[8];
+  char upper_tex[10];
+  char lower_tex[10];
+  char mid_tex[10];
 
   // sidedef index.  Always valid after loading & pruning.
   int index;

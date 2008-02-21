@@ -161,6 +161,9 @@ sector_c::sector_c(int _idx, const raw_sector_t *raw)
   memcpy(floor_tex, raw->floor_tex, sizeof(floor_tex));
   memcpy(ceil_tex,  raw->ceil_tex,  sizeof(ceil_tex));
 
+  // ensure NUL terminated
+  floor_tex[8] = ceil_tex[8] = 0;
+
   light   = UINT16(raw->light);
   special = UINT16(raw->special);
   tag     = SINT16(raw->tag);
@@ -313,6 +316,9 @@ sidedef_c::sidedef_c(int _idx, const raw_sidedef_t *raw)
   memcpy(upper_tex, raw->upper_tex, sizeof(upper_tex));
   memcpy(lower_tex, raw->lower_tex, sizeof(lower_tex));
   memcpy(mid_tex,   raw->mid_tex,   sizeof(mid_tex));
+
+  // ensure NUL terminated
+  upper_tex[8] = lower_tex[8] = mid_tex[8] = 0;
 }
 
 sidedef_c::~sidedef_c()
