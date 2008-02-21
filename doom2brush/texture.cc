@@ -104,8 +104,13 @@ void Texture_Load(const char *filename)
 
   while (fgets(line_buf, sizeof(line_buf)-10, fp) != NULL)
   {
-    char *pos = line_buf;
+    char *pos;
 
+    // remove any LF or CR
+    pos = strrchr(line_buf, '\n'); if (pos) *pos = 0;
+    pos = strrchr(line_buf, '\r'); if (pos) *pos = 0;
+
+    pos = line_buf;
     while (*pos && isspace(*pos))
       pos++;
 
