@@ -3,16 +3,17 @@
 texture DEFAULT   e7/e7panelwood2
 texture F_SKY1    skies/skybox
 texture GRASS1    czest3ctf/grass_lush
-texture GRAY1     base_wall/concrete
-texture FLAT18    base_wall/concrete
-texture FLAT19    base_wall/concrete
-texture FLAT1     gothic_floor/largeblockfloor4
+texture GRAY1     base_wall/concrete_dark
+texture FLAT18    base_wall/concrete_dark
+texture FLAT19    base_wall/concrete_dark
+texture FLAT1     base_wall/concrete_dark
 texture STARTAN3  gothic_block/blocks18c_3
 texture FLOOR4_8  gothic_floor/largeblockfloor4
 texture CEIL3_5   gothic_floor/largeblockfloor4
-texture CEMENT1   base_wall/concrete
-texture CEMENT9   base_wall/concretepipe01
+texture CEMENT1   base_wall/concrete_dark
+texture CEMENT9   base_wall/concrete_dark
 texture METAL     base_trim/dirty_pewter
+texture FWATER1   liquids/vorwater
 
 entity  1    info_player_start
 entity  2    info_player_start
