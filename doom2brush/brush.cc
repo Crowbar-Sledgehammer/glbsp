@@ -118,6 +118,7 @@ static void CollectExtraFloors(void)
           continue;
 
         S->extrafloors.push_back(L->right->sector);
+        S->ef_lines.push_back(L);
       }
     }
 
@@ -180,7 +181,7 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
     best_len = len;
   }
 
-  return best ? Texture_Convert(best, false) : NULL;
+  return best ? Texture_Convert(best) : NULL;
 }
 
 
@@ -259,7 +260,7 @@ void Brush_ConvertSectors(void)
         flat_name = EF->ceil_tex;
       }
 
-      flat_name = Texture_Convert(flat_name, true /* is_flat */);
+      flat_name = Texture_Convert(flat_name);
 
       fprintf(map_fp, "// %s sector:%d subsec:%d\n",
               (pass == 0) ? "floor" : (pass == 1) ? "ceiling" :
@@ -284,15 +285,30 @@ void Brush_ConvertSectors(void)
         brush_side_c& b = sides[k];
 
         const char *side_tex = NULL;
-        
-        if (pass < 2)
+
+        if (pass == 1 && strncmp(S->ceil_tex, "F_SKY", 5) == 0)
+        {
+          side_tex = Texture_Convert("NODRAW");
+        }
+        else if (pass < 2)
+        {
           side_tex = DetermineSideTex(sub, b, pass == 1);
+        }
+        else if (pass == 2)
+        {
+          side_tex = Texture_Convert("NODRAW");
+        }
+        else if (pass > 2)
+        {
+          linedef_c *EL = S->ef_lines[pass - 3];
+          SYS_ASSERT(EL && EL->right);
+
+          if (EL->right->mid_tex[0] && EL->right->mid_tex[0] != '-')
+            side_tex = Texture_Convert(EL->right->mid_tex);
+        }
 
         if (! side_tex)
           side_tex = flat_name;
-
-        if (pass == 2)
-          side_tex = "common/caulk";
 
         fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
             b.x1, b.y1, z1,  b.x1, b.y1, z2,  b.x2, b.y2, z2,
@@ -344,7 +360,7 @@ void Brush_ConvertWalls(void)
     double z1 = L->right->sector->floor_under;
     double z2 = L->right->sector->ceil_over;
 
-    const char *tex_name = Texture_Convert(L->right->mid_tex, false /* is_flat */);
+    const char *tex_name = Texture_Convert(L->right->mid_tex);
 
     fprintf(map_fp, "// wall line:%d sector:%d\n", i, L->right->sector->index);
     fprintf(map_fp, "{\n");
