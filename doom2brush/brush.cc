@@ -201,9 +201,9 @@ static void CollectSlopes(void)
       S->floor_slope->sy = L->start->y;
       S->floor_slope->sz = L->left->sector->floor_h;
 
-      S->floor_slope->sx = far_x;
-      S->floor_slope->sy = far_y;
-      S->floor_slope->sz = S->floor_h;
+      S->floor_slope->ex = far_x;
+      S->floor_slope->ey = far_y;
+      S->floor_slope->ez = S->floor_h;
     }
 
     if (L->type == 778 || L->type == 779)
@@ -214,9 +214,9 @@ static void CollectSlopes(void)
       S->ceil_slope->sy = L->start->y;
       S->ceil_slope->sz = L->left->sector->ceil_h;
 
-      S->ceil_slope->sx = far_x;
-      S->ceil_slope->sy = far_y;
-      S->ceil_slope->sz = S->ceil_h;
+      S->ceil_slope->ex = far_x;
+      S->ceil_slope->ey = far_y;
+      S->ceil_slope->ez = S->ceil_h;
     }
   }
 }
@@ -268,9 +268,35 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
   return best ? Texture_Convert(best) : NULL;
 }
 
-static void WriteSlopePlane(subsec_c *sub, int pass, const char *tex)
+
+static void WriteSlopedFloor(sector_c *S, const char *tex)
 {
-  // TODO
+  slope_c *P = S->floor_slope;
+  SYS_ASSERT(P);
+
+  double nx = P->ey - P->sy;
+  double ny = P->sx - P->ex;
+
+  fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+      P->sx, P->sy, P->sz,
+      P->ex, P->ey, P->ez, 
+      P->ex + nx, P->ey + ny, P->ez,
+      tex);
+}
+
+static void WriteSlopedCeiling(sector_c *S, const char *tex)
+{
+  slope_c *P = S->floor_slope;
+  SYS_ASSERT(P);
+
+  double nx = P->ey - P->sy;
+  double ny = P->sx - P->ex;
+
+  fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+      P->sx, P->sy, P->sz,
+      P->ex, P->ey, P->ez, 
+      P->ex - nx, P->ey - ny, P->ez,
+      tex);
 }
 
 
@@ -362,7 +388,7 @@ void Brush_ConvertSectors(void)
       // Top
       if (pass == 0 && S->floor_slope)
       {
-        WriteSlopePlane(sub, pass, flat_name);
+        WriteSlopedFloor(S, flat_name);
       }
       else
       {
@@ -374,7 +400,7 @@ void Brush_ConvertSectors(void)
       // Bottom
       if (pass == 1 && S->ceil_slope)
       {
-        WriteSlopePlane(sub, pass, flat_name);
+        WriteSlopedCeiling(S, flat_name);
       }
       else
       {
