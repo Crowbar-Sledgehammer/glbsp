@@ -4,6 +4,7 @@ texture DEFAULT   e7/e7panelwood2
 texture NODRAW    common/caulk
 
 texture F_SKY1    skies/skybox
+texture FWATER1   liquids/vorwater
 texture GRASS1    czest3ctf/grass_lush
 texture GRAY1     base_wall/concrete_dark
 texture FLAT18    base_wall/concrete_dark
@@ -15,7 +16,7 @@ texture CEIL3_5   gothic_floor/largeblockfloor4
 texture CEMENT1   base_wall/concrete_dark
 texture CEMENT9   base_wall/concrete_dark
 texture METAL     base_trim/dirty_pewter
-texture FWATER1   liquids/vorwater
+texture GATE2     sfx/bounce_concrete
 
 entity  1    info_player_start
 entity  2    info_player_start

@@ -78,7 +78,7 @@ static void GetBrushSides(subsec_c *sub, std::vector<brush_side_c>& sides)
 
 static void FindSectorExtents(void)
 {
-  for (int loop = 0; loop < 10; loop++)
+  for (int loop = 0; loop < 2; loop++)
   {
     for (int i = 0; i < lev_linedefs.num; i++)
     {
