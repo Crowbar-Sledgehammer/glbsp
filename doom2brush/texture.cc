@@ -140,7 +140,7 @@ void Texture_Load(const char *filename)
 }
 
 
-const char * Texture_Convert(const char *old_name, bool is_flat)
+const char * Texture_Convert(const char *old_name)
 {
   if (tex_DB.find(old_name) == tex_DB.end())
   {

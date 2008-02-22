@@ -22,7 +22,7 @@
 
 void Texture_Load(const char *filename);
 
-const char * Texture_Convert(const char *old_name, bool is_flat);
+const char * Texture_Convert(const char *old_name);
 const char *  Entity_Convert(int id_number);
 
 #endif /* __DM2BR_TEXTURE_H__ */
