@@ -22,6 +22,7 @@
 
 class node_c;
 class sector_c;
+class linedef_c;
 
 
 class vertex_c
@@ -63,6 +64,8 @@ public:
   int tag;
 
   std::vector<sector_c *> extrafloors;
+  std::vector<linedef_c *>   ef_lines;
+
   std::vector<sector_c *> liquids;
 
   sector_c(int _idx, const raw_sector_t *raw);

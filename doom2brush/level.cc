@@ -147,7 +147,8 @@ void GetGLVerts(wad_c *base)
   }
 }
 
-sector_c::sector_c(int _idx, const raw_sector_t *raw) : extrafloors(), liquids()
+sector_c::sector_c(int _idx, const raw_sector_t *raw) :
+            extrafloors(), ef_lines(), liquids()
 {
   index = _idx;
 
