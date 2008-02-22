@@ -1,6 +1,8 @@
 // sample convdefs.txt file for OpenArena
 
 texture DEFAULT   e7/e7panelwood2
+texture NODRAW    common/caulk
+
 texture F_SKY1    skies/skybox
 texture GRASS1    czest3ctf/grass_lush
 texture GRAY1     base_wall/concrete_dark
