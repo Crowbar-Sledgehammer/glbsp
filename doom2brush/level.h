@@ -43,6 +43,17 @@ public:
 #define IS_GL_VERTEX  (1 << 30)
 
 
+class slope_c
+{
+public:
+  double sx, sy, sz;
+  double ex, ey, ez;
+
+   slope_c() { }
+  ~slope_c() { }
+};
+
+
 class sector_c
 {
 public:
@@ -51,7 +62,6 @@ public:
 
   // heights
   int floor_h, ceil_h;
-
   int floor_under, ceil_over;
 
   // textures
@@ -62,6 +72,9 @@ public:
   int light;
   int special;
   int tag;
+
+  slope_c *floor_slope;
+  slope_c *ceil_slope;
 
   std::vector<sector_c *> extrafloors;
   std::vector<linedef_c *>   ef_lines;

@@ -156,8 +156,8 @@ sector_c::sector_c(int _idx, const raw_sector_t *raw) :
   ceil_h  = SINT16(raw->ceil_h);
 
   // these are updated by FindSectorExtents
-  floor_under = floor_h - 64;
-  ceil_over   = ceil_h  + 64;
+  floor_under = floor_h;
+  ceil_over   = ceil_h;
 
   memcpy(floor_tex, raw->floor_tex, sizeof(floor_tex));
   memcpy(ceil_tex,  raw->ceil_tex,  sizeof(ceil_tex));
@@ -168,6 +168,8 @@ sector_c::sector_c(int _idx, const raw_sector_t *raw) :
   light   = UINT16(raw->light);
   special = UINT16(raw->special);
   tag     = SINT16(raw->tag);
+
+  floor_slope = ceil_slope = NULL;
 }
 
 sector_c::~sector_c()

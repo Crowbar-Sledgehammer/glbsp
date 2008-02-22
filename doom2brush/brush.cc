@@ -78,24 +78,27 @@ static void GetBrushSides(subsec_c *sub, std::vector<brush_side_c>& sides)
 
 static void FindSectorExtents(void)
 {
-  for (int i = 0; i < lev_linedefs.num; i++)
+  for (int loop = 0; loop < 10; loop++)
   {
-    linedef_c *L = lev_linedefs.Get(i);
+    for (int i = 0; i < lev_linedefs.num; i++)
+    {
+      linedef_c *L = lev_linedefs.Get(i);
 
-    if (! (L->left  && L->left->sector))
-      continue;
+      if (! (L->left  && L->left->sector))
+        continue;
 
-    if (! (L->right && L->right->sector))
-      continue;
+      if (! (L->right && L->right->sector))
+        continue;
 
-    sector_c *B = L->left->sector;
-    sector_c *F = L->right->sector;
+      sector_c *B = L->left->sector;
+      sector_c *F = L->right->sector;
 
-    B->floor_under = MIN(B->floor_under, F->floor_under);
-    B->ceil_over   = MAX(B->ceil_over  , F->ceil_over  );
+      B->floor_under = MIN(B->floor_under, F->floor_under);
+      B->ceil_over   = MAX(B->ceil_over  , F->ceil_over  );
 
-    F->floor_under = B->floor_under;
-    B->ceil_over   = B->ceil_over;
+      F->floor_under = B->floor_under;
+      F->ceil_over   = B->ceil_over;
+    }
   }
 }
 
@@ -133,6 +136,87 @@ static void CollectExtraFloors(void)
 
         S->liquids.push_back(L->right->sector);
       }
+    }
+  }
+}
+
+static void CollectSlopes(void)
+{
+  for (int i = 0; i < lev_linedefs.num; i++)
+  {
+    linedef_c *L = lev_linedefs.Get(i);
+
+    if (! L->right || ! L->right->sector ||
+        ! L->left  || ! L->left->sector  || L->zero_len)
+      continue;
+
+    if (L->type < 777 && L->type > 779)
+      continue;
+
+    // determine further point in sector from this line
+    
+    sector_c *S = L->right->sector;
+
+    double far_x    = L->start->x;
+    double far_y    = L->start->y;
+    double far_dist = 0;
+
+    for (int k = 0; k < lev_linedefs.num; k++)
+    {
+      linedef_c *M = lev_linedefs.Get(k);
+
+      if ((M->right && M->right->sector == S) ||
+          (M->left  && M->left->sector  == S))
+      {
+        double d1 = PerpDist(M->start->x, M->start->y,
+                             L->start->x, L->start->y, L->end->x, L->end->y);
+
+        double d2 = PerpDist(M->end->x, M->end->y,
+                             L->start->x, L->start->y, L->end->x, L->end->y);
+
+        if (d1 > far_dist)
+        {
+          far_x = M->start->x;
+          far_y = M->start->y;
+          far_dist = d1;
+        }
+
+        if (d2 > far_dist)
+        {
+          far_x = M->end->x;
+          far_y = M->end->y;
+          far_dist = d2;
+        }
+      }
+    }
+
+    if (far_dist < 0.01)
+      FatalError("Bad slope in sector %d\n", S->index);
+
+    if (L->type == 777 || L->type == 779)
+    {
+      S->floor_slope = new slope_c();
+
+      S->floor_slope->sx = L->start->x;
+      S->floor_slope->sy = L->start->y;
+      S->floor_slope->sz = L->left->sector->floor_h;
+
+      S->floor_slope->sx = far_x;
+      S->floor_slope->sy = far_y;
+      S->floor_slope->sz = S->floor_h;
+    }
+
+    if (L->type == 778 || L->type == 779)
+    {
+      S->ceil_slope = new slope_c();
+
+      S->ceil_slope->sx = L->start->x;
+      S->ceil_slope->sy = L->start->y;
+      S->ceil_slope->sz = L->left->sector->ceil_h;
+
+      S->ceil_slope->sx = far_x;
+      S->ceil_slope->sy = far_y;
+      S->ceil_slope->sz = S->ceil_h;
     }
   }
 }
@@ -184,12 +268,18 @@ static const char *DetermineSideTex(subsec_c *sub, brush_side_c& b, int is_ceil)
   return best ? Texture_Convert(best) : NULL;
 }
 
+static void WriteSlopePlane(subsec_c *sub, int pass, const char *tex)
+{
+  // TODO
+}
+
 
 void Brush_ConvertSectors(void)
 {
   FindSectorExtents();
 
   CollectExtraFloors();
+  CollectSlopes();
 
   std::vector<brush_side_c> sides;
 
@@ -223,7 +313,7 @@ void Brush_ConvertSectors(void)
 
       if (pass == 0)
       {
-        z1 = S->floor_under;
+        z1 = S->floor_under - 64;
         z2 = S->floor_h;
 
         flat_name = S->floor_tex;
@@ -231,7 +321,7 @@ void Brush_ConvertSectors(void)
       else if (pass == 1)
       {
         z1 = S->ceil_h;
-        z2 = S->ceil_over;
+        z2 = S->ceil_over + 64;
 
         flat_name = S->ceil_tex;
       }
@@ -242,7 +332,7 @@ void Brush_ConvertSectors(void)
 
         sector_c *liq = S->liquids[0];
 
-        z1 = S->floor_under;
+        z1 = S->floor_under - 32;
         z2 = liq->floor_h;
 
         flat_name = liq->floor_tex;
@@ -270,14 +360,28 @@ void Brush_ConvertSectors(void)
       fprintf(map_fp, "{\n");
 
       // Top
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
-          0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
-          flat_name);
+      if (pass == 0 && S->floor_slope)
+      {
+        WriteSlopePlane(sub, pass, flat_name);
+      }
+      else
+      {
+        fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+            0.0, 0.0, z2,  0.0, 1.0, z2,  1.0, 0.0, z2,
+            flat_name);
+      }
 
       // Bottom
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
-          0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
-          flat_name);
+      if (pass == 1 && S->ceil_slope)
+      {
+        WriteSlopePlane(sub, pass, flat_name);
+      }
+      else
+      {
+        fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+            0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
+            flat_name);
+      }
 
       // Sides
       for (unsigned int k = 0; k < sides.size(); k++)
@@ -357,8 +461,8 @@ void Brush_ConvertWalls(void)
     x[3] = x[0] - nx * 16;
     y[3] = y[0] - ny * 16;
 
-    double z1 = L->right->sector->floor_under;
-    double z2 = L->right->sector->ceil_over;
+    double z1 = L->right->sector->floor_under - 64;
+    double z2 = L->right->sector->ceil_over + 64;
 
     const char *tex_name = Texture_Convert(L->right->mid_tex);
 
