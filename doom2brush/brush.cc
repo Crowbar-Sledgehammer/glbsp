@@ -481,11 +481,11 @@ void Brush_ConvertWalls(void)
     nx /= n_len;
     ny /= n_len;
 
-    x[2] = x[1] - nx * 16;
-    y[2] = y[1] - ny * 16;
+    x[2] = x[1] - nx * 8;
+    y[2] = y[1] - ny * 8;
 
-    x[3] = x[0] - nx * 16;
-    y[3] = y[0] - ny * 16;
+    x[3] = x[0] - nx * 8;
+    y[3] = y[0] - ny * 8;
 
     double z1 = L->right->sector->floor_under - 64;
     double z2 = L->right->sector->ceil_over + 64;
@@ -594,7 +594,7 @@ void Brush_ConvertThings(void)
 
     // use "Ambush" flag to mean "place on 2nd extrafloor"
     if ((T->options & 8) && sec->extrafloors.size() > 0)
-      z = sec->extrafloors[0]->floor_h;
+      z = sec->extrafloors[0]->ceil_h;
     else
       z = sec->floor_h;
 
