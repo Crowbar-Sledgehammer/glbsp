@@ -157,8 +157,6 @@ static void CollectSlopes(void)
     
     sector_c *S = L->right->sector;
 
-    double far_x    = L->start->x;
-    double far_y    = L->start->y;
     double far_dist = 0;
 
     for (int k = 0; k < lev_linedefs.num; k++)
@@ -175,23 +173,23 @@ static void CollectSlopes(void)
                              L->start->x, L->start->y, L->end->x, L->end->y);
 
         if (d1 > far_dist)
-        {
-          far_x = M->start->x;
-          far_y = M->start->y;
           far_dist = d1;
-        }
 
         if (d2 > far_dist)
-        {
-          far_x = M->end->x;
-          far_y = M->end->y;
           far_dist = d2;
-        }
       }
     }
 
     if (far_dist < 0.01)
       FatalError("Bad slope in sector %d\n", S->index);
+
+    double nx = L->end->y - L->start->y;
+    double ny = L->start->x - L->end->x;
+
+    double n_len = ComputeDist(nx, ny);
+
+    nx = far_dist * nx / n_len;
+    ny = far_dist * ny / n_len;
 
     if (L->type == 777 || L->type == 779)
     {
@@ -201,8 +199,8 @@ static void CollectSlopes(void)
       S->floor_slope->sy = L->start->y;
       S->floor_slope->sz = L->left->sector->floor_h;
 
-      S->floor_slope->ex = far_x;
-      S->floor_slope->ey = far_y;
+      S->floor_slope->ex = L->start->x + nx;
+      S->floor_slope->ey = L->start->y + ny;
       S->floor_slope->ez = S->floor_h;
     }
 
@@ -214,8 +212,8 @@ static void CollectSlopes(void)
       S->ceil_slope->sy = L->start->y;
       S->ceil_slope->sz = L->left->sector->ceil_h;
 
-      S->ceil_slope->ex = far_x;
-      S->ceil_slope->ey = far_y;
+      S->ceil_slope->ex = L->start->x + nx;
+      S->ceil_slope->ey = L->start->y + ny;
       S->ceil_slope->ez = S->ceil_h;
     }
   }
@@ -286,7 +284,7 @@ static void WriteSlopedFloor(sector_c *S, const char *tex)
 
 static void WriteSlopedCeiling(sector_c *S, const char *tex)
 {
-  slope_c *P = S->floor_slope;
+  slope_c *P = S->ceil_slope;
   SYS_ASSERT(P);
 
   double nx = P->ey - P->sy;
@@ -578,6 +576,8 @@ static sector_c *PointInSector(double x, double y)
 
 void Brush_ConvertThings(void)
 {
+  int telept_target = 1;
+
   for (int i = 0; i < lev_things.num; i++)
   {
     thing_c *T = lev_things.Get(i);
@@ -609,6 +609,12 @@ void Brush_ConvertThings(void)
     if (T->angle != 0)
     {
       Brush_WriteField("angle", "%d", T->angle);
+    }
+
+    if (T->type == 14)
+    {
+      Brush_WriteField("targetname", "t%d", telept_target);
+      telept_target++;
     }
 
     fprintf(map_fp, "}\n");
