@@ -15,14 +15,18 @@ texture FLOOR4_8  gothic_floor/largeblockfloor4
 texture CEIL3_5   gothic_floor/largeblockfloor4
 texture CEMENT1   base_wall/concrete_dark
 texture CEMENT9   base_wall/concrete_dark
-texture METAL     base_trim/dirty_pewter
+texture METAL     base_wall/shinybluemetal1
+texture CEIL5_2   base_wall/shinybluemetal1
 texture GATE2     sfx/bounce_concrete
+texture SUPPORT2  base_trim/pewter
+texture FIRELAV2  base_light/proto_lightred
 
 entity  1    info_player_start
 entity  2    info_player_start
 entity  3    info_player_start
 entity  4    info_player_start
 entity  11   info_player_deathmatch
+entity  14   misc_teleporter_desc
 
 entity  2001 weapon_shotgun
 entity  2002 weapon_lightning
