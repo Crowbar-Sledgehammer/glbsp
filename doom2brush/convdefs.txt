@@ -39,6 +39,8 @@ entity  2014 item_health_small
 entity  2011 item_health
 entity  2012 item_health_large
 entity  2013 item_health_mega
+entity  2015 item_armor_shard
+entity  2018 item_armor_combat
 entity  2019 item_armor_body
 entity  2023 item_quad
 
