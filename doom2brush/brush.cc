@@ -563,8 +563,10 @@ void Brush_ConvertWalls(void)
     double right_A = GetInteriorAngle(L->end,   L);
 
     left_A  = line_A + left_A  / 2.0;
-    right_A = line_A - right_A / 2.0;
-    
+    right_A = line_A - right_A / 2.0 + 180.0;
+
+// fprintf(stderr, "left_A = %1.1f  right_A = %1.1f  line_A = %1.1f\n\n", left_A, right_A, line_A);
+
     double lx = sx + 12.0 * cos(left_A * M_PI / 180.0);
     double ly = sy + 12.0 * sin(left_A * M_PI / 180.0);
 
