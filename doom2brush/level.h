@@ -35,6 +35,9 @@ public:
   // vertices has occurred.  For GL vertices, bit 30 will be set.
   int index;
 
+  // linedefs that touch this vertex
+  std::vector<linedef_c *> lines;
+
   vertex_c(int _idx, const raw_vertex_t *raw);
   vertex_c(int _idx, const raw_v2_vertex_t *raw);
   ~vertex_c();

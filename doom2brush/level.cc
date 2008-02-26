@@ -51,7 +51,7 @@ static const uint8_g *lev_v3_magic = (uint8_g *)"gNd3";
 void GetLinedefsHexen(wad_c *base);
 void GetThingsHexen(wad_c *base);
 
-vertex_c::vertex_c(int _idx, const raw_vertex_t *raw)
+vertex_c::vertex_c(int _idx, const raw_vertex_t *raw) : lines()
 {
   index = _idx;
 
