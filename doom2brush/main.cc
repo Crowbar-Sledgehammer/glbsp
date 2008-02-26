@@ -112,9 +112,6 @@ int main(int argc, char **argv)
 
   LoadLevel(level_name);
 
-  double lx, ly, hx, hy;
-  LevelGetBounds(&lx, &ly, &hx, &hy);
-
 
   map_fp = fopen("out.map", "w");
   if (! map_fp)

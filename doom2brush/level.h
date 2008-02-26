@@ -359,6 +359,5 @@ void LoadLevel(const char *name);
 // free all level data
 void FreeLevel(void);
 
-void LevelGetBounds(double *lx, double *ly, double *hx, double *hy);
 
 #endif /* __DM2BR_LEVEL_H__ */
