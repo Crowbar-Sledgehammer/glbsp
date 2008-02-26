@@ -451,8 +451,86 @@ void Brush_ConvertSectors(void)
 
 //------------------------------------------------------------------------
 
+static void CollectLinesAtVertices(void)
+{
+  for (int i = 0; i < lev_linedefs.num; i++)
+  {
+    linedef_c *L = lev_linedefs.Get(i);
+
+    if (L->zero_len)
+      continue;
+
+    L->start->lines.push_back(L);
+    L->end  ->lines.push_back(L);
+  }
+}
+
+static double GetInteriorAngle(vertex_c *V, linedef_c *L)
+{
+  // returns the angle on the back side of the linedef
+  // and the neighbouring linedef (both one-sided) at the
+  // given vertex.
+
+  SYS_ASSERT(V == L->start || V == L->end);
+
+  double line_ang = ComputeAngle(L->end->x - L->start->x, L->end->y - L->start->y);
+
+  if (V == L->end)
+  {
+    line_ang = line_ang + 180.0;
+    if (line_ang >= 360.0)
+      line_ang -= 360.0;
+  }
+
+  double best_ang = 999.9;
+
+  for (unsigned int i = 0; i < V->lines.size(); i++)
+  {
+    linedef_c *N = V->lines[i];
+
+    // we only do one-sided linedefs
+    if (N->left || ! N->right || ! N->right->sector)
+      continue;
+
+    if (N->zero_len)
+      continue;
+
+    SYS_ASSERT(V == N->start || V == N->end);
+
+    double nb_ang = ComputeAngle(N->end->x - N->start->x, N->end->y - N->start->y);
+
+    if (V == N->end)
+    {
+      nb_ang = nb_ang + 180.0;
+      if (nb_ang >= 360.0)
+        nb_ang -= 360.0;
+    }
+
+    double diff = line_ang - nb_ang;
+
+    if (diff < 0)
+      diff += 360.0;
+
+    fprintf(stderr, "AT (%1.0f %1.0f) diff=%1.4f\n", V->x, V->y, diff);
+
+    best_ang = MIN(best_ang, diff);
+  }
+
+  if (best_ang > 360.0)
+  {
+    fprintf(stderr, "Warning: unconnected one-sided line at (%1.0f,%1.0f)\n",
+            V->x, V->y);
+
+    return 90.0;
+  }
+
+  return best_ang;
+}
+
 void Brush_ConvertWalls(void)
 {
+  CollectLinesAtVertices();
+
   for (int i = 0; i < lev_linedefs.num; i++)
   {
     linedef_c *L = lev_linedefs.Get(i);
@@ -463,6 +541,9 @@ void Brush_ConvertWalls(void)
 
     if (L->zero_len)
       continue;
+
+    double left_A  = GetInteriorAngle(L->start, L);
+//!!!    double right_A = GetInteriorAngle(L->end,   L);
 
     double x[4], y[4];
 
