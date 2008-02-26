@@ -488,6 +488,10 @@ static double GetInteriorAngle(vertex_c *V, linedef_c *L)
   {
     linedef_c *N = V->lines[i];
 
+    // skip ourself
+    if (N == L)
+      continue;
+
     // we only do one-sided linedefs
     if (N->left || ! N->right || ! N->right->sector)
       continue;
@@ -496,6 +500,10 @@ static double GetInteriorAngle(vertex_c *V, linedef_c *L)
       continue;
 
     SYS_ASSERT(V == N->start || V == N->end);
+
+    // ignore mismatch in join method
+    if ((V == L->start) != (V == N->end))
+      continue;
 
     double nb_ang = ComputeAngle(N->end->x - N->start->x, N->end->y - N->start->y);
 
@@ -506,7 +514,7 @@ static double GetInteriorAngle(vertex_c *V, linedef_c *L)
         nb_ang -= 360.0;
     }
 
-    double diff = line_ang - nb_ang;
+    double diff = (V == L->start) ? (nb_ang - line_ang) : (line_ang - nb_ang);
 
     if (diff < 0)
       diff += 360.0;
@@ -543,7 +551,7 @@ void Brush_ConvertWalls(void)
       continue;
 
     double left_A  = GetInteriorAngle(L->start, L);
-//!!!    double right_A = GetInteriorAngle(L->end,   L);
+    double right_A = GetInteriorAngle(L->end,   L);
 
     double x[4], y[4];
 
