@@ -519,7 +519,7 @@ static double GetInteriorAngle(vertex_c *V, linedef_c *L)
     if (diff < 0)
       diff += 360.0;
 
-    fprintf(stderr, "AT (%1.0f %1.0f) diff=%1.4f\n", V->x, V->y, diff);
+//  fprintf(stderr, "AT (%1.0f %1.0f) diff=%1.4f\n", V->x, V->y, diff);
 
     best_ang = MIN(best_ang, diff);
   }
@@ -550,29 +550,37 @@ void Brush_ConvertWalls(void)
     if (L->zero_len)
       continue;
 
+    double sx = L->start->x;
+    double sy = L->start->y;
+
+    double ey = L->end  ->y;
+    double ex = L->end  ->x;
+
+    // determine coordinates for left and right sides
+    double line_A = ComputeAngle(L->end->x - L->start->x, L->end->y - L->start->y);
+
     double left_A  = GetInteriorAngle(L->start, L);
     double right_A = GetInteriorAngle(L->end,   L);
 
-    double x[4], y[4];
+    left_A  = line_A + left_A  / 2.0;
+    right_A = line_A - right_A / 2.0;
+    
+    double lx = sx + 12.0 * cos(left_A * M_PI / 180.0);
+    double ly = sy + 12.0 * sin(left_A * M_PI / 180.0);
 
-    x[0] = L->start->x;  y[0] = L->start->y;
-    x[1] = L->end  ->x;  y[1] = L->end  ->y;
+    double rx = ex + 12.0 * cos(right_A * M_PI / 180.0);
+    double ry = ey + 12.0 * sin(right_A * M_PI / 180.0);
 
-    // FIXME: compute back coordinates properly !!!!
 
-    double nx = y[1] - y[0];
-    double ny = x[0] - x[1];
+    // normal (used to get back face coordinates)
+    double nx = ey - sy;
+    double ny = sx - ex;
 
     double n_len = ComputeDist(nx, ny);
 
-    nx /= n_len;
-    ny /= n_len;
+    nx = 12.0 * nx / n_len;
+    ny = 12.0 * ny / n_len;
 
-    x[2] = x[1] - nx * 8;
-    y[2] = y[1] - ny * 8;
-
-    x[3] = x[0] - nx * 8;
-    y[3] = y[0] - ny * 8;
 
     double z1 = L->right->sector->floor_under - 64;
     double z2 = L->right->sector->ceil_over + 64;
@@ -592,15 +600,25 @@ void Brush_ConvertWalls(void)
         0.0, 0.0, z1,  1.0, 0.0, z1,  0.0, 1.0, z1,
         tex_name);
 
-    // Sides
-    for (int k1 = 0; k1 < 4; k1++)
-    {
-      int k2 = (k1+1) % 4;
+    // Front
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+        sx, sy, z1,  sx, sy, z2,  ex, ey, z2,
+        tex_name);
 
-      fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
-          x[k1], y[k1], z1,  x[k1], y[k1], z2,  x[k2], y[k2], z2,
-          tex_name);
-    }
+    // Back
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+        ex-nx, ey-ny, z1,  ex-nx, ey-ny, z2,  sx-nx, sy-ny, z2,
+        tex_name);
+
+    // Left
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+        lx, ly, z1,  lx, ly, z2,  sx, sy, z2,
+        tex_name);
+
+    // Right
+    fprintf(map_fp, "  ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) ( %1.4f %1.4f %1.4f ) %s 0 0 0 0.50 0.50\n",
+        ex, ey, z1,  ex, ey, z2,  rx, ry, z2,
+        tex_name);
 
     fprintf(map_fp, "}\n");
   }
