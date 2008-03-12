@@ -683,6 +683,24 @@ static sector_c *PointInSector(double x, double y)
 }
 
 
+int Thing_Z_Slope(slope_c *slope, double x, double y, double r)
+{
+  double z_max = -9e9;
+
+  for (int i = 0; i < 4; i++)
+  {
+    double tx = x + ((i&1) ? +1 : -1) * r;
+    double ty = y + ((i&2) ? +1 : -1) * r;
+
+    double tz = slope->HeightAt(tx, ty);
+
+    z_max = MAX(z_max, tz);
+  }
+
+  return (int)ceil(z_max);
+}
+
+
 void Brush_ConvertThings(void)
 {
   int telept_target = 1;
@@ -704,6 +722,8 @@ void Brush_ConvertThings(void)
     // use "Ambush" flag to mean "place on 2nd extrafloor"
     if ((T->options & 8) && sec->extrafloors.size() > 0)
       z = sec->extrafloors[0]->ceil_h;
+    else if (sec->floor_slope)
+      z = Thing_Z_Slope(sec->floor_slope, T->x, T->y, 16);
     else
       z = sec->floor_h;
 
