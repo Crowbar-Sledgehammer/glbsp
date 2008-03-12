@@ -42,6 +42,21 @@ LEVELARRAY(subsec_c,  lev_subsecs,  "subsector")
 LEVELARRAY(node_c,    lev_nodes,    "node")
 
 
+
+double slope_c::HeightAt(double x, double y)
+{
+  double dx = ex - sx;
+  double dy = ey - sy;
+  double dz = ez - sz;
+
+  double d_len = dx*dx + dy*dy;
+
+  double along = ((x - sx) * dx + (y - sy) * dy) / d_len;
+
+  return sz + along * dz;
+}
+
+
 /* ----- reading routines ------------------------------ */
 
 static const uint8_g *lev_v2_magic = (uint8_g *)"gNd2";

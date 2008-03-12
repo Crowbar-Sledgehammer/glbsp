@@ -54,6 +54,8 @@ public:
 
    slope_c() { }
   ~slope_c() { }
+
+  double HeightAt(double x, double y);
 };
 
 
