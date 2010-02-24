@@ -2,4 +2,5 @@
 Doom-2-Brush TODO
 =================
 
+-  place entities on Slopes properly (compute heights at four corners)
 
