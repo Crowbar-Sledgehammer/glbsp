@@ -2,7 +2,7 @@
 // MAIN : Command-line version main program
 //------------------------------------------------------------------------
 //
-//  GL-Friendly Node Builder (C) 2000-2007 Andrew Apted
+//  GL-Friendly Node Builder (C) 2000-2010 Andrew Apted
 //
 //  Based on 'BSP 2.3' by Colin Reed, Lee Killough and others.
 //
@@ -42,7 +42,7 @@ static void ShowTitle(void)
 {
   TextPrintMsg(
     "\n"
-    "**** GLBSP Node Builder " GLBSP_VER " (C) 2007 Andrew Apted ****\n\n"
+    "**** GLBSP Node Builder " GLBSP_VER " (C) 2010 Andrew Apted ****\n\n"
   );
 }
 
