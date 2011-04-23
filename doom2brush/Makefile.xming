@@ -1,0 +1,40 @@
+#
+#  Doom-2-Brush
+#
+#  Makefile for WIN32
+#
+
+PROG=doom2brush.exe
+
+CC=i586-mingw32msvc-gcc
+CXX=i586-mingw32msvc-g++
+CFLAGS= -g3 -Wall -DWIN32
+CXXFLAGS=$(CFLAGS)
+LDFLAGS=
+LIBS=-lm
+
+OBJS=./main.o     \
+     ./asserts.o  \
+     ./brush.o    \
+     ./level.o    \
+     ./system.o   \
+     ./texture.o  \
+     ./util.o     \
+     ./wad.o
+
+
+# ----- TARGETS ------------------------------------------------------
+
+all:    $(PROG)
+
+clean:
+	rm -f $(PROG) *.o core core.* ERRS d2b_debug.txt
+
+$(PROG): $(OBJS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $(PROG) $(LDFLAGS) $(LIBS)
+
+bin: all
+	strip --strip-unneeded $(PROG)
+
+.PHONY: all clean bin install
+
