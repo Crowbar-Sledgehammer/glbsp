@@ -31,3 +31,8 @@ USAGE:
 4. now drag the 'in.wad' file onto doom2brush.exe -- this
    will convert the map and create a 'out.map' file.
 
+
+NOTE: the map must be in DOOM format, this program does not
+      handle Hexen or UDMF format which ZDoom projects
+      sometimes use.
+
