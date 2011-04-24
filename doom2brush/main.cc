@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  const char *filename = "doom2.wad";
+  const char *filename = "in.wad";
 
   if (arg_count > 0 && ! ArgvIsOption(0))
     filename = arg_list[0];
