@@ -28,8 +28,8 @@ USAGE:
    a file called 'in.gwa'.  Don't forget this step if doing
    multiple maps!
 
-4. now drag the 'in.wad' file onto doom2brush.exe -- this
-   will convert the map and create a 'out.map' file.
+4. run doom2brush.exe by double clicking on it -- this will
+   convert the map and create a 'out.map' file.
 
 
 NOTE: the map must be in DOOM format, this program does not
