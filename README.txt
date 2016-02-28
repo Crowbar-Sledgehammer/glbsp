@@ -45,7 +45,7 @@ License
 
 Thanks to Lee Killough and André Majorel (former maintainer of BSP,
 and devil-may-care French flying ace, respectively), glBSP is under
-the GNU General Public License (GPL).  See the file 'COPYING.txt' in
+the GNU General Public License (GPL).  See the file 'LICENSE.txt' in
 the source package (or go to http://www.gnu.org) for the full text,
 but to summarise:
 
@@ -126,7 +126,7 @@ Raphael Quinet, for DEU and the original idea.
 id Software, for not only creating such an irresistable game, but
 releasing the source code for so much of their stuff.
 
-... and everyone else who deserves it ! 
+... and everyone else who deserves it !
 
 
 
