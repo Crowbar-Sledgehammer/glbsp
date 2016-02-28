@@ -66,7 +66,7 @@ $(PROGNAME): $(OBJS)
 
 bin: all
 	strip --strip-unneeded $(PROGNAME)
-	cat $(MAIN)/README.txt $(MAIN)/USAGE.txt $(MAIN)/CHANGES.txt > $(MAIN)/glbsp.txt
+	cat $(MAIN)/README.md $(MAIN)/USAGE.md $(MAIN)/CHANGES.md > $(MAIN)/glbsp.txt
 
 .PHONY: all clean localclean bin
 

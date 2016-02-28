@@ -42,7 +42,7 @@ backup: clean
 	tar czf /tmp/glbsp.tgz make* *.[ch]
 
 bin: all
-	cat $(MAIN)/README.txt $(MAIN)/USAGE.txt $(MAIN)/CHANGES.txt > $(MAIN)/glbsp.txt
+	cat $(MAIN)/README.md $(MAIN)/USAGE.md $(MAIN)/CHANGES.md > $(MAIN)/glbsp.txt
 
 install: bin
 	cp $(PROGNAME) /usr/bin/$(PROGNAME)

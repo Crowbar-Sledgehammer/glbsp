@@ -37,7 +37,7 @@ all:    $(LIB_NAME) $(CMD_NAME) $(DOC_NAME)
 clean:
 	rm -f $(LIB_NAME) $(CMD_NAME) $(GUI_NAME) $(DOC_NAME)
 	rm -f src/*.o cmdline/*.o gui/*.o
-	rm -f ./core ./ERRS ./gb_debug.txt 
+	rm -f ./core ./ERRS ./gb_debug.txt
 
 .PHONY: all clean
 
@@ -71,7 +71,7 @@ $(LIB_NAME): $(LIB_OBJS)
 CMD_FLAGS=$(BASE_FLAGS) -I$(ZLIB_DIR)
 CMD_LIBS=$(ZLIB_DIR)/libz.a -lm
 
-CMD_OBJS=cmdline/main.o cmdline/display.o  
+CMD_OBJS=cmdline/main.o cmdline/display.o
 
 cmdline/%.o: cmdline/%.c
 	$(CC) $(CMD_FLAGS) -c $^ -o $@
@@ -125,7 +125,7 @@ $(GUI_NAME): $(LIB_NAME) $(GUI_OBJS)
 
 # ----- DOCUMENTATION ---------------------------------------------
 
-DOC_FILES=README.txt USAGE.txt TRICKS.txt CHANGES.txt
+DOC_FILES=README.md USAGE.md TRICKS.md CHANGES.md
 
 $(DOC_NAME): $(DOC_FILES)
 	cat $(DOC_FILES) > glbsp_doc.tmp

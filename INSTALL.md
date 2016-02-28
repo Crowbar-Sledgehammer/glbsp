@@ -25,7 +25,7 @@ NOTE WELL: glBSP is under the GNU General Public License (GPL),
            hence you cannot use the library (libglbsp) in your
            own program unless it is also under the GPL.
 
-           The file LICENSE.txt contains a copy of the GPL
+           The file LICENSE contains a copy of the GPLv2
            license, and there is a lot of useful information
            at this web page: http://www.gnu.org/licenses/
 
